@@ -238,6 +238,7 @@
             }
         }
 
+
     </script>
 </head>
 <body>
@@ -248,44 +249,7 @@
         <th>Gateway (Route vuoto per Default):</th>
         <th class="hidden">DNS (non implementato):</th>
     </tr>
-    <tr>
-        <td>
-            <label for="macchina1">Macchina 1:</label>
-            <input type="text" id="macchina1" /><br />
-            <input type="radio" name="tipo1" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />
-            <input type="radio" name="tipo1" value="router" onclick="toggle(this)">Router</input><br />
-            <input type="radio" name="tipo1" value="ns" onclick="toggle(this)">Name Server</input><br />
-            <input type="radio" name="tipo1" value="ws" onclick="toggle(this)">Web Server</input><br />
-        </td>
-        <td class="interfaces" id="1">
-            <div id="add1" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>
-            <label>eth0:</label>
-            <input type="text" class="eth" />
-            <label>IP/Net:</label>
-            <input type="text" class="ip" /><br />
-        </td>
-        <td class="gateways" id="gw1">
-            <div id="addgw1" class="btn btn-default" onclick="addGateway(this)">Aggiungi gateway</div><br>
-            <label>Route(dove, IP/Net):</label>
-            <input type="text" class="route" /><br />
-            <label>GW(per dove):</label>
-            <input type="text" class="gw" /><br />
-            <label>Interface:</label>
-            <select class="interface">
-                <option value="0">eth0</option>
-            </select><br />
-        </td>
-        <td class="dns hidden" id="dns1">
-            <label>Zone (root &egrave; .):</label>
-            <input type="text" class="zone" /><br />
-            <label>Own IP:</label>
-            <input type="text" class="myip" /><br />
-            <label>Next Name:</label>
-            <input type="text" class="nextname" /><br />
-            <label>Next IP:</label>
-            <input type="text" class="nextip" /><br />
-        </td>
-    </tr>
+
 </table>
 <div id="add" class="btn btn-default" onclick="addMachine(this)">Aggiungi Macchina</div><br>
 <div id="gen" class="btn btn-primary" onclick="generate(this)">Genera rete</div><br>
@@ -293,5 +257,13 @@
 <h3>File generati (esclusi etc/resolv.conf e etc/bind/*):</h3>
 <hr />
 <div id="solution"></div>
+
+
+<script>
+    // startup
+    window.onload= function() {
+        addMachine(NaN);
+    }
+</script>
 </body>
 </html>
