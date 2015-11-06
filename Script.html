@@ -6,9 +6,38 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <style>
+        body {
+            background: white;
+            padding: 10px;
+        }
         .hidden {
             display: none;
+            visibility: hidden;
+            opacity: 0;
         }
+        .btn {
+            margin: 2px 0;
+            padding: 4px 3px;
+            border-radius: 0;
+        }
+        input {
+            border-radius: 0;
+        }
+        table {
+            border-collapse: separate; border-spacing: 0 2px; box-sizing: border-box;
+        }
+        tr td:first-child, tr th:first-child { border-bottom-left-radius: 1px; border-top-left-radius: 1px; }
+        tr td:last-child, tr th:last-child { border-bottom-right-radius: 1px; border-top-right-radius: 1px; }
+        tr {
+            background-color: rgba(0, 0, 0, 0.01);
+
+        }
+        td, th {
+            border: solid 1px #aaa;
+            border: solid 1px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+        }
+
     </style>
 
     <script src="js/jquery-2.1.4.min.js"></script>
@@ -73,10 +102,12 @@
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
-                    '<div id="add'+rows+'" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
+                    '<div id="add'+rows+'" class="btn btn-success" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
+                    '<div id="rem'+rows+'" class="btn btn-danger" onclick="removeInterface(this)">Rimuovi ultima</div><br>'+
                     '</td>'+
                     '<td class="gateways" id="gw'+rows+'">'+
-                    '<div id="addgw'+rows+'" class="btn btn-default" onclick="addGateway(this)">Aggiungi gateway</div><br>'+
+                    '<div id="addgw'+rows+'" class="btn btn-success" onclick="addGateway(this)">Aggiungi gateway</div><br>'+
+                    '<div id="remgw'+rows+'" class="btn btn-danger" onclick="removeGateway(this)">Rimuovi ultimo</div><br>'+
                     '<label>Route:</label>'+
                     '<input type="text" class="route" /><br />'+
                     '<label>GW:</label>'+
@@ -257,16 +288,17 @@
     </script>
 </head>
 <body>
-<table id="netkit" border="1" cellspacing="0" cellpadding="5">
+<table id="netkit" border="0" cellspacing="0" cellpadding="0">
     <tr>
         <th>Nome Macchina</th>
         <th>Interfacce di Rete</th>
         <th>Gateway (Route vuoto per Default):</th>
-        <th class="hidden">DNS (non implementato):</th>
+        <th>Funzioni aggiuntive:</th>
     </tr>
 
 </table>
-<div id="add" class="btn btn-default" onclick="addMachine(this)">Aggiungi Macchina</div><br>
+<div id="add" class="btn btn-success" onclick="addMachine(this)">Aggiungi Macchina</div><br>
+<div id="rem" class="btn btn-danger" onclick="removeMachine(this)">Rimuovi ultima Macchina</div><br>
 <div id="gen" class="btn btn-primary" onclick="generate(this)">Genera rete</div><br>
 
 <h3>File generati (esclusi etc/resolv.conf e etc/bind/*):</h3>
