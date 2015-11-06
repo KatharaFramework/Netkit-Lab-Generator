@@ -69,7 +69,7 @@
                     '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
-                    ' <input type="checkbox" name="userdir'+rows+'" value="userdir"">userdir?</input>' +
+                    ' <input type="checkbox" name="userdir'+rows+'" value="1"">userdir?</input>' +
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
@@ -165,6 +165,7 @@
                 arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
                 arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
                 arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
+                arr[name]["userdir"] = $('input[name=userdir'+(i-1)+']:checked').val();
             }
             console.log(arr);
             return arr;
@@ -229,7 +230,7 @@
                 }
                 // ws
                 else if(arr[machine]["tipo"]=='ws') {
-                    //text += "echo a2enmod userdir >> " + file;
+                    if(arr[machine]["userdir"]=='1') text += "echo a2enmod userdir >> " + file+"<br />";
                     text += "echo /etc/init.d/apache2 start >> " + file+"<br />";
                 }
                 else if(arr[machine]["tipo"]=='terminale') {
