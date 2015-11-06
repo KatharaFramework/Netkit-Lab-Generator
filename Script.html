@@ -2,7 +2,7 @@
 <!-- versione 2.0 -->
 <html>
 <head>
-    <title>Netkit Wiki</title>
+    <title>Netkit Lab Generator</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <style>
@@ -292,6 +292,8 @@
                     if(arr[machine]["userdir"]=='1') {
                         text += "mkdir -p "+machine+"/home/guest/public_html<br />";
                         text += "touch "+machine+"/home/guest/public_html/index.html<br />";
+                        text += "echo '&lt;html&gt;&lt;head&gt;&lt;title&gt;Guest Home&lt;/title&gt;&lt;/head&gt;&lt;body&gt;" +
+                                "Guest Home&lt;/body&gt;&lt;/html&gt;' >> "+machine+"/home/guest/public_html/index.html<br />";
                         text += "echo a2enmod userdir >> " + file+"<br />";
                     }
                     text += "echo /etc/init.d/apache2 start >> " + file+"<br />";
