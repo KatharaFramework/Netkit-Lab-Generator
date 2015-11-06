@@ -62,6 +62,11 @@
                     '</select><br />' );
         }
 
+        function removeGateway(obj) {
+            //TODO
+            // algoritmo: prende tutte le gateway nel contenitore, le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
+        }
+
         function addInterfaceId(id){
             var childs = $("#"+id+" input.eth").length;
             $("#"+id).append( '<label>eth'+childs+': </label>' +
@@ -69,6 +74,11 @@
                     '<label> IP/Net: </label>'+
                     '<input type="text" class="ip" /><br />');
             $("#gw"+id+" select").append( '<option value="'+childs+'">eth'+childs+'</option>');
+        }
+
+        function removeInterface(obj) {
+            //TODO
+            // algoritmo: prende tutte le interface nel contenitore, le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
         }
 
         function toggle(obj){
@@ -130,18 +140,35 @@
             addInterfaceId(rows);
         }
 
+        function removeMachine(obj){
+            //TODO
+            // algoritmo: prende tutte le macchine nella tabella (escludendo il th iniziale), le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
+        }
+
         function download(filename, text) {
             var pom = document.createElement('a');
             pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-            pom.setAttribute('download', filename);
+            pom.download = filename;
 
-            if (document.createEvent) {
+            if (!window.ActiveXObject) {
                 var event = document.createEvent('MouseEvents');
+                event.initMouseEvent(
+                        "click", true, false, window, 0, 0, 0, 0, 0
+                        , false, false, false, false, 0, null
+                );
+                pom.dispatchEvent(event);
+                /*
+                event = document.createEvent('Event');
                 event.initEvent('click', true, true);
                 pom.dispatchEvent(event);
+                */
             }
-            else {
-                pom.click();
+            // for IE
+            else if ( !! window.ActiveXObject && document.execCommand)     {
+                var _window = window.open(fileURL, '_blank');
+                _window.document.close();
+                _window.document.execCommand('SaveAs', true, fileName || fileURL)
+                _window.close();
             }
         }
 
@@ -166,7 +193,8 @@
             //                            "myip" -> ip of ns
             //                            "nextname" -> next ns/ws/host name
             //                            "nextip" -> next ip
-            //		      "tipo" ->   nometipo
+            //                "tipo" ->   nometipo
+            //                "userdir" -> "1" oppure ""
             // nome seconda macchina -> ecc...
 
             var machines = $("#netkit tr").length-1; //NB: la prima riga contiene il titolo
@@ -284,7 +312,7 @@
             var find = '<br />';
             var re = new RegExp(find, 'g'); // globally
 
-            download('script-netkit-' + event.timeStamp + '.sh', text.replace(re, "\n"));
+            download('script-netkit-' + event.timeStamp + '', text.replace(re, "\n"));
         }
 
 
