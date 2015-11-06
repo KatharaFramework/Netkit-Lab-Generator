@@ -86,12 +86,28 @@
             if(obj.value=='ns'){
                 document.getElementById("dns"+id).classList.remove("hidden");
                 $(".nameserver").append( '<option value="'+$("#macchina"+id).val()+'">'+$("#macchina"+id).val()+'</option>');
-                //TODO verifica unicità
+                //TODO verifica unicità... quale unicità?
             }
 
             if(obj.value!='ns'){
                 document.getElementById("dns"+id).classList.add("hidden");
                 //TODO rimozione da elenchi nameserver
+            }
+
+            if(obj.value=='ws'){
+                document.getElementById("ws"+id).classList.remove("hidden");
+            }
+
+            if(obj.value!='ws'){
+                document.getElementById("ws"+id).classList.add("hidden");
+            }
+
+            if(obj.value=='terminale'){
+                document.getElementById("terminale"+id).classList.remove("hidden");
+            }
+
+            if(obj.value!='terminale'){
+                document.getElementById("terminale"+id).classList.add("hidden");
             }
         }
 
@@ -102,13 +118,10 @@
                     '<label for="macchina1">Macchina '+rows+':</label>'+
                     '<input type="text" id="macchina'+rows+'" /><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input>' +
-                    ' <select class="nameserver">' +
-                    '</select>'+
                     '<br />'+
                     '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
-                    ' <input type="checkbox" name="userdir'+rows+'" value="1"">userdir?</input>' +
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
@@ -135,6 +148,14 @@
                     '<input type="text" class="nextname" /><br />'+
                     '<label>Next IP:</label>'+
                     '<input type="text" class="nextip" /><br />'+
+                    '</td>'+
+                    '<td class="ws hidden" id="ws'+rows+'">'+
+                    '<input type="checkbox" name="userdir'+rows+'" value="1">Enable userdir module?</input>' +
+                    '</td>'+
+                    '<td class="ws" id="terminale'+rows+'">'+
+                    '<label>Nameserver di riferimento:</label>'+
+                    '<select class="nameserver">' +
+                    '</select>'+
                     '</td>'+
                     '</tr>');
             addInterfaceId(rows);
@@ -237,10 +258,10 @@
 
             // conversione array in stringa html (con <br>, <hr>, <h4>, ecc) appesa a text
 
-            text += "# Accetta il download o copia il testo seguente in un .sh e lancialo!<br />"+
-                    "# Ricordati di dare prima chmod +x per renderlo eseguibile!<br /><br />"
+            text += "# Accetta il download o copia il testo seguente in un .sh e lancialo!\n"+
+                    "# Ricordati di dare prima chmod +x per renderlo eseguibile!\n\n"
 
-            text += "#! /bin/sh<br />";
+            text += "#! /bin/sh\n";
             text += "mkdir -p";
 
             for(var machine in arr){
@@ -250,13 +271,13 @@
                     text += " "+machine;
                 }
             }
-            text += "<br />";
+            text += "\n";
 
             // generazione lab.conf
-            text += "touch lab.conf<br />";
+            text += "touch lab.conf\n";
             for (var machine in arr) {
                 for (var interface in arr[machine]["interfaces"]){
-                    text += "echo "+machine + "[" + interface + "]="+arr[machine]["interfaces"][interface]["eth"] + " >> lab.conf<br />";
+                    text += "echo "+machine + "[" + interface + "]="+arr[machine]["interfaces"][interface]["eth"] + " >> lab.conf\n";
                 }
             }
 
@@ -267,54 +288,55 @@
                 for (var interface in arr[machine]["interfaces"]){
                     //ifconfig eth_ SELFADDRESS/MASK up
                     text += "echo ifconfig eth" + interface + " " +
-                            arr[machine]["interfaces"][interface]["ip"] + " up >> "+file+"<br />";
+                            arr[machine]["interfaces"][interface]["ip"] + " up >> "+file+"\n";
                 }
                 for (var gateway in arr[machine]["gateways"]){
                     //route add default gw GATEWAY dev eth_
                     if(arr[machine]["gateways"][gateway]["route"]=="") {
                         text += "echo route add default gw " +
                                 arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
-                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"<br />";
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"\n";
                     }
                     //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
                     else  {
                         text += "echo route add -net " + arr[machine]["gateways"][gateway]["route"] + " gw " +
                                 arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
-                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"<br />";
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"\n";
                     }
                 }
                 // ns
                 if(arr[machine]["tipo"]=='ns') {
-                    text += "echo /etc/init.d/bind start >> " + file+"<br />";
+                    text += "echo /etc/init.d/bind start >> " + file+"\n";
                 }
                 // ws
                 else if(arr[machine]["tipo"]=='ws') {
                     if(arr[machine]["userdir"]=='1') {
-                        text += "mkdir -p "+machine+"/home/guest/public_html<br />";
-                        text += "touch "+machine+"/home/guest/public_html/index.html<br />";
+                        text += "mkdir -p "+machine+"/home/guest/public_html\n";
+                        text += "touch "+machine+"/home/guest/public_html/index.html\n";
                         text += "echo '&lt;html&gt;&lt;head&gt;&lt;title&gt;Guest Home&lt;/title&gt;&lt;/head&gt;&lt;body&gt;" +
-                                "Guest Home&lt;/body&gt;&lt;/html&gt;' >> "+machine+"/home/guest/public_html/index.html<br />";
-                        text += "echo a2enmod userdir >> " + file+"<br />";
+                                "Guest Home&lt;/body&gt;&lt;/html&gt;' >> "+machine+"/home/guest/public_html/index.html\n";
+                        text += "echo a2enmod userdir >> " + file+"\n";
                     }
-                    text += "echo /etc/init.d/apache2 start >> " + file+"<br />";
+                    text += "echo /etc/init.d/apache2 start >> " + file+"\n";
                 }
                 else if(arr[machine]["tipo"]=='terminale') {
                     //text += "echo a2enmod userdir >> " + file;
-                    text += "mkdir -p "+machine+"/etc<br />";
-                    text += "touch "+machine+"/etc/resolv.conf<br />";
-                    text += "echo nameserver >> "+machine+"/etc/resolv.conf<br />"; //TODO ip nameserver
+                    text += "mkdir -p "+machine+"/etc\n";
+                    text += "touch "+machine+"/etc/resolv.conf\n";
+                    text += "echo nameserver >> "+machine+"/etc/resolv.conf\n"; //TODO ip nameserver
                 }
             }
 
-            text += "rm $0<br />";
+            text += "rm $0\n";
 
             // TODO scrittura file dns. NB: basta ciclare su  machine in arr (un ns a macchina)
+            var initTextArea = '<textarea rows="20" cols="70" readonly>';
+            var endTextArea = '</textarea>';
 
-            $("#solution").html(text);
-            var find = '<br />';
-            var re = new RegExp(find, 'g'); // globally
+            $("#solution").html(initTextArea + text + endTextArea);
 
-            download('script-netkit-' + event.timeStamp + '', text.replace(re, "\n"));
+            //INIBITO IL DOWNLOAD IN FASE DI TESTING
+            //download('script-netkit-' + event.timeStamp + '', text);
         }
 
 
@@ -344,6 +366,7 @@
     // startup
     window.onload= function() {
         addMachine(NaN);
+        console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
     }
 </script>
 </body>
