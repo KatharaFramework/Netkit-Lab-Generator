@@ -86,7 +86,8 @@
             if(obj.value=='ns'){
                 document.getElementById("dns"+id).classList.remove("hidden");
                 $(".nameserver").append( '<option value="'+$("#macchina"+id).val()+'">'+$("#macchina"+id).val()+'</option>');
-                //TODO verifica unicità... quale unicità?
+                //TODO verifica unicita' (attualmente lo stesso nameserver viene aggiunto piu' volte
+                //     se il radio button è selezionato e deselezionato a ripetizione)
             }
 
             if(obj.value!='ns'){
