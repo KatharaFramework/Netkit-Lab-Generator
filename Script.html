@@ -261,7 +261,11 @@
                 }
                 // ws
                 else if(arr[machine]["tipo"]=='ws') {
-                    if(arr[machine]["userdir"]=='1') text += "echo a2enmod userdir >> " + file+"<br />";
+                    if(arr[machine]["userdir"]=='1') {
+                        text += "mkdir -p "+machine+"/home/guest/public_html<br />";
+                        text += "touch "+machine+"/home/guest/public_html/index.html<br />";
+                        text += "echo a2enmod userdir >> " + file+"<br />";
+                    }
                     text += "echo /etc/init.d/apache2 start >> " + file+"<br />";
                 }
                 else if(arr[machine]["tipo"]=='terminale') {
