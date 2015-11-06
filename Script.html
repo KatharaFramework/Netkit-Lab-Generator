@@ -112,17 +112,22 @@
             }
         }
 
+        function abilitaTipo(obj){
+            var id = obj.id.substring(8);
+            $("#netkit tr:nth-child("+(id-1+2)+") td input[type=radio]").removeAttr( "disabled" );
+        }
+
         function addMachine(obj) {
             var rows = $("#netkit tr").length;
             $("#netkit").append( '<tr>'+
                     '<td>'+
                     '<label for="macchina1">Macchina '+rows+':</label>'+
-                    '<input type="text" id="macchina'+rows+'" /><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input>' +
+                    '<input type="text" id="macchina'+rows+'" onkeyup="abilitaTipo(this)"/><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked disabled>Terminale</input>' +
                     '<br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
+                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)" disabled>Router</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)" disabled>Name Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)" disabled>Web Server</input>' +
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
@@ -215,14 +220,20 @@
             //                            "myip" -> ip of ns
             //                            "nextname" -> next ns/ws/host name
             //                            "nextip" -> next ip
-            //                "tipo" ->   nometipo
-            //                "userdir" -> "1" oppure ""
+            //                "tipo" ->    nometipo
+            //                "ws" ->     "userdir" -> "1" oppure ""
             // nome seconda macchina -> ecc...
 
             var machines = $("#netkit tr").length-1; //NB: la prima riga contiene il titolo
             var arr=[];
             for(var i=2; i<=(machines+1); ++i){ //NB: la prima riga contiene il titolo
-                var name = $("#netkit tr:nth-child("+i+") td input").val();
+                var name = $("#netkit tr:nth-child("+i+") td:first-child input").val();
+
+                //Controllo su nome macchina non vuoto (necessario per motivi di testing)
+                if(name==""){
+                    alert("Il campo Nome non puo essere vuoto");
+                    exit;
+                }
                 arr[name] = [];
                 arr[name]["interfaces"] = [];
                 arr[name]["gateways"] = [];
@@ -246,7 +257,7 @@
                 arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
                 arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
                 arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
-                arr[name]["userdir"] = $('input[name=userdir'+(i-1)+']:checked').val();
+                arr[name]["ws"]["userdir"] = $('input[name=userdir'+(i-1)+']:checked').val();
             }
             console.log(arr);
             return arr;
@@ -311,7 +322,7 @@
                 }
                 // ws
                 else if(arr[machine]["tipo"]=='ws') {
-                    if(arr[machine]["userdir"]=='1') {
+                    if(arr[machine]["ws"]["userdir"]=='1') {
                         text += "mkdir -p "+machine+"/home/guest/public_html\n";
                         text += "touch "+machine+"/home/guest/public_html/index.html\n";
                         text += "echo '&lt;html&gt;&lt;head&gt;&lt;title&gt;Guest Home&lt;/title&gt;&lt;/head&gt;&lt;body&gt;" +
@@ -331,7 +342,7 @@
             text += "rm $0\n";
 
             // TODO scrittura file dns. NB: basta ciclare su  machine in arr (un ns a macchina)
-            var initTextArea = '<textarea rows="20" cols="70" readonly>';
+            var initTextArea = '<textarea style="width:100%" rows="30" readonly>';
             var endTextArea = '</textarea>';
 
             $("#solution").html(initTextArea + text + endTextArea);
@@ -358,7 +369,7 @@
 <div id="rem" class="btn btn-danger" onclick="removeMachine(this)">Rimuovi ultima Macchina</div><br>
 <div id="gen" class="btn btn-primary" onclick="generate(this)">Genera rete</div><br>
 
-<h3>File generati (esclusi etc/resolv.conf e etc/bind/*):</h3>
+<h3>File generati:</h3>
 <hr />
 <div id="solution"></div>
 
