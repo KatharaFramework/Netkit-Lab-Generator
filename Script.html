@@ -42,16 +42,35 @@
             $("#gw"+id+" select").append( '<option value="'+childs+'">eth'+childs+'</option>');
         }
 
+        function toggle(obj){
+            var id = obj.name.substring(4);
+            if(obj.value=='ns'){
+                document.getElementById("dns"+id).classList.remove("hidden");
+                $(".nameserver").append( '<option value="'+$("#macchina"+id).val()+'">'+$("#macchina"+id).val()+'</option>');
+                //TODO verifica unicità
+            }
+
+            if(obj.value!='ns'){
+                document.getElementById("dns"+id).classList.add("hidden");
+                //TODO rimozione da elenchi nameserver
+            }
+        }
+
         function addMachine(obj) {
             var rows = $("#netkit tr").length;
             $("#netkit").append( '<tr>'+
                     '<td>'+
                     '<label for="macchina1">Macchina '+rows+':</label>'+
                     '<input type="text" id="macchina'+rows+'" /><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input>' +
+                    ' <select class="nameserver">' +
+                    '</select>'+
+                    '<br />'+
                     '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
                     '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
+                    ' <input type="checkbox" name="userdir'+rows+'" value="userdir"">userdir?</input>' +
+                    '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
                     '<div id="add'+rows+'" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
@@ -171,10 +190,10 @@
                     text += " "+machine;
                 }
             }
-
+            text += "<br />";
 
             // generazione lab.conf
-            text += "<br />touch lab.conf<br />";
+            text += "touch lab.conf<br />";
             for (var machine in arr) {
                 for (var interface in arr[machine]["interfaces"]){
                     text += "echo "+machine + "[" + interface + "]="+arr[machine]["interfaces"][interface]["eth"] + " >> lab.conf<br />";
@@ -183,35 +202,41 @@
 
             // generazione macchina.startup
             for (var machine in arr) {
-                file = machine+".startup<br />";
-                text += "touch " + file;
+                file = machine+".startup";
+                text += "touch " + file +"<br />";
                 for (var interface in arr[machine]["interfaces"]){
                     //ifconfig eth_ SELFADDRESS/MASK up
                     text += "echo ifconfig eth" + interface + " " +
-                            arr[machine]["interfaces"][interface]["ip"] + " up >> "+file;
+                            arr[machine]["interfaces"][interface]["ip"] + " up >> "+file+"<br />";
                 }
                 for (var gateway in arr[machine]["gateways"]){
                     //route add default gw GATEWAY dev eth_
                     if(arr[machine]["gateways"][gateway]["route"]=="") {
                         text += "echo route add default gw " +
                                 arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
-                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file;
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"<br />";
                     }
                     //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
                     else  {
                         text += "echo route add -net " + arr[machine]["gateways"][gateway]["route"] + " gw " +
                                 arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
-                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file;
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file+"<br />";
                     }
                 }
                 // ns
                 if(arr[machine]["tipo"]=='ns') {
-                    text += "echo /etc/init.d/bind start >> " + file;
+                    text += "echo /etc/init.d/bind start >> " + file+"<br />";
                 }
                 // ws
-                if(arr[machine]["tipo"]=='ws') {
+                else if(arr[machine]["tipo"]=='ws') {
                     //text += "echo a2enmod userdir >> " + file;
-                    text += "echo /etc/init.d/apache2 start >> " + file;
+                    text += "echo /etc/init.d/apache2 start >> " + file+"<br />";
+                }
+                else if(arr[machine]["tipo"]=='terminale') {
+                    //text += "echo a2enmod userdir >> " + file;
+                    text += "mkdir -p "+machine+"/etc<br />";
+                    text += "touch "+machine+"/etc/resolv.conf<br />";
+                    text += "echo nameserver >> "+machine+"/etc/resolv.conf<br />"; //TODO ip nameserver
                 }
             }
 
@@ -226,17 +251,6 @@
             download('script-netkit-' + event.timeStamp + '.sh', text.replace(re, "\n"));
         }
 
-        function toggle(obj){
-            var id = obj.name.substring(4);
-            console.log(id);
-            if(obj.value=='ns'){
-                document.getElementById("dns"+id).classList.remove("hidden");
-            }
-
-            if(obj.value!='ns'){
-                document.getElementById("dns"+id).classList.add("hidden");
-            }
-        }
 
 
     </script>
