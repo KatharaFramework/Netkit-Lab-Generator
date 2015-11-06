@@ -3,12 +3,12 @@
 <html>
 <head>
     <title>Netkit Wiki</title>
-<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <style>
-      .hidden {
+        .hidden {
             display: none;
-            }
+        }
     </style>
 
     <script src="js/jquery-2.1.4.min.js"></script>
@@ -48,10 +48,10 @@
                     '<td>'+
                     '<label for="macchina1">Macchina '+rows+':</label>'+
                     '<input type="text" id="macchina'+rows+'" /><br />'+
-	    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
-	    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
-	    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
-	    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input><br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
                     '<div id="add'+rows+'" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
@@ -79,21 +79,21 @@
                     '</tr>');
             addInterfaceId(rows);
         }
-      
-      function download(filename, text) {
-          var pom = document.createElement('a');
-          pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-          pom.setAttribute('download', filename);
 
-          if (document.createEvent) {
-              var event = document.createEvent('MouseEvents');
-              event.initEvent('click', true, true);
-              pom.dispatchEvent(event);
-          }
-          else {
-              pom.click();
-          }
-      }
+        function download(filename, text) {
+            var pom = document.createElement('a');
+            pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            pom.setAttribute('download', filename);
+
+            if (document.createEvent) {
+                var event = document.createEvent('MouseEvents');
+                event.initEvent('click', true, true);
+                pom.dispatchEvent(event);
+            }
+            else {
+                pom.click();
+            }
+        }
 
 
         function generateArr(obj) {
@@ -116,7 +116,7 @@
             //                            "myip" -> ip of ns
             //                            "nextname" -> next ns/ws/host name
             //                            "nextip" -> next ip
-	    //		      "tipo" ->   nometipo
+            //		      "tipo" ->   nometipo
             // nome seconda macchina -> ecc...
 
             var machines = $("#netkit tr").length-1; //NB: la prima riga contiene il titolo
@@ -145,7 +145,7 @@
                 arr[name]["dns"]["myip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.myip").val();
                 arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
                 arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
-		arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
+                arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
             }
             console.log(arr);
             return arr;
@@ -164,14 +164,14 @@
             text += "#! /bin/sh<br />";
             text += "mkdir -p";
 
-            for(var machine in arr){ 
+            for(var machine in arr){
                 if(machine.substring(0, 2)=='ns') {
                     text += " "+machine+"/etc/bind";
                 } else {
                     text += " "+machine;
                 }
             }
-            
+
 
             // generazione lab.conf
             text += "<br />touch lab.conf<br />";
@@ -220,23 +220,23 @@
             // TODO scrittura file dns. NB: basta ciclare su  machine in arr (un ns a macchina)
 
             $("#solution").html(text);
-          var find = '<br />';
-                    var re = new RegExp(find, 'g'); // globally
-          
-          download('script-netkit-' + event.timeStamp + '.sh', text.replace(re, "\n"));
+            var find = '<br />';
+            var re = new RegExp(find, 'g'); // globally
+
+            download('script-netkit-' + event.timeStamp + '.sh', text.replace(re, "\n"));
         }
 
-	function toggle(obj){
-		var id = obj.name.substring(4);
-		console.log(id);
-		if(obj.value=='ns'){
-			document.getElementById("dns"+id).classList.remove("hidden");
-		}
+        function toggle(obj){
+            var id = obj.name.substring(4);
+            console.log(id);
+            if(obj.value=='ns'){
+                document.getElementById("dns"+id).classList.remove("hidden");
+            }
 
-		if(obj.value!='ns'){
-			document.getElementById("dns"+id).classList.add("hidden");
-		}
-	}
+            if(obj.value!='ns'){
+                document.getElementById("dns"+id).classList.add("hidden");
+            }
+        }
 
     </script>
 </head>
@@ -252,10 +252,10 @@
         <td>
             <label for="macchina1">Macchina 1:</label>
             <input type="text" id="macchina1" /><br />
-	    <input type="radio" name="tipo1" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />
-	    <input type="radio" name="tipo1" value="router" onclick="toggle(this)">Router</input><br />
-	    <input type="radio" name="tipo1" value="ns" onclick="toggle(this)">Name Server</input><br />
-	    <input type="radio" name="tipo1" value="ws" onclick="toggle(this)">Web Server</input><br />
+            <input type="radio" name="tipo1" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />
+            <input type="radio" name="tipo1" value="router" onclick="toggle(this)">Router</input><br />
+            <input type="radio" name="tipo1" value="ns" onclick="toggle(this)">Name Server</input><br />
+            <input type="radio" name="tipo1" value="ws" onclick="toggle(this)">Web Server</input><br />
         </td>
         <td class="interfaces" id="1">
             <div id="add1" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>
