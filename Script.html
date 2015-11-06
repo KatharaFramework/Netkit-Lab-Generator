@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!-- versione 2.0 -->
+<html>
+<head>
+    <title>Netkit Wiki</title>
+<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <style>
+      .hidden {
+            display: none;
+            }
+    </style>
+
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <script>window.jQuery || document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"><\/script>');</script>
+    <script>
+
+        function addInterface(obj) {
+            var id = obj.id.substring(3);
+            addInterfaceId(id);
+        }
+
+        function addGateway(obj) {
+            var id = obj.id.substring(3);
+            var childs = $("#"+id+" input.gw").length;
+            $("#"+id).append('<label>Route:</label>'+
+                    '<input type="text" class="route"><br />'+
+                    '<label>GW:</label>'+
+                    '<input type="text" class="gw"><br />'+
+                    '<label>Interface:</label>'+
+                    '<select class="interface">' +
+                    $("#"+id+" select").html() +
+                    '</select><br />' );
+        }
+
+        function addInterfaceId(id){
+            var childs = $("#"+id+" input.eth").length;
+            $("#"+id).append( '<label>eth'+childs+': </label>' +
+                    '<input type="text" class="eth" />'+
+                    '<label> IP/Net: </label>'+
+                    '<input type="text" class="ip" /><br />');
+            $("#gw"+id+" select").append( '<option value="'+childs+'">eth'+childs+'</option>');
+        }
+
+        function addMachine(obj) {
+            var rows = $("#netkit tr").length;
+            $("#netkit").append( '<tr>'+
+                    '<td>'+
+                    '<label for="macchina1">Macchina '+rows+':</label>'+
+                    '<input type="text" id="macchina'+rows+'" /><br />'+
+	    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
+	    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
+	    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
+	    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input><br />'+
+                    '</td>'+
+                    '<td class="interfaces" id="'+rows+'">'+
+                    '<div id="add'+rows+'" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
+                    '</td>'+
+                    '<td class="gateways" id="gw'+rows+'">'+
+                    '<div id="addgw'+rows+'" class="btn btn-default" onclick="addGateway(this)">Aggiungi gateway</div><br>'+
+                    '<label>Route:</label>'+
+                    '<input type="text" class="route" /><br />'+
+                    '<label>GW:</label>'+
+                    '<input type="text" class="gw" /><br />'+
+                    '<label>Interface:</label>'+
+                    '<select class="interface">'+
+                    '</select><br />'+
+                    '</td>'+
+                    '<td class="dns hidden" id="dns'+rows+'">'+
+                    '<label>Zone (root &egrave; .):</label>'+
+                    '<input type="text" class="zone" /><br />'+
+                    '<label>Own IP:</label>'+
+                    '<input type="text" class="myip" /><br />'+
+                    '<label>Next Name:</label>'+
+                    '<input type="text" class="nextname" /><br />'+
+                    '<label>Next IP:</label>'+
+                    '<input type="text" class="nextip" /><br />'+
+                    '</td>'+
+                    '</tr>');
+            addInterfaceId(rows);
+        }
+      
+      function download(filename, text) {
+          var pom = document.createElement('a');
+          pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+          pom.setAttribute('download', filename);
+
+          if (document.createEvent) {
+              var event = document.createEvent('MouseEvents');
+              event.initEvent('click', true, true);
+              pom.dispatchEvent(event);
+          }
+          else {
+              pom.click();
+          }
+      }
+
+
+        function generateArr(obj) {
+
+            // struttura array:
+            // nome macchina ->
+            //                "interfaces" ->
+            //                            numero interfaccia (senza eth) ->
+            //                                              "eth" -> dominio di collisione
+            //                                              "ip" -> ip/mask
+            //                            altro numero interfaccia -> ecc...
+            //                "gateways" ->
+            //                            numero gateway ->
+            //                                              "route" -> ip/mask
+            //                                              "gw" -> ip gateway
+            //                                              "interface" -> numero interfaccia (senza eth)
+            //                            altro numero gateway -> ecc...
+            //                "dns" ->
+            //                            "zone" -> zone name
+            //                            "myip" -> ip of ns
+            //                            "nextname" -> next ns/ws/host name
+            //                            "nextip" -> next ip
+	    //		      "tipo" ->   nometipo
+            // nome seconda macchina -> ecc...
+
+            var machines = $("#netkit tr").length-1; //NB: la prima riga contiene il titolo
+            var arr=[];
+            for(var i=2; i<=(machines+1); ++i){ //NB: la prima riga contiene il titolo
+                var name = $("#netkit tr:nth-child("+i+") td input").val();
+                arr[name] = [];
+                arr[name]["interfaces"] = [];
+                arr[name]["gateways"] = [];
+                arr[name]["dns"] = [];
+                var interfaces = $("#netkit tr:nth-child("+i+") td.interfaces input.eth").length;
+                for(var j=0; j<interfaces; ++j){
+                    arr[name]["interfaces"][j] = [];
+                    arr[name]["interfaces"][j]["eth"] = $("#netkit tr:nth-child("+i+") td.interfaces#"+(i-1)+" input.eth").eq(j).val();
+                    arr[name]["interfaces"][j]["ip"] = $("#netkit tr:nth-child("+i+") td.interfaces#"+(i-1)+" input.ip").eq(j).val();
+                }
+                var gateways = $("#netkit tr:nth-child("+i+") td.gateways input.route").length;
+                for(var j=0; j<gateways; ++j){
+                    arr[name]["gateways"][j] = [];
+                    arr[name]["gateways"][j]["route"] = $("#netkit tr:nth-child("+i+") td.gateways#gw"+(i-1)+" input.route").eq(j).val();
+                    arr[name]["gateways"][j]["gw"] = $("#netkit tr:nth-child("+i+") td.gateways#gw"+(i-1)+" input.gw").eq(j).val();
+                    arr[name]["gateways"][j]["interface"] = $("#netkit tr:nth-child("+i+") td.gateways#gw"+(i-1)+" select.interface").eq(j).val();
+                }
+                arr[name]["dns"] = [];
+                arr[name]["dns"]["zone"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.zone").val();
+                arr[name]["dns"]["myip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.myip").val();
+                arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
+                arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
+		arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
+            }
+            console.log(arr);
+            return arr;
+        }
+
+        function generate(obj) {
+            var arr = generateArr(obj);
+            //console.log(arr);
+            var text="";
+
+            // conversione array in stringa html (con <br>, <hr>, <h4>, ecc) appesa a text
+
+            text += "# Accetta il download o copia il testo seguente in un .sh e lancialo!<br />"+
+                    "# Ricordati di dare prima chmod +x per renderlo eseguibile!<br /><br />"
+
+            text += "#! /bin/sh<br />";
+            text += "mkdir -p";
+
+            for(var machine in arr){ 
+                if(machine.substring(0, 2)=='ns') {
+                    text += " "+machine+"/etc/bind";
+                } else {
+                    text += " "+machine;
+                }
+            }
+            
+
+            // generazione lab.conf
+            text += "<br />touch lab.conf<br />";
+            for (var machine in arr) {
+                for (var interface in arr[machine]["interfaces"]){
+                    text += "echo "+machine + "[" + interface + "]="+arr[machine]["interfaces"][interface]["eth"] + " >> lab.conf<br />";
+                }
+            }
+
+            // generazione macchina.startup
+            for (var machine in arr) {
+                file = machine+".startup<br />";
+                text += "touch " + file;
+                for (var interface in arr[machine]["interfaces"]){
+                    //ifconfig eth_ SELFADDRESS/MASK up
+                    text += "echo ifconfig eth" + interface + " " +
+                            arr[machine]["interfaces"][interface]["ip"] + " up >> "+file;
+                }
+                for (var gateway in arr[machine]["gateways"]){
+                    //route add default gw GATEWAY dev eth_
+                    if(arr[machine]["gateways"][gateway]["route"]=="") {
+                        text += "echo route add default gw " +
+                                arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file;
+                    }
+                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                    else  {
+                        text += "echo route add -net " + arr[machine]["gateways"][gateway]["route"] + " gw " +
+                                arr[machine]["gateways"][gateway]["gw"] + " dev eth"+
+                                arr[machine]["gateways"][gateway]["interface"]+" >> " + file;
+                    }
+                }
+                // ns
+                if(arr[machine]["tipo"]=='ns') {
+                    text += "echo /etc/init.d/bind start >> " + file;
+                }
+                // ws
+                if(arr[machine]["tipo"]=='ws') {
+                    //text += "echo a2enmod userdir >> " + file;
+                    text += "echo /etc/init.d/apache2 start >> " + file;
+                }
+            }
+
+            text += "rm $0<br />";
+
+            // TODO scrittura file dns. NB: basta ciclare su  machine in arr (un ns a macchina)
+
+            $("#solution").html(text);
+          var find = '<br />';
+                    var re = new RegExp(find, 'g'); // globally
+          
+          download('script-netkit-' + event.timeStamp + '.sh', text.replace(re, "\n"));
+        }
+
+	function toggle(obj){
+		var id = obj.name.substring(4);
+		console.log(id);
+		if(obj.value=='ns'){
+			document.getElementById("dns"+id).classList.remove("hidden");
+		}
+
+		if(obj.value!='ns'){
+			document.getElementById("dns"+id).classList.add("hidden");
+		}
+	}
+
+    </script>
+</head>
+<body>
+<table id="netkit" border="1" cellspacing="0" cellpadding="5">
+    <tr>
+        <th>Nome Macchina</th>
+        <th>Interfacce di Rete</th>
+        <th>Gateway (Route vuoto per Default):</th>
+        <th class="hidden">DNS (non implementato):</th>
+    </tr>
+    <tr>
+        <td>
+            <label for="macchina1">Macchina 1:</label>
+            <input type="text" id="macchina1" /><br />
+	    <input type="radio" name="tipo1" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />
+	    <input type="radio" name="tipo1" value="router" onclick="toggle(this)">Router</input><br />
+	    <input type="radio" name="tipo1" value="ns" onclick="toggle(this)">Name Server</input><br />
+	    <input type="radio" name="tipo1" value="ws" onclick="toggle(this)">Web Server</input><br />
+        </td>
+        <td class="interfaces" id="1">
+            <div id="add1" class="btn btn-default" onclick="addInterface(this)">Aggiungi interfaccia</div><br>
+            <label>eth0:</label>
+            <input type="text" class="eth" />
+            <label>IP/Net:</label>
+            <input type="text" class="ip" /><br />
+        </td>
+        <td class="gateways" id="gw1">
+            <div id="addgw1" class="btn btn-default" onclick="addGateway(this)">Aggiungi gateway</div><br>
+            <label>Route(dove, IP/Net):</label>
+            <input type="text" class="route" /><br />
+            <label>GW(per dove):</label>
+            <input type="text" class="gw" /><br />
+            <label>Interface:</label>
+            <select class="interface">
+                <option value="0">eth0</option>
+            </select><br />
+        </td>
+        <td class="dns hidden" id="dns1">
+            <label>Zone (root &egrave; .):</label>
+            <input type="text" class="zone" /><br />
+            <label>Own IP:</label>
+            <input type="text" class="myip" /><br />
+            <label>Next Name:</label>
+            <input type="text" class="nextname" /><br />
+            <label>Next IP:</label>
+            <input type="text" class="nextip" /><br />
+        </td>
+    </tr>
+</table>
+<div id="add" class="btn btn-default" onclick="addMachine(this)">Aggiungi Macchina</div><br>
+<div id="gen" class="btn btn-primary" onclick="generate(this)">Genera rete</div><br>
+
+<h3>File generati (esclusi etc/resolv.conf e etc/bind/*):</h3>
+<hr />
+<div id="solution"></div>
+</body>
+</html>
