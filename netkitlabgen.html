@@ -3,8 +3,16 @@
 <html>
 <head>
     <title>Netkit Lab Generator</title>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <script>window.jQuery || document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"><\/script>');</script>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script>
+        if (!$("link[href='/css/bootstrap.min.css']").length)
+            $("head").append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous" />');
+    </script>
+
     <style>
         body {
             background: white;
@@ -37,12 +45,16 @@
             border: solid 1px rgba(0, 0, 0, 0.2);
             padding: 10px;
         }
+        strong {
+            font-size: 120%;
+            padding: 0 5px;
+        }
 
     </style>
 
-    <script src="js/jquery-2.1.4.min.js"></script>
-    <script>window.jQuery || document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"><\/script>');</script>
     <script>
+
+        var nameservers = [];
 
         function addInterface(obj) {
             var id = obj.id.substring(3);
@@ -63,8 +75,19 @@
         }
 
         function removeGateway(obj) {
-            //TODO
-            // algoritmo: prende tutte le gateway nel contenitore, le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
+            var id = obj.id.substring(5);
+            var len = $("#netkit tr:nth-child("+(id-1+2)+") td input.route").length;
+            if(len > 1) {
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.route").eq(len-1).prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.route").eq(len-1).remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.gw").eq(len-1).prev().prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.gw").eq(len-1).prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.gw").eq(len-1).remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td select.interface").eq(len-1).prev().prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td select.interface").eq(len-1).prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td select.interface").eq(len-1).next().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td select.interface").eq(len-1).remove();
+            }
         }
 
         function addInterfaceId(id){
@@ -77,23 +100,45 @@
         }
 
         function removeInterface(obj) {
-            //TODO
-            // algoritmo: prende tutte le interface nel contenitore, le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
+            var id = obj.id.substring(3);
+            var len = $("#netkit tr:nth-child("+(id-1+2)+") td input.eth").length;
+            if(len > 1) {
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.eth").eq(len-1).prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.eth").eq(len-1).remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.ip").eq(len-1).prev().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.ip").eq(len-1).next().remove();
+                $("#netkit tr:nth-child("+(id-1+2)+") td input.ip").eq(len-1).remove();
+                $("#gw"+id+" select option:last-child").remove();
+            }
+        }
+
+        function updateNs() {
+            $(".nameserver").html("");
+            for(var key in nameservers) {
+                if(nameservers[key]!="")
+                    $(".nameserver").append( '<option value="'+key+'">'+nameservers[key]+'</option>');
+            }
         }
 
         function toggle(obj){
             var id = obj.name.substring(4);
+
             if(obj.value=='ns'){
                 document.getElementById("dns"+id).classList.remove("hidden");
-                $(".nameserver").append( '<option value="'+$("#macchina"+id).val()+'">'+$("#macchina"+id).val()+'</option>');
-                //TODO verifica unicita' (attualmente lo stesso nameserver viene aggiunto piu' volte
-                //     se il radio button è selezionato e deselezionato a ripetizione)
+
+                //aggiunta nameserver all'array globale
+                nameservers[id]=$("#macchina"+id).val();
             }
 
             if(obj.value!='ns'){
                 document.getElementById("dns"+id).classList.add("hidden");
-                //TODO rimozione da elenchi nameserver
+
+                //rimozione nameserver all'array globale
+                nameservers[id]="";
             }
+
+            // aggiornamento dropdown nameserver
+            updateNs();
 
             if(obj.value=='ws'){
                 document.getElementById("ws"+id).classList.remove("hidden");
@@ -112,31 +157,44 @@
             }
         }
 
+        /*
         function abilitaTipo(obj){
             var id = obj.id.substring(8);
             $("#netkit tr:nth-child("+(id-1+2)+") td input[type=radio]").removeAttr( "disabled" );
+        }
+        */
+
+        function nameWritten(obj){
+            //abilitaTipo(obj);
+
+            var id = obj.id.replace("macchina", "");
+            var tipo = $("#netkit tr:nth-child("+ (id-1+2) +") td input[type=radio]:checked").val();
+            if( tipo=="ns" )
+                nameservers[id]=obj.value;
+            else nameservers[id]="";
+
+            updateNs();
         }
 
         function addMachine(obj) {
             var rows = $("#netkit tr").length;
             $("#netkit").append( '<tr>'+
                     '<td>'+
-                    '<label for="macchina1">Macchina '+rows+':</label>'+
-                    '<input type="text" id="macchina'+rows+'" onkeyup="abilitaTipo(this)"/><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked disabled>Terminale</input>' +
-                    '<br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)" disabled>Router</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)" disabled>Name Server</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)" disabled>Web Server</input>' +
+                    '<label for="macchina'+rows+'">Macchina '+rows+':</label>'+
+                    '<input type="text" id="macchina'+rows+'" onkeyup="nameWritten(this)" /><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
                     '<div id="add'+rows+'" class="btn btn-success" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
-                    '<div id="rem'+rows+'" class="btn btn-danger" onclick="removeInterface(this)">Rimuovi ultima</div><br>'+
+                    '<div id="rem'+rows+'" class="btn btn-danger" onclick="removeInterface(this)">Rimuovi ultima interfaccia</div><br>'+
                     '</td>'+
                     '<td class="gateways" id="gw'+rows+'">'+
                     '<div id="addgw'+rows+'" class="btn btn-success" onclick="addGateway(this)">Aggiungi gateway</div><br>'+
-                    '<div id="remgw'+rows+'" class="btn btn-danger" onclick="removeGateway(this)">Rimuovi ultimo</div><br>'+
+                    '<div id="remgw'+rows+'" class="btn btn-danger" onclick="removeGateway(this)">Rimuovi ultimo gw</div><br>'+
                     '<label>Route:</label>'+
                     '<input type="text" class="route" /><br />'+
                     '<label>GW:</label>'+
@@ -158,23 +216,31 @@
                     '<td class="ws hidden" id="ws'+rows+'">'+
                     '<input type="checkbox" name="userdir'+rows+'" value="1">Enable userdir module?</input>' +
                     '</td>'+
-                    '<td class="ws" id="terminale'+rows+'">'+
+                    '<td class="terminale" id="terminale'+rows+'">'+
                     '<label>Nameserver di riferimento:</label>'+
                     '<select class="nameserver">' +
                     '</select>'+
                     '</td>'+
                     '</tr>');
             addInterfaceId(rows);
+
+            updateNs();
         }
 
         function removeMachine(obj){
-            //TODO
-            // algoritmo: prende tutte le macchine nella tabella (escludendo il th iniziale), le carica in un array, rimuove l'ultima, le riscrive nel contenitore.
+            if($("#netkit tr").length > 2) {
+                $("#netkit tr:last-child").remove();
+
+                nameservers[$("#netkit tr").length]="";
+                //nb: la length e' sempre piu' lunga di 1, quindi se ho rimosso la macchina 3 ho comunque lunghezza 3
+                updateNs();
+            }
         }
 
         function download(filename, text) {
             var pom = document.createElement('a');
-            pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            var fileurl= 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+            pom.setAttribute('href', fileurl);
             pom.download = filename;
 
             if (!window.ActiveXObject) {
@@ -192,9 +258,9 @@
             }
             // for IE
             else if ( !! window.ActiveXObject && document.execCommand)     {
-                var _window = window.open(fileURL, '_blank');
+                var _window = window.open(fileurl, '_blank');
                 _window.document.close();
-                _window.document.execCommand('SaveAs', true, fileName || fileURL)
+                _window.document.execCommand('SaveAs', true, filename || fileurl)
                 _window.close();
             }
         }
@@ -231,7 +297,7 @@
 
                 //Controllo su nome macchina non vuoto (necessario per motivi di testing)
                 if(name==""){
-                    alert("Il campo Nome non puo essere vuoto");
+                    alert("Il campo Nome Macchina non può essere vuoto");
                     exit;
                 }
                 arr[name] = [];
@@ -257,6 +323,7 @@
                 arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
                 arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
                 arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
+                arr[name]["ws"]=[];
                 arr[name]["ws"]["userdir"] = $('input[name=userdir'+(i-1)+']:checked').val();
             }
             console.log(arr);
@@ -358,16 +425,16 @@
 <body>
 <table id="netkit" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <th>Nome Macchina</th>
+        <th>Info Macchina</th>
         <th>Interfacce di Rete</th>
         <th>Gateway (Route vuoto per Default):</th>
         <th>Funzioni aggiuntive:</th>
     </tr>
 
 </table>
-<div id="add" class="btn btn-success" onclick="addMachine(this)">Aggiungi Macchina</div><br>
-<div id="rem" class="btn btn-danger" onclick="removeMachine(this)">Rimuovi ultima Macchina</div><br>
-<div id="gen" class="btn btn-primary" onclick="generate(this)">Genera rete</div><br>
+<div id="add" class="btn btn-success" onclick="addMachine(this)">Aggiungi Macchina</div>
+<div id="rem" class="btn btn-danger" onclick="removeMachine(this)">Rimuovi ultima Macchina</div><br />
+<div id="gen" class="btn btn-primary" onclick="generate(this)"><strong>Genera rete</strong></div><br />
 
 <h3>File generati:</h3>
 <hr />
@@ -379,6 +446,7 @@
     window.onload= function() {
         addMachine(NaN);
         console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+        console.log(" =======================================\n Good job for finding this page. Your     \n life with Netkit will be a lot easier!      \n ======================================= ");
     }
 </script>
 </body>
