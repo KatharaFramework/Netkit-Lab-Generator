@@ -182,19 +182,19 @@
                     '<td>'+
                     '<label for="macchina'+rows+'">Macchina '+rows+':</label>'+
                     '<input type="text" id="macchina'+rows+'" onkeyup="nameWritten(this)" /><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked>Terminale</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)">Router</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)">Name Server</input><br />'+
-                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)">Web Server</input>' +
+                    '<input type="radio" name="tipo'+rows+'" value="terminale" onclick="toggle(this)" checked> Terminale</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="router" onclick="toggle(this)"> Router</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ns" onclick="toggle(this)"> Name Server</input><br />'+
+                    '<input type="radio" name="tipo'+rows+'" value="ws" onclick="toggle(this)"> Web Server</input>' +
                     '<br />'+
                     '</td>'+
                     '<td class="interfaces" id="'+rows+'">'+
-                    '<div id="add'+rows+'" class="btn btn-success" onclick="addInterface(this)">Aggiungi interfaccia</div><br>'+
-                    '<div id="rem'+rows+'" class="btn btn-danger" onclick="removeInterface(this)">Rimuovi ultima interfaccia</div><br>'+
+                    '<div id="add'+rows+'" class="btn btn-success" onclick="addInterface(this)">Aggiungi interfaccia</div> '+
+                    '<div id="rem'+rows+'" class="btn btn-danger" onclick="removeInterface(this)">Rimuovi ultima interfaccia</div><br />'+
                     '</td>'+
                     '<td class="gateways" id="gw'+rows+'">'+
-                    '<div id="addgw'+rows+'" class="btn btn-success" onclick="addGateway(this)">Aggiungi gateway</div><br>'+
-                    '<div id="remgw'+rows+'" class="btn btn-danger" onclick="removeGateway(this)">Rimuovi ultimo gw</div><br>'+
+                    '<div id="addgw'+rows+'" class="btn btn-success" onclick="addGateway(this)">Aggiungi gateway</div> '+
+                    '<div id="remgw'+rows+'" class="btn btn-danger" onclick="removeGateway(this)">Rimuovi ultimo gw</div><br />'+
                     '<label>Route:</label>'+
                     '<input type="text" class="route" /><br />'+
                     '<label>GW:</label>'+
