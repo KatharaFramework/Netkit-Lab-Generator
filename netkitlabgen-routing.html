@@ -48,7 +48,7 @@
 </script>
 <body>
 
-<div ng-app="myApp" ng-controller="myCtrl">
+<div ng-app="napp" ng-controller="nc">
 
     <table id="netkit" border="0" cellspacing="0" cellpadding="0">
         <tr>
@@ -125,13 +125,13 @@
         };
     }
 
-    var app = angular.module('myApp', []);
+    var app = angular.module('napp', []);
     app.config(['$compileProvider',
         function ($compileProvider) {
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/);
         }
     ]);
-    app.controller('myCtrl', function($scope) {
+    app.controller('nc', function($scope) {
 
         var backbone = {
             "name":"",
