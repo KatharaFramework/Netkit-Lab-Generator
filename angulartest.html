@@ -126,47 +126,57 @@
 <!-- TODO binding di tutti gli input, generazione script-->
 
 <script>
+    if (typeof JSON.clone !== "function")
+    {
+        JSON.clone = function(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        };
+    }
+
     var app = angular.module('myApp', []);
     app.controller('myCtrl', function($scope) {
+
         var backbone = {
             "row":1,
             "type":"terminale",
             "interfaces":{"counter":1, "if":[{"eth":{"number":0}}]},
             "gateways":{"counter":1, "gw":[{}]}
         };
-        $scope.netkit = [backbone];
+
+        $scope.netkit = [JSON.clone(backbone)];
 
         $scope.counter = 1;
         $scope.addMachine = function() {
             $scope.counter++;
-            var push = {
-                "row":1,
-                "type":"terminale",
-                "interfaces":{"counter":1, "if":[{"eth":{"number":0}}]},
-                "gateways":{"counter":1, "gw":[{}]}
-            }; //TODO: meglio il refactor
-            push.row=$scope.counter;
-            $scope.netkit.push(push);
+            var p = JSON.clone(backbone);
+            p.row=$scope.counter;
+            $scope.netkit.push(p);
         };
         $scope.removeMachine = function() {
-            $scope.netkit.pop(); //TODO if counter<=1
-            $scope.counter--;
+            if($scope.counter>1) {
+                $scope.netkit.pop();
+                $scope.counter--;
+            }
         };
         $scope.addInterface = function(machine) {
             machine.interfaces.if.push({"eth":{"number":machine.interfaces.counter}});
             machine.interfaces.counter++;
         };
         $scope.removeInterface = function(machine) {
-            machine.interfaces.if.pop(); //TODO if counter<=1
-            machine.interfaces.counter--;
+            if(machine.interfaces.counter>1) {
+                machine.interfaces.if.pop();
+                machine.interfaces.counter--;
+            }
         };
         $scope.addGateway = function(machine) {
             machine.gateways.counter++;
             machine.gateways.gw.push({});
         };
         $scope.removeGateway = function(machine) {
-            machine.gateways.gw.pop(); //TODO if counter<=1
-            machine.interfaces.counter--;
+            if(machine.gateways.counter>1) {
+                machine.gateways.gw.pop();
+                machine.interfaces.counter--;
+            }
         };
     });
 </script>
