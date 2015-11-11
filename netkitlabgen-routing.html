@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="css/bootstrap.min.css" />
-<script>
-    if (!$("link[href='/css/bootstrap.min.css']").length)
-        document.write('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous" \/>');
-</script>
-
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous" />
 
 <style>
     body {
@@ -48,7 +43,7 @@
 </style>
 <script src="js/angular.min.js"></script>
 <script>
-    if (!$("link[href='/js/angular.min.js']").length)
+    if (typeof(angular)=="undefined")
         document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"><\/script>');
 </script>
 <body>
@@ -79,7 +74,7 @@
                 <div data-ng-repeat="i in x.interfaces.if">
                     <input type="text" class="eth" id="{{i.eth.number}}" ng-model="i.eth.domain" />
                     <label> IP/Net: </label>
-                    <input type="text" class="ip" />
+                    <input type="text" class="ip" ng-model="i.ip" />
                 </div>
             </td>
             <td class="gateways" id="gw{{x.row}}">
@@ -87,11 +82,11 @@
                 <div id="remgw{{x.row}}" class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
                 <div data-ng-repeat="j in x.gateways.gw">
                     <label>Route:</label>
-                    <input type="text" class="route" /><br />
+                    <input type="text" class="route" ng-model="j.route" /><br />
                     <label>GW:</label>
-                    <input type="text" class="gw" /><br />
+                    <input type="text" class="gw" ng-model="j.gw" /><br />
                     <label>Interface:</label>
-                    <select class="interface">
+                    <select class="interface" ng-model="j.if">
                         <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                     </select>
                 </div>
@@ -100,12 +95,12 @@
 
             </td>
             <td class="ws" id="ws{{x.row}}" ng-show="x.type=='ws'">
-                <input type="checkbox" name="userdir{{x.row}}" value="1">Enable userdir module?</input>
+                <input type="checkbox" name="userdir{{x.row}}" value="1" ng-model="x.ws.userdir">Enable userdir module?</input>
             </td>
             <td class="terminale" id="terminale{{x.row}}" ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
-                <select class="nameserver">
-                    <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.row}}">{{m.name}}</option>
+                <select class="nameserver" ng-model="x.pc.ns">
+                    <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>
             </td>
             <td class="rt" id="router{{x.row}}" ng-show="x.type=='router'">
@@ -115,32 +110,35 @@
     </table>
     <div id="add" class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
     <div id="rem" class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
-    <div id="gen" class="btn btn-primary" ng-click="generate()"><strong>Genera rete</strong></div><br />
-
-    {{netkit}}
+    <a id="gen" class="btn btn-primary" download="script.netkit" href="{{ makedownload(generate(netkit)) }}"><strong>Scarica il file sh</strong></a><br /><br />
+    <h4>Anteprima:</h4>
+    <textarea style="width:100%" rows="30" readonly>{{ generate(netkit) }}</textarea>
 
 </div>
 
 
-
-<!-- TODO binding di tutti gli input, generazione script-->
-
 <script>
-    if (typeof JSON.clone !== "function")
-    {
+    if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
             return JSON.parse(JSON.stringify(obj));
         };
     }
 
     var app = angular.module('myApp', []);
+    app.config(['$compileProvider',
+        function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/);
+        }
+    ]);
     app.controller('myCtrl', function($scope) {
 
         var backbone = {
+            "name":"",
             "row":1,
             "type":"terminale",
             "interfaces":{"counter":1, "if":[{"eth":{"number":0}}]},
-            "gateways":{"counter":1, "gw":[{}]}
+            "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
+            "pc":{"ns":""}
         };
 
         $scope.netkit = [JSON.clone(backbone)];
@@ -170,15 +168,100 @@
         };
         $scope.addGateway = function(machine) {
             machine.gateways.counter++;
-            machine.gateways.gw.push({});
+            machine.gateways.gw.push({"route":"", "if":0});
         };
         $scope.removeGateway = function(machine) {
             if(machine.gateways.counter>1) {
                 machine.gateways.gw.pop();
-                machine.interfaces.counter--;
+                machine.gateways.counter--;
             }
         };
+
+        $scope.makedownload = function(text) {
+            return 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+        };
+
+        $scope.generate = function(nk) {
+            var text="";
+
+            // conversione array in stringa html (con <br>, <hr>, <h4>, ecc) appesa a text
+
+            text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
+
+            text += "#! /bin/sh\n";
+            text += "mkdir -p";
+
+            for(var mindex in nk){
+                if(nk[mindex].name.substring(0, 2)=='ns') {
+                    text += " "+nk[mindex].name+"/etc/bind";
+                } else {
+                    text += " "+nk[mindex].name;
+                }
+            }
+            text += "\n";
+
+            // generazione lab.conf
+            text += "touch lab.conf\n";
+            for (var mindex in nk) {
+                for (var i in nk[mindex].interfaces.if){
+                    text += "echo "+nk[mindex].name + "[" + nk[mindex].interfaces.if[i].eth.number + "]="+nk[mindex].interfaces.if[i].eth.domain + " >> lab.conf\n";
+                }
+            }
+
+            // generazione macchina.startup
+            for (var mindex in nk) {
+                file = nk[mindex].name+".startup";
+                text += "touch " + file +"<br />";
+                for (var i in nk[mindex].interfaces.if){
+                    //ifconfig eth_ SELFADDRESS/MASK up
+                    text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
+                            nk[mindex].interfaces.if[i].ip + " up >> "+file+"\n";
+                }
+                for (var g in nk[mindex].gateways.gw){
+                    //route add default gw GATEWAY dev eth_
+                    if(nk[mindex].gateways.gw[g].route=="") {
+                        text += "echo route add default gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth"+
+                                nk[mindex].gateways.gw[g].if+" >> " + file+"\n";
+                    }
+                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                    else  {
+                        text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth"+
+                                nk[mindex].gateways.gw[g].if+" >> " + file+"\n";
+                    }
+                }
+                // ns
+                if(nk[mindex].type=='ns') {
+                    text += "echo /etc/init.d/bind start >> " + file+"\n";
+                }
+                // ws
+                else if(nk[mindex].type=='ws') {
+                    if(nk[mindex].ws.userdir==true) {
+                        text += "mkdir -p "+nk[mindex].name+"/home/guest/public_html\n";
+                        text += "touch "+nk[mindex].name+"/home/guest/public_html/index.html\n";
+                        text += "echo '&lt;html&gt;&lt;head&gt;&lt;title&gt;Guest Home&lt;/title&gt;&lt;/head&gt;&lt;body&gt;" +
+                                "Guest Home&lt;/body&gt;&lt;/html&gt;' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
+                        text += "echo a2enmod userdir >> " + file+"\n";
+                    }
+                    text += "echo /etc/init.d/apache2 start >> " + file+"\n";
+                }
+                else if(nk[mindex].type=='terminale') {
+                    text += "mkdir -p "+nk[mindex].name+"/etc\n";
+                    text += "touch "+nk[mindex].name+"/etc/resolv.conf\n";
+                    text += "#ATTENZIONE: l'ip del NS in "+nk[mindex].name+"/etc/resolv.conf &egrave; probabilmente errato"
+                    text += "echo nameserver >> "+nk[mindex].name+"/etc/resolv.conf " + nk[mindex].pc.ns.split("/")[0] + "\n"; //TODO ip nameserver (si può ricavare correttamente?)
+                }
+            }
+
+            text += "rm $0\n";
+
+            return text;
+
+        };
     });
+
+
 </script>
 
 </body>
