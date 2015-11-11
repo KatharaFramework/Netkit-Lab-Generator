@@ -249,7 +249,7 @@
                 else if(nk[mindex].type=='terminale') {
                     text += "mkdir -p "+nk[mindex].name+"/etc\n";
                     text += "touch "+nk[mindex].name+"/etc/resolv.conf\n";
-                    text += "#ATTENZIONE: l'ip del NS in "+nk[mindex].name+"/etc/resolv.conf &egrave; probabilmente errato"
+                    text += "#ATTENZIONE: l'ip del NS in "+nk[mindex].name+"/etc/resolv.conf e' probabilmente errato\n"
                     text += "echo nameserver >> "+nk[mindex].name+"/etc/resolv.conf " + nk[mindex].pc.ns.split("/")[0] + "\n"; //TODO ip nameserver (si può ricavare correttamente?)
                 }
             }
