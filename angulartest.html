@@ -149,7 +149,7 @@
             $scope.netkit.push(push);
         };
         $scope.removeMachine = function() {
-            $scope.netkit.pop();
+            $scope.netkit.pop(); //TODO if counter<=1
             $scope.counter--;
         };
         $scope.addInterface = function(machine) {
@@ -157,7 +157,7 @@
             machine.interfaces.counter++;
         };
         $scope.removeInterface = function(machine) {
-            machine.interfaces.if.pop();
+            machine.interfaces.if.pop(); //TODO if counter<=1
             machine.interfaces.counter--;
         };
         $scope.addGateway = function(machine) {
@@ -165,7 +165,7 @@
             machine.gateways.gw.push({});
         };
         $scope.removeGateway = function(machine) {
-            machine.gateways.gw.pop();
+            machine.gateways.gw.pop(); //TODO if counter<=1
             machine.interfaces.counter--;
         };
     });
