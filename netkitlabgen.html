@@ -95,7 +95,9 @@
             $("#"+id).append( '<label>eth'+childs+': </label>' +
                     '<input type="text" class="eth" />'+
                     '<label> IP/Net: </label>'+
-                    '<input type="text" class="ip" /><br />');
+                    '<input type="text" class="ip" />'+
+                    '<label> Nome DNS Completo: </label>'+
+                    '<input type="text" class="fullname" /><br />');
             $("#gw"+id+" select").append( '<option value="'+childs+'">eth'+childs+'</option>');
         }
 
@@ -206,12 +208,6 @@
                     '<td class="dns hidden" id="dns'+rows+'">'+
                     '<label>Zone (root &egrave; .):</label>'+
                     '<input type="text" class="zone" /><br />'+
-                    '<label>Own IP:</label>'+
-                    '<input type="text" class="myip" /><br />'+
-                    '<label>Next Name:</label>'+
-                    '<input type="text" class="nextname" /><br />'+
-                    '<label>Next IP:</label>'+
-                    '<input type="text" class="nextip" /><br />'+
                     '</td>'+
                     '<td class="ws hidden" id="ws'+rows+'">'+
                     '<input type="checkbox" name="userdir'+rows+'" value="1">Enable userdir module?</input>' +
@@ -274,6 +270,7 @@
             //                            numero interfaccia (senza eth) ->
             //                                              "eth" -> dominio di collisione
             //                                              "ip" -> ip/mask
+            //                                              "fullname" -> fullname
             //                            altro numero interfaccia -> ecc...
             //                "gateways" ->
             //                            numero gateway ->
@@ -283,9 +280,6 @@
             //                            altro numero gateway -> ecc...
             //                "dns" ->
             //                            "zone" -> zone name
-            //                            "myip" -> ip of ns
-            //                            "nextname" -> next ns/ws/host name
-            //                            "nextip" -> next ip
             //                "tipo" ->    nometipo
             //                "ws" ->     "userdir" -> "1" oppure ""
             // nome seconda macchina -> ecc...
@@ -297,7 +291,7 @@
 
                 //Controllo su nome macchina non vuoto (necessario per motivi di testing)
                 if(name==""){
-                    alert("Il campo Nome Macchina non pu� essere vuoto");
+                    alert("Il campo Nome Macchina non può essere vuoto");
                     exit;
                 }
                 arr[name] = [];
@@ -309,6 +303,7 @@
                     arr[name]["interfaces"][j] = [];
                     arr[name]["interfaces"][j]["eth"] = $("#netkit tr:nth-child("+i+") td.interfaces#"+(i-1)+" input.eth").eq(j).val();
                     arr[name]["interfaces"][j]["ip"] = $("#netkit tr:nth-child("+i+") td.interfaces#"+(i-1)+" input.ip").eq(j).val();
+                    arr[name]["interfaces"][j]["fullname"] = $("#netkit tr:nth-child("+i+") td.interfaces#"+(i-1)+" input.fullname").eq(j).val();
                 }
                 var gateways = $("#netkit tr:nth-child("+i+") td.gateways input.route").length;
                 for(var j=0; j<gateways; ++j){
@@ -319,9 +314,6 @@
                 }
                 arr[name]["dns"] = [];
                 arr[name]["dns"]["zone"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.zone").val();
-                arr[name]["dns"]["myip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.myip").val();
-                arr[name]["dns"]["nextname"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextname").val();
-                arr[name]["dns"]["nextip"] = $("#netkit tr:nth-child("+i+") td.dns#dns"+(i-1)+" input.nextip").val();
                 arr[name]["tipo"] = $('input[name=tipo'+(i-1)+']:checked').val();
                 arr[name]["ws"]=[];
                 arr[name]["ws"]["userdir"] = $('input[name=userdir'+(i-1)+']:checked').val();
@@ -343,6 +335,7 @@
             text += "#! /bin/sh\n";
             text += "mkdir -p";
 
+            //TODO cambiare con la nuova radio button
             for(var machine in arr){
                 if(machine.substring(0, 2)=='ns') {
                     text += " "+machine+"/etc/bind";
@@ -412,10 +405,62 @@
             var initTextArea = '<textarea style="width:100%" rows="30" readonly>';
             var endTextArea = '</textarea>';
 
-            $("#solution").html(initTextArea + text + endTextArea);
+            
+            $("#solution").html(initTextArea + generaDNS(arr) + endTextArea);
+            //$("#solution").html(initTextArea + text + endTextArea);
 
             //INIBITO IL DOWNLOAD IN FASE DI TESTING
             //download('script-netkit-' + event.timeStamp + '', text);
+        }
+
+        //TODO aggiungere spunta sulle opzioni del dns per allow recursion
+        //TODO aggiungere spunta per definire se un NS è authority su qualcosa o no!
+        // in caso non lo sia fargli evitare il primo for
+        //NOTE: in molti casi qui si necessita dell'ip della macchina senza subnet... forse sarebbe meglio separare i campi nella generazione dell'array?
+        //TODO questo algoritmo è semi-ricorsivo... per ogni macchina questa si auto-aggiunge al suo Ns di riferimento, bisogna separare il caso in cui questa è "."
+        //TODO inserire menu a tendina vicino (sotto) scelta della zona così da parametrizzare quell'interfaccia 0 che io uso qui sotto
+
+        function generaDNS(obj){
+            var arr = obj;
+            var text = "";
+            var authority = [];
+            var root;
+            for (var machine in arr) {
+                if(arr[machine]["tipo"]=='ns'){
+                    if(arr[machine]["dns"]["zone"] == "."){
+                        root = arr[machine];
+                    }
+                    authority[arr[machine]["dns"]["zone"]] = arr[machine];
+                    text += "Nel SOA di " + arr[machine]["dns"]["zone"] + "bisogna inserire " + 
+                        arr[machine]["interfaces"][0]["fullname"] + "\n"; //ho preso il nome dell'interfaccia eth0
+                    text += "Nei record di " + arr[machine]["dns"]["zone"] + "bisogna inserire un record A" + 
+                        arr[machine]["interfaces"][0]["fullname"] + " " + arr[machine]["interfaces"][0]["ip"] + "\n";
+                }
+            }
+
+
+            for (var machine in arr) {
+                if(arr[machine]["tipo"]=='ns'){
+                    text += "Nel file db.root aggiungere il root ns come nome: " + root["interfaces"][0]["fullname"] +
+                        "e ip: " + root["interfaces"][0]["ip"];
+                }
+            }
+
+            for (var machine in arr) {
+                for (var interface in arr[machine]["interfaces"]){
+                        var ip = arr[machine]["interfaces"][interface]["ip"];
+                        var nome = arr[machine]["interfaces"][interface]["fullname"]; //www.pluto.net.
+                        var nomediviso = nome.split(".") //[0]www [1]pluto [2]net [3]
+                        var autorita = "";
+                        text += "nel nameserver ";
+                        for (var i=1; i<nomediviso.length; i++){
+                            autorita += nomediviso[i];
+                        }
+                        text += authority[autorita]+" bisogna inserire un record A per " +
+                            nomediviso[0] + " assegnato all'ip " + ip + "\n";
+                }
+            }
+            return text;
         }
 
 
