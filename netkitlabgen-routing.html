@@ -60,58 +60,55 @@
 
         <tr data-ng-repeat="x in netkit">
             <td>
-                <label for="macchina{{x.row}}">Macchina {{x.row}}:</label>
-                <input type="text" id="macchina{{x.row}}" ng-model="x.name" placeholder="pc" /><br />
-                <input type="radio" name="tipo{{x.row}}" value="terminale" ng-model="x.type"> Terminale</input><br />
-                <input type="radio" name="tipo{{x.row}}" value="router" ng-model="x.type"> Router</input><br />
-                <input type="radio" name="tipo{{x.row}}" value="ns" ng-model="x.type"> Name Server</input><br />
-                <input type="radio" name="tipo{{x.row}}" value="ws" ng-model="x.type"> Web Server</input>
+                <label>Macchina {{x.row}}:</label>
+                <input type="text" ng-model="x.name" placeholder="pc" /><br />
+                <input type="radio" value="terminale" ng-model="x.type"> Terminale</input><br />
+                <input type="radio" value="router" ng-model="x.type"> Router</input><br />
+                <input type="radio" value="ns" ng-model="x.type"> Name Server</input><br />
+                <input type="radio" value="ws" ng-model="x.type"> Web Server</input>
                 <br />
             </td>
-            <td class="interfaces" id="{{x.row}}">
-                <div id="add{{x.row}}" class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
-                <div id="rem{{x.row}}" class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
+            <td class="interfaces">
+                <div class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
+                <div class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
                 <div data-ng-repeat="i in x.interfaces.if">
                     <label>Dominio: </label>
-                    <input type="text" class="eth" id="{{i.eth.number}}" ng-model="i.eth.domain" placeholder="A" /><br />
+                    <input type="text" ng-model="i.eth.domain" placeholder="A" /><br />
                     <label> IP/Net: </label>
-                    <input type="text" class="ip" ng-model="i.ip" placeholder="0.0.0.0/0" />
+                    <input type="text" ng-model="i.ip" placeholder="0.0.0.0/0" />
                 </div>
             </td>
-            <td class="gateways" id="gw{{x.row}}">
-                <div id="addgw{{x.row}}" class="btn btn-success" ng-click="addGateway(x)">Aggiungi gateway</div>
-                <div id="remgw{{x.row}}" class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
+            <td class="gateways">
+                <div class="btn btn-success" ng-click="addGateway(x)">Aggiungi gateway</div>
+                <div class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
                 <div data-ng-repeat="j in x.gateways.gw">
                     <label>Route:</label>
-                    <input type="text" class="route" ng-model="j.route" placeholder="0.0.0.0/0" /><br />
+                    <input type="text" ng-model="j.route" placeholder="0.0.0.0/0" /><br />
                     <label>GW:</label>
-                    <input type="text" class="gw" ng-model="j.gw" placeholder="0.0.0.0" /><br />
+                    <input type="text" ng-model="j.gw" placeholder="0.0.0.0" /><br />
                     <label>Interface:</label>
-                    <select class="interface" ng-model="j.if">
+                    <select ng-model="j.if">
                         <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                     </select>
                 </div>
             </td>
-            <td class="dns" id="dns{{x.row}}" ng-show="x.type=='ns'">
-
+            <td  ng-show="x.type=='ns'"></td>
+            <td ng-show="x.type=='ws'">
+                <input type="checkbox" value="1" ng-model="x.ws.userdir">Enable userdir module?</input>
             </td>
-            <td class="ws" id="ws{{x.row}}" ng-show="x.type=='ws'">
-                <input type="checkbox" name="userdir{{x.row}}" value="1" ng-model="x.ws.userdir">Enable userdir module?</input>
-            </td>
-            <td class="terminale" id="terminale{{x.row}}" ng-show="x.type=='terminale'">
+            <td ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
-                <select class="nameserver" ng-model="x.pc.ns">
+                <select ng-model="x.pc.ns">
                     <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>
             </td>
-            <td class="rt" id="router{{x.row}}" ng-show="x.type=='router'">
-            </td>
+            <td id="router{{x.row}}" ng-show="x.type=='router'"></td>
         </tr>
 
     </table>
-    <div id="add" class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
-    <div id="rem" class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
-    <a id="gen" class="btn btn-primary" download="script.netkit" href="{{ makedownload(generate(netkit)) }}"><strong>Scarica il file sh</strong></a><br /><br />
+    <div class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
+    <div class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
+    <a class="btn btn-primary" download="script.netkit" href="{{ makedownload(generate(netkit)) }}"><strong>Scarica il file sh</strong></a><br /><br />
     <h4>Anteprima:</h4>
     <textarea style="width:100%" rows="30" readonly>{{ generate(netkit) }}</textarea>
 
