@@ -61,7 +61,7 @@
         <tr data-ng-repeat="x in netkit">
             <td>
                 <label for="macchina{{x.row}}">Macchina {{x.row}}:</label>
-                <input type="text" id="macchina{{x.row}}" ng-model="x.name" /><br />
+                <input type="text" id="macchina{{x.row}}" ng-model="x.name" placeholder="pc" /><br />
                 <input type="radio" name="tipo{{x.row}}" value="terminale" ng-model="x.type"> Terminale</input><br />
                 <input type="radio" name="tipo{{x.row}}" value="router" ng-model="x.type"> Router</input><br />
                 <input type="radio" name="tipo{{x.row}}" value="ns" ng-model="x.type"> Name Server</input><br />
@@ -72,9 +72,10 @@
                 <div id="add{{x.row}}" class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
                 <div id="rem{{x.row}}" class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
                 <div data-ng-repeat="i in x.interfaces.if">
-                    <input type="text" class="eth" id="{{i.eth.number}}" ng-model="i.eth.domain" />
+                    <label>Dominio: </label>
+                    <input type="text" class="eth" id="{{i.eth.number}}" ng-model="i.eth.domain" placeholder="A" /><br />
                     <label> IP/Net: </label>
-                    <input type="text" class="ip" ng-model="i.ip" />
+                    <input type="text" class="ip" ng-model="i.ip" placeholder="0.0.0.0/0" />
                 </div>
             </td>
             <td class="gateways" id="gw{{x.row}}">
@@ -82,9 +83,9 @@
                 <div id="remgw{{x.row}}" class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
                 <div data-ng-repeat="j in x.gateways.gw">
                     <label>Route:</label>
-                    <input type="text" class="route" ng-model="j.route" /><br />
+                    <input type="text" class="route" ng-model="j.route" placeholder="0.0.0.0/0" /><br />
                     <label>GW:</label>
-                    <input type="text" class="gw" ng-model="j.gw" /><br />
+                    <input type="text" class="gw" ng-model="j.gw" placeholder="0.0.0.0" /><br />
                     <label>Interface:</label>
                     <select class="interface" ng-model="j.if">
                         <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
@@ -260,6 +261,11 @@
         };
     });
 
+    // startup
+    window.onload= function() {
+        console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+        console.log(" =======================================\n Good job for finding this page. Your     \n life with Netkit will be a lot easier!      \n ======================================= ");
+    }
 
 </script>
 
