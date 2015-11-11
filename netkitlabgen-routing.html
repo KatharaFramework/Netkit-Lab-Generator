@@ -240,8 +240,7 @@
                     if(nk[mindex].ws.userdir==true) {
                         text += "mkdir -p "+nk[mindex].name+"/home/guest/public_html\n";
                         text += "touch "+nk[mindex].name+"/home/guest/public_html/index.html\n";
-                        text += "echo '&lt;html&gt;&lt;head&gt;&lt;title&gt;Guest Home&lt;/title&gt;&lt;/head&gt;&lt;body&gt;" +
-                                "Guest Home&lt;/body&gt;&lt;/html&gt;' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
+                        text += "echo '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
                         text += "echo a2enmod userdir >> " + file+"\n";
                     }
                     text += "echo /etc/init.d/apache2 start >> " + file+"\n";
