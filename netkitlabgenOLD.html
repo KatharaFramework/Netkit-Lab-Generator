@@ -363,7 +363,7 @@
             // generazione macchina.startup
             for (var machine in arr) {
                 file = machine+".startup";
-                text += "touch " + file +"<br />";
+                text += "touch " + file +"\n";
                 for (var interface in arr[machine]["interfaces"]){
                     //ifconfig eth_ SELFADDRESS/MASK up
                     text += "echo ifconfig eth" + interface + " " +

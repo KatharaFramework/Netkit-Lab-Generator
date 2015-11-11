@@ -211,7 +211,7 @@
             // generazione macchina.startup
             for (var mindex in nk) {
                 file = nk[mindex].name+".startup";
-                text += "touch " + file +"<br />";
+                text += "touch " + file +"\n";
                 for (var i in nk[mindex].interfaces.if){
                     //ifconfig eth_ SELFADDRESS/MASK up
                     text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
