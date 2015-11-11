@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<script>
+    if (!$("link[href='/css/bootstrap.min.css']").length)
+        document.write('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous" \/>');
+</script>
+
+
+
+<style>
+    body {
+        background: white;
+        padding: 10px;
+    }
+    .ng-hide {
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .btn {
+        margin: 2px 0;
+        padding: 4px 3px;
+        border-radius: 0;
+    }
+    input {
+        border-radius: 0;
+    }
+    table {
+        border-collapse: separate; border-spacing: 0 2px; box-sizing: border-box;
+    }
+    tr td:first-child, tr th:first-child { border-bottom-left-radius: 1px; border-top-left-radius: 1px; }
+    tr td:last-child, tr th:last-child { border-bottom-right-radius: 1px; border-top-right-radius: 1px; }
+    tr {
+        background-color: rgba(0, 0, 0, 0.01);
+
+    }
+    td, th {
+        border: solid 1px #aaa;
+        border: solid 1px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+    }
+    strong {
+        font-size: 120%;
+        padding: 0 5px;
+    }
+
+</style>
+<script src="js/angular.min.js"></script>
+<script>
+    if (!$("link[href='/js/angular.min.js']").length)
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"><\/script>');
+</script>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+
+    <table id="netkit" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>Info Macchina</th>
+            <th>Interfacce di Rete</th>
+            <th>Gateway (Route vuoto per Default):</th>
+            <th>Funzioni aggiuntive:</th>
+        </tr>
+
+        <tr data-ng-repeat="x in netkit">
+            <td>
+                <label for="macchina{{x.row}}">Macchina {{x.row}}:</label>
+                <input type="text" id="macchina{{x.row}}" ng-model="x.name" /><br />
+                <input type="radio" name="tipo{{x.row}}" value="terminale" ng-model="x.type"> Terminale</input><br />
+                <input type="radio" name="tipo{{x.row}}" value="router" ng-model="x.type"> Router</input><br />
+                <input type="radio" name="tipo{{x.row}}" value="ns" ng-model="x.type"> Name Server</input><br />
+                <input type="radio" name="tipo{{x.row}}" value="ws" ng-model="x.type"> Web Server</input>
+                <br />
+            </td>
+            <td class="interfaces" id="{{x.row}}">
+                <div id="add{{x.row}}" class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
+                <div id="rem{{x.row}}" class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
+                <div data-ng-repeat="i in x.interfaces.if">
+                    <input type="text" class="eth" id="{{i.eth.number}}" ng-model="i.eth.domain" />
+                    <label> IP/Net: </label>
+                    <input type="text" class="ip" />
+                </div>
+            </td>
+            <td class="gateways" id="gw{{x.row}}">
+                <div id="addgw{{x.row}}" class="btn btn-success" ng-click="addGateway(x)">Aggiungi gateway</div>
+                <div id="remgw{{x.row}}" class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
+                <div data-ng-repeat="j in x.gateways.gw">
+                    <label>Route:</label>
+                    <input type="text" class="route" /><br />
+                    <label>GW:</label>
+                    <input type="text" class="gw" /><br />
+                    <label>Interface:</label>
+                    <select class="interface">
+                        <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+                    </select>
+                </div>
+            </td>
+            <td class="dns" id="dns{{x.row}}" ng-show="x.type=='ns'">
+
+            </td>
+            <td class="ws" id="ws{{x.row}}" ng-show="x.type=='ws'">
+                <input type="checkbox" name="userdir{{x.row}}" value="1">Enable userdir module?</input>
+            </td>
+            <td class="terminale" id="terminale{{x.row}}" ng-show="x.type=='terminale'">
+                <label>Nameserver di riferimento:</label>
+                <select class="nameserver">
+                    <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.row}}">{{m.name}}</option>
+                </select>
+            </td>
+            <td class="rt" id="router{{x.row}}" ng-show="x.type=='router'">
+            </td>
+        </tr>
+
+    </table>
+    <div id="add" class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
+    <div id="rem" class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
+    <div id="gen" class="btn btn-primary" ng-click="generate()"><strong>Genera rete</strong></div><br />
+
+    {{netkit}}
+
+</div>
+
+
+
+<!-- TODO binding di tutti gli input, generazione script-->
+
+<script>
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function($scope) {
+        var backbone = {
+            "row":1,
+            "type":"terminale",
+            "interfaces":{"counter":1, "if":[{"eth":{"number":0}}]},
+            "gateways":{"counter":1, "gw":[{}]}
+        };
+        $scope.netkit = [backbone];
+
+        $scope.counter = 1;
+        $scope.addMachine = function() {
+            $scope.counter++;
+            var push = {
+                "row":1,
+                "type":"terminale",
+                "interfaces":{"counter":1, "if":[{"eth":{"number":0}}]},
+                "gateways":{"counter":1, "gw":[{}]}
+            }; //TODO: meglio il refactor
+            push.row=$scope.counter;
+            $scope.netkit.push(push);
+        };
+        $scope.removeMachine = function() {
+            $scope.netkit.pop();
+            $scope.counter--;
+        };
+        $scope.addInterface = function(machine) {
+            machine.interfaces.if.push({"eth":{"number":machine.interfaces.counter}});
+            machine.interfaces.counter++;
+        };
+        $scope.removeInterface = function(machine) {
+            machine.interfaces.if.pop();
+            machine.interfaces.counter--;
+        };
+        $scope.addGateway = function(machine) {
+            machine.gateways.counter++;
+            machine.gateways.gw.push({});
+        };
+        $scope.removeGateway = function(machine) {
+            machine.gateways.gw.pop();
+            machine.interfaces.counter--;
+        };
+    });
+</script>
+
+</body>
+</html>
