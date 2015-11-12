@@ -108,7 +108,11 @@
                         ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit">
                 </select>
             </td>
-            <td id="router{{x.row}}" ng-show="x.type=='router'"></td>
+            <td ng-show="x.type=='router'">
+                <input type="checkbox" value="router" ng-model="x.routing['rip'].en"> rip</input><br />
+                <input type="checkbox" value="ns" ng-model="x.routing['ospf'].en"> ospf</input><br />
+                <!-- TODO form object aggiuntivi per network e campi ospf -->
+            </td>
         </tr>
 
     </table>
@@ -146,7 +150,8 @@
             "interfaces":{"counter":1, "if":[{"eth":{"number":0}, "ip":""}]},
             "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
             "pc":{"ns":""},
-            "ws":{"userdir":false}
+            "ws":{"userdir":false},
+            "routing":[]
         };
 
         $scope.netkit = [JSON.clone(backbone)];
@@ -263,6 +268,32 @@
 
             text += "rm $0\n";
 
+            //TODO
+            for (var mindex in nk) {
+                if(nk[mindex].routing['rip'].en || nk[mindex].routing['ospf'].en){
+                    text += "echo /etc/init.d/zebra start >> " + file+"\n";
+                    text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
+                    text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                }
+                if(nk[mindex].routing['rip'].en){
+                    text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                    text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                    text += "echo 'network "+nk[mindex].routing['rip'].network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                }
+                if(nk[mindex].routing['ospf'].en){
+                    text += "echo 'ospfd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                    text += "echo 'interface eth"+nk[mindex].routing['ospf'].interface+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'ospf cost "+nk[mindex].routing['ospf'].cost+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'router ospf' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'network "+nk[mindex].routing['ospf'].network+" area "+nk[mindex].routing['ospf'].area+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                }
+                if(nk[mindex].routing['rip'].en && nk[mindex].routing['ospf'].en){
+                    text += "echo 'redistribute ospf' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                    text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                    text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                }
+            }
             return text;
 
         };

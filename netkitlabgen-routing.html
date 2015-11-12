@@ -108,7 +108,7 @@
                         ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit">
                 </select>
             </td>
-            <td id="router{{x.row}}" ng-show="x.type=='router'"></td>
+            <td ng-show="x.type=='router'"></td>
         </tr>
 
     </table>
