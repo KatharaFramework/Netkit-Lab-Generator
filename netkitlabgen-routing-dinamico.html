@@ -109,16 +109,16 @@
                 </select>
             </td>
             <td ng-show="x.type=='router'">
-                <input type="checkbox" value="router" ng-model="x.routing['rip'].en"> rip</input><br />
-                <div ng-show="x.routing['rip'].en">
-                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing['rip'].network" />
+                <input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input><br />
+                <div ng-show="x.routing.rip.en">
+                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing.rip.network" />
                 </div>
-                <input type="checkbox" value="ns" ng-model="x.routing['ospf'].en"> ospf</input><br />
-                <div ng-show="x.routing['ospf'].en">
-                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing['ospf'].network" /><br />
-                    <label>Area: </label><input type="text" placeholder="0.0.0.0" ng-model="x.routing['ospf'].area" /><br />
-                    <label>Cost: </label><input type="text" placeholder="0" ng-model="x.routing['ospf'].cost" /><br />
-                    <select ng-model="x.routing['ospf'].interface">
+                <input type="checkbox" value="ns" ng-model="x.routing.ospf.en"> ospf</input><br />
+                <div ng-show="x.routing.ospf.en">
+                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing.ospf.network" /><br />
+                    <label>Area: </label><input type="text" placeholder="0.0.0.0" ng-model="x.routing.ospf.area" /><br />
+                    <label>Cost: </label><input type="text" placeholder="0" ng-model="x.routing.ospf.cost" /><br />
+                    <select ng-model="x.routing.ospf.interface">
                         <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                     </select>
                 </div>
@@ -161,7 +161,7 @@
             "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
             "pc":{"ns":""},
             "ws":{"userdir":false},
-            "routing":[]
+            "routing":{"rip":{"en":false}, "ospf":{"en":false}}
         };
 
         $scope.netkit = [JSON.clone(backbone)];
@@ -280,27 +280,27 @@
 
             //TODO testing
             for (var mindex in nk) {
-                if(typeof(nk[mindex].routing['rip'].en)=="undefined") nk[mindex].routing['rip'].en = false;
-                if(typeof(nk[mindex].routing['ospf'].en)=="undefined") nk[mindex].routing['ospf'].en = false;
+                if(typeof(nk[mindex].routing.rip.en)=="undefined") nk[mindex].routing.rip.en = false;
+                if(typeof(nk[mindex].routing.ospf.en)=="undefined") nk[mindex].routing.ospf.en = false;
 
-                if(nk[mindex].routing['rip'].en || nk[mindex].routing['ospf'].en){
+                if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
                     text += "echo /etc/init.d/zebra start >> " + file+"\n";
                     text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
                     text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
                 }
-                if(nk[mindex].routing['rip'].en){
+                if(nk[mindex].routing.rip.en){
                     text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
                     text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-                    text += "echo 'network "+nk[mindex].routing['rip'].network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                    text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
                 }
-                if(nk[mindex].routing['ospf'].en){
+                if(nk[mindex].routing.ospf.en){
                     text += "echo 'ospfd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
-                    text += "echo 'interface eth"+nk[mindex].routing['ospf'].interface+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
-                    text += "echo 'ospf cost "+nk[mindex].routing['ospf'].cost+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'interface eth"+nk[mindex].routing.ospf.interface+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'ospf cost "+nk[mindex].routing.ospf.cost+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
                     text += "echo 'router ospf' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
-                    text += "echo 'network "+nk[mindex].routing['ospf'].network+" area "+nk[mindex].routing['ospf'].area+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                    text += "echo 'network "+nk[mindex].routing.ospf.network+" area "+nk[mindex].routing.ospf.area+"' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
                 }
-                if(nk[mindex].routing['rip'].en && nk[mindex].routing['ospf'].en){
+                if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
                     text += "echo 'redistribute ospf' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
                     text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
                     text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
