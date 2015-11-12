@@ -110,8 +110,18 @@
             </td>
             <td ng-show="x.type=='router'">
                 <input type="checkbox" value="router" ng-model="x.routing['rip'].en"> rip</input><br />
+                <div ng-show="x.routing['rip'].en">
+                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing['rip'].network" />
+                </div>
                 <input type="checkbox" value="ns" ng-model="x.routing['ospf'].en"> ospf</input><br />
-                <!-- TODO form object aggiuntivi per network e campi ospf -->
+                <div ng-show="x.routing['ospf'].en">
+                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing['ospf'].network" /><br />
+                    <label>Area: </label><input type="text" placeholder="0.0.0.0" ng-model="x.routing['ospf'].area" /><br />
+                    <label>Cost: </label><input type="text" placeholder="0" ng-model="x.routing['ospf'].cost" /><br />
+                    <select ng-model="x.routing['ospf'].interface">
+                        <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+                    </select>
+                </div>
             </td>
         </tr>
 
@@ -268,8 +278,11 @@
 
             text += "rm $0\n";
 
-            //TODO
+            //TODO testing
             for (var mindex in nk) {
+                if(typeof(nk[mindex].routing['rip'].en)=="undefined") nk[mindex].routing['rip'].en = false;
+                if(typeof(nk[mindex].routing['ospf'].en)=="undefined") nk[mindex].routing['ospf'].en = false;
+
                 if(nk[mindex].routing['rip'].en || nk[mindex].routing['ospf'].en){
                     text += "echo /etc/init.d/zebra start >> " + file+"\n";
                     text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
