@@ -174,7 +174,7 @@
             $scope.netkit.push(p);
         };
         $scope.removeMachine = function() {
-            if(confirm("Sicuro di voler rimuovere la macchina?") && $scope.counter>1) {
+            if($scope.counter>1 && confirm("Sicuro di voler rimuovere la macchina?")) {
                 $scope.netkit.pop();
                 $scope.counter--;
             }
@@ -184,7 +184,7 @@
             machine.interfaces.counter++;
         };
         $scope.removeInterface = function(machine) {
-            if(confirm("Sicuro di voler rimuovere l'interfaccia?") && machine.interfaces.counter>1) {
+            if(machine.interfaces.counter>1 && confirm("Sicuro di voler rimuovere l'interfaccia?")) {
                 machine.interfaces.if.pop();
                 machine.interfaces.counter--;
             }
@@ -194,7 +194,7 @@
             machine.gateways.gw.push({"route":"", "if":0});
         };
         $scope.removeGateway = function(machine) {
-            if(confirm("Sicuro di voler rimuovere il gateway?") && machine.gateways.counter>1) {
+            if(machine.gateways.counter>1 && confirm("Sicuro di voler rimuovere il gateway?")) {
                 machine.gateways.gw.pop();
                 machine.gateways.counter--;
             }
