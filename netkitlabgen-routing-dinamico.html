@@ -74,7 +74,7 @@
                 <div class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
                 <div class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
                 <div data-ng-repeat="i in x.interfaces.if">
-                    <label>Dominio: </label>
+                    <label>Eth{{i.eth.number}}: </label>
                     <input type="text" ng-model="i.eth.domain" placeholder="A" /><br />
                     <label> IP/Net: </label>
                     <input type="text" ng-model="i.ip" placeholder="0.0.0.0/0" />
@@ -174,7 +174,7 @@
             $scope.netkit.push(p);
         };
         $scope.removeMachine = function() {
-            if($scope.counter>1) {
+            if(confirm("Sicuro di voler rimuovere la macchina?") && $scope.counter>1) {
                 $scope.netkit.pop();
                 $scope.counter--;
             }
@@ -184,7 +184,7 @@
             machine.interfaces.counter++;
         };
         $scope.removeInterface = function(machine) {
-            if(machine.interfaces.counter>1) {
+            if(confirm("Sicuro di voler rimuovere l'interfaccia?") && machine.interfaces.counter>1) {
                 machine.interfaces.if.pop();
                 machine.interfaces.counter--;
             }
@@ -194,7 +194,7 @@
             machine.gateways.gw.push({"route":"", "if":0});
         };
         $scope.removeGateway = function(machine) {
-            if(machine.gateways.counter>1) {
+            if(confirm("Sicuro di voler rimuovere il gateway?") && machine.gateways.counter>1) {
                 machine.gateways.gw.pop();
                 machine.gateways.counter--;
             }
