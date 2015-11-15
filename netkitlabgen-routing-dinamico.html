@@ -235,12 +235,11 @@
 
             // generazione macchina.startup
             for (var mindex in nk) {
-                file = nk[mindex].name+".startup";
-                text += "touch " + file +"\n";
+                text += "touch " +  nk[mindex].name+".startup" +"\n";
                 for (var i in nk[mindex].interfaces.if){
                     //ifconfig eth_ SELFADDRESS/MASK up
                     text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
-                            nk[mindex].interfaces.if[i].ip + " up >> "+file+"\n";
+                            nk[mindex].interfaces.if[i].ip + " up >> "+ nk[mindex].name+".startup"+"\n";
                 }
                 if(!(nk[mindex].type=='router' && (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en))) {
                     for (var g in nk[mindex].gateways.gw) {
@@ -248,19 +247,19 @@
                         if (nk[mindex].gateways.gw[g].route == "") {
                             text += "echo route add default gw " +
                                     nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " + file + "\n";
+                                    nk[mindex].gateways.gw[g].if + " >> " +  nk[mindex].name+".startup" + "\n";
                         }
                         //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
                         else {
                             text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
                                     nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " + file + "\n";
+                                    nk[mindex].gateways.gw[g].if + " >> " +  nk[mindex].name+".startup" + "\n";
                         }
                     }
                 }
                 // ns
                 if(nk[mindex].type=='ns') {
-                    text += "echo /etc/init.d/bind start >> " + file+"\n";
+                    text += "echo /etc/init.d/bind start >> " +  nk[mindex].name+".startup"+"\n";
                 }
                 // ws
                 else if(nk[mindex].type=='ws') {
@@ -268,9 +267,9 @@
                         text += "mkdir -p "+nk[mindex].name+"/home/guest/public_html\n";
                         text += "touch "+nk[mindex].name+"/home/guest/public_html/index.html\n";
                         text += "echo '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
-                        text += "echo a2enmod userdir >> " + file+"\n";
+                        text += "echo a2enmod userdir >> " +  nk[mindex].name+".startup"+"\n";
                     }
-                    text += "echo /etc/init.d/apache2 start >> " + file+"\n";
+                    text += "echo /etc/init.d/apache2 start >> " +  nk[mindex].name+".startup"+"\n";
                 }
                 else if(nk[mindex].type=='terminale') {
                     text += "mkdir -p "+nk[mindex].name+"/etc\n";
@@ -283,7 +282,7 @@
             //TODO testing
             for (var mindex in nk) {
                 if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
-                    text += "echo /etc/init.d/zebra start >> " + file+"\n";
+                    text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
                     text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
                     text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
                 }
