@@ -51,6 +51,9 @@
         opacity:0;
         display:none;
     }
+    th {
+        background-color: #fafafa;
+    }
     hr {
         margin: 5px 0;
     }
@@ -169,9 +172,10 @@
     <a class="btn btn-primary" download="script.netkit" href="{{ makedownload(generate(netkit)) }}"><strong>Scarica il file .sh</strong></a><br /><br />
 
     <hr />
+    <br />
 
     <h4>Anteprima:</h4>
-    <textarea style="width:100%" rows="30" readonly>{{ generate(netkit) }}</textarea>
+    <textarea style="width:100%" rows="15" readonly>{{ generate(netkit) }}</textarea>
 
 </div>
 
