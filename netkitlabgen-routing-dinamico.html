@@ -124,7 +124,11 @@
                     <hr />
                 </div>
             </td>
-            <td  ng-show="x.type=='ns'"></td>
+            <td  ng-show="x.type=='ns'">
+                <div>Il supporto completo al DNS non &egrave; presente in questa versione.<br />
+                Verr&agrave; comunque aggiunto l'avvio di bind nel file di startup di <br />
+                questa macchina e creato il file /etc/bind/named.conf (vuoto).</div>
+            </td>
             <td ng-show="x.type=='ws'">
                 <input type="checkbox" value="1" ng-model="x.ws.userdir"> Enable <strong>userdir</strong> module?</input>
             </td>
@@ -292,6 +296,8 @@
                 // ns
                 if(nk[mindex].type=='ns') {
                     text += "echo /etc/init.d/bind start >> " +  nk[mindex].name+".startup"+"\n";
+                    text += "mkdir -p "+nk[mindex].name+"/etc/bind\n";
+                    text += "touch "+nk[mindex].name+"/etc/bind/named.conf\n";
                 }
                 // ws
                 else if(nk[mindex].type=='ws') {
