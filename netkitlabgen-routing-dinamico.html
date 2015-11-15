@@ -240,18 +240,20 @@
                     text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
                             nk[mindex].interfaces.if[i].ip + " up >> "+file+"\n";
                 }
-                for (var g in nk[mindex].gateways.gw){
-                    //route add default gw GATEWAY dev eth_
-                    if(nk[mindex].gateways.gw[g].route=="") {
-                        text += "echo route add default gw " +
-                                nk[mindex].gateways.gw[g].gw + " dev eth"+
-                                nk[mindex].gateways.gw[g].if+" >> " + file+"\n";
-                    }
-                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
-                    else  {
-                        text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
-                                nk[mindex].gateways.gw[g].gw + " dev eth"+
-                                nk[mindex].gateways.gw[g].if+" >> " + file+"\n";
+                if(!(nk[mindex].type=='router' && (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en))) {
+                    for (var g in nk[mindex].gateways.gw) {
+                        //route add default gw GATEWAY dev eth_
+                        if (nk[mindex].gateways.gw[g].route == "") {
+                            text += "echo route add default gw " +
+                                    nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                    nk[mindex].gateways.gw[g].if + " >> " + file + "\n";
+                        }
+                        //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                        else {
+                            text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
+                                    nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                    nk[mindex].gateways.gw[g].if + " >> " + file + "\n";
+                        }
                     }
                 }
                 // ns
@@ -276,13 +278,8 @@
                 }
             }
 
-            text += "rm $0\n";
-
             //TODO testing
             for (var mindex in nk) {
-                if(typeof(nk[mindex].routing.rip.en)=="undefined") nk[mindex].routing.rip.en = false;
-                if(typeof(nk[mindex].routing.ospf.en)=="undefined") nk[mindex].routing.ospf.en = false;
-
                 if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
                     text += "echo /etc/init.d/zebra start >> " + file+"\n";
                     text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
@@ -307,6 +304,10 @@
                     text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
                 }
             }
+
+
+            text += "rm $0\n";
+
             return text;
 
         };
