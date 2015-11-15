@@ -14,6 +14,13 @@
         visibility: hidden;
         opacity: 0;
     }
+    .form-control {
+        border-radius: 0;
+        padding: 2px 6px;
+        margin-top: -2px;
+        margin-bottom: 2px;
+        height: 26px;
+    }
     .btn {
         margin: 2px 0;
         padding: 4px 3px;
@@ -39,6 +46,17 @@
         font-size: 120%;
         padding: 0 5px;
     }
+    .hidelasthr:last-child hr {
+        visibility:hidden;
+        opacity:0;
+        display:none;
+    }
+    hr {
+        margin: 5px 0;
+    }
+    label {
+        margin-bottom: 0;
+    }
 </style>
 
 <script src="js/angular.min.js"></script>
@@ -62,8 +80,8 @@
 
         <tr data-ng-repeat="x in netkit">
             <td>
-                <label>Macchina {{x.row}}:</label>
-                <input type="text" ng-model="x.name" placeholder="pc" /><br />
+                <div><label>Macchina {{x.row}}:</label>
+                <input type="text" ng-model="x.name" class="form-control" placeholder="pc" /></div>
                 <input type="radio" value="terminale" ng-model="x.type"> Terminale</input><br />
                 <input type="radio" value="router" ng-model="x.type"> Router</input><br />
                 <input type="radio" value="ns" ng-model="x.type"> Name Server</input><br />
@@ -73,30 +91,32 @@
             <td class="interfaces">
                 <div class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
                 <div class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
-                <div data-ng-repeat="i in x.interfaces.if">
-                    <label>Eth{{i.eth.number}}: </label>
-                    <input type="text" ng-model="i.eth.domain" placeholder="A" /><br />
-                    <label> IP/Net: </label>
-                    <input type="text" ng-model="i.ip" placeholder="0.0.0.0/0" />
+                <div class="hidelasthr" data-ng-repeat="i in x.interfaces.if">
+                    <div><label>Eth{{i.eth.number}}: </label>
+                    <input type="text" ng-model="i.eth.domain" class="form-control" placeholder="A" /></div>
+                    <div><label> IP/Net: </label>
+                    <input type="text" ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" /></div>
+                    <hr />
                 </div>
             </td>
             <td class="gateways">
                 <div class="btn btn-success" ng-click="addGateway(x)">Aggiungi gateway</div>
                 <div class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
-                <div data-ng-repeat="j in x.gateways.gw">
-                    <label>Route:</label>
-                    <input type="text" ng-model="j.route" placeholder="0.0.0.0/0" /><br />
-                    <label>GW:</label>
-                    <input type="text" ng-model="j.gw" placeholder="0.0.0.0" /><br />
-                    <label>Interface:</label>
-                    <select ng-model="j.if">
+                <div class="hidelasthr" data-ng-repeat="j in x.gateways.gw">
+                    <div><label>Route:</label>
+                    <input type="text" ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" /></div>
+                    <div><label>GW:</label>
+                    <input type="text" ng-model="j.gw" class="form-control" placeholder="0.0.0.0" /></div>
+                    <div><label>Interface:</label>
+                    <select ng-model="j.if" class="form-control">
                         <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
-                    </select>
+                    </select></div>
+                    <hr />
                 </div>
             </td>
             <td  ng-show="x.type=='ns'"></td>
             <td ng-show="x.type=='ws'">
-                <input type="checkbox" value="1" ng-model="x.ws.userdir">Enable userdir module?</input>
+                <input type="checkbox" value="1" class="form-control" ng-model="x.ws.userdir">Enable userdir module?</input>
             </td>
             <td ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
@@ -105,21 +125,23 @@
                     <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>-->
                 <select ng-model="x.pc.ns"
-                        ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit">
+                        ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
+                        class="form-control">
                 </select>
             </td>
             <td ng-show="x.type=='router'">
-                <input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input><br />
+                <div><input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input></div>
                 <div ng-show="x.routing.rip.en">
-                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing.rip.network" />
+                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" class="form-control" ng-model="x.routing.rip.network" />
                 </div>
                 <input type="checkbox" value="ns" ng-model="x.routing.ospf.en"> ospf</input><br />
                 <div ng-show="x.routing.ospf.en">
-                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" ng-model="x.routing.ospf.network" /><br />
-                    <label>Area: </label><input type="text" placeholder="0.0.0.0" ng-model="x.routing.ospf.area" /><br />
+                    <div><label>Network: </label><input type="text" placeholder="0.0.0.0/0" class="form-control" ng-model="x.routing.ospf.network" /></div>
+                    <div><label>Area: </label><input type="text" placeholder="0.0.0.0" class="form-control" ng-model="x.routing.ospf.area" /></div>
+                    <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
-                        <label>Cost: </label><input type="text" placeholder="0" ng-model="x.routing.ospf.if[o.eth.number].cost" /><br />
-                        <select ng-model="x.routing.ospf.if[o.eth.number].interface">
+                        <div><input type="text" placeholder="0" class="form-control" ng-model="x.routing.ospf.if[o.eth.number].cost" /></div>
+                        <select ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select>
                     </div>
