@@ -457,7 +457,7 @@
 
         text += "# Ricordati di usare prima 'chmod +x' (o 'chmod 500') sullo script per renderlo eseguibile. Lo script si autodistrugge al termine\n";
         if(lab["warning"] == 1) {
-            text += "# ATTENZIONE: l'ip scelto per il nameserver in nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia\n";
+            text += "# ATTENZIONE: l'ip scelto per il nameserver nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia\n";
         }
 
         text += "\n";
@@ -491,7 +491,7 @@
         }
         var content = zip.generate({type:"blob"});
         if(lab["warning"] == 1) {
-            alert("ATTENZIONE: l'ip scelto per il nameserver in nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia");
+            alert("ATTENZIONE: l'ip scelto per il nameserver nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia");
         }
 
         saveAs(content, "lab.zip");
