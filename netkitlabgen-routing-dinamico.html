@@ -166,14 +166,14 @@
             </td>
             <td ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
-                <!-- tecnica funzionante ma meno elegante -->
-                <!-- <select ng-model="x.pc.ns">
+                <select ng-model="x.pc.ns">
+                    <option value=""> </option>
                     <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
-                </select>-->
-                <select ng-model="x.pc.ns"
+                </select>
+                <!--<select ng-model="x.pc.ns"
                         ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
                         class="form-control">
-                </select>
+                </select>-->
             </td>
             <td ng-show="x.type=='router'">
                 <label>Routing dinamico: </label>
@@ -258,6 +258,8 @@
         var lab = [];
         lab["folder"] = [];
         lab["file"] = [];
+        lab["warning"] = 0;
+        lab["error"] = 0;
 
         for(var mindex in nk){
             if(nk[mindex].name.substring(0, 2)=='ns') {
@@ -318,8 +320,12 @@
                 lab["file"][nk[mindex].name+".startup"] += "/etc/init.d/apache2 start\n";
             }
             else if(nk[mindex].type=='terminale') {
-                lab["folder"][nk[mindex].name+"/etc"]="";
-                lab["file"][nk[mindex].name+"/etc/resolv.conf"]="nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
+                if(typeof(nk[mindex].pc.ns) != "undefined" && nk[mindex].pc.ns != "") {
+                    lab["folder"][nk[mindex].name + "/etc"] = "";
+                    lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
+
+                    lab["warning"] = 1;
+                }
             }
         }
         for (var mindex in nk) {
@@ -371,7 +377,13 @@
     function makeScript(lab){
         var text="";
 
-        text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
+        text += "# Ricordati di usare prima 'chmod +x' (o 'chmod 500') sullo script per renderlo eseguibile. Lo script si autodistrugge al termine\n";
+        if(lab["warning"] == 1) {
+            text += "# ATTENZIONE: l'ip scelto per il nameserver in nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia\n";
+        }
+
+        text += "\n";
+
         text += "#! /bin/sh\n";
 
         for(var folderName in lab["folder"]){
@@ -392,6 +404,7 @@
 
     function makeZip(lab){
         var zip = new JSZip();
+
         for(var folderName in lab["folder"]){
             zip.folder(folderName);
         }
@@ -399,8 +412,10 @@
             zip.file(fileName, lab["file"][fileName]);
         }
         var content = zip.generate({type:"blob"});
+        if(lab["warning"] == 1) {
+            alert("ATTENZIONE: l'ip scelto per il nameserver in nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia");
+        }
 
-        alert("ATTENZIONE: l'ip scelto per il nameserver in /etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
         saveAs(content, "lab.zip");
     }
 
