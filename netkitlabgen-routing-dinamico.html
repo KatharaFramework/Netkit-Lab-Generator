@@ -67,11 +67,18 @@
     }
     hr {
         margin: 5px 0;
+        width:100%;
+    }
+    h1,h2,h3,h4,h5{
+        width:100%;
     }
     label {
         margin-bottom: 0;
     }
-    pre {outline: 1px solid #ccc; padding: 5px; border-radius: 0; }
+    pre {outline: 1px solid #ccc; padding: 5px; border-radius: 0; width:100%; display:block }
+    textarea {
+        width:100%;
+    }
     .string { color: green; }
     .number { color: darkorange; }
     .boolean { color: blue; }
@@ -136,9 +143,13 @@
                 </div>
             </td>
             <td  ng-show="x.type=='ns'">
-                <div>Il supporto completo al DNS non &egrave; presente in questa versione.<br />
-                Verr&agrave; comunque aggiunto l'avvio di bind nel file di startup di <br />
-                questa macchina e creato il file /etc/bind/named.conf (vuoto).</div>
+                <div>
+                    Il supporto completo al DNS non <br />
+                    &egrave; presente in questa versione.<br />
+                    Verr&agrave; comunque aggiunto l'avvio<br />
+                    di bind nel file di startup di <br />
+                    questa macchina e creato il file <br />
+                    /etc/bind/named.conf (vuoto).</div>
             </td>
             <td ng-show="x.type=='ws'">
                 <input type="checkbox" value="1" ng-model="x.ws.userdir"> Enable <strong>userdir</strong> module?</input>
@@ -184,7 +195,7 @@
     <br />
 
     <h4>Anteprima:</h4>
-    <textarea style="width:100%" rows="15" readonly>{{ generate(netkit) }}</textarea>
+    <textarea rows="15" readonly>{{ generate(netkit) }}</textarea>
 
     <div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
     <div id="origin" class="hidden">{{netkit}}</div>
