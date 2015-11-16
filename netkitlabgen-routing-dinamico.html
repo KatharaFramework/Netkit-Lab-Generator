@@ -186,7 +186,7 @@
     <h4>Anteprima:</h4>
     <textarea style="width:100%" rows="15" readonly>{{ generate(netkit) }}</textarea>
 
-    <div class="btn btn-success" onclick="debug()">Debug</div>
+    <div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
     <div id="origin" class="hidden">{{netkit}}</div>
     <pre id="highlight"></pre>
 
@@ -196,7 +196,7 @@
 <script>
     if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
-            return JSON.parse(JSON.stringify(obj, undefined, 4));
+            return JSON.parse(JSON.stringify(obj));
         };
     }
 
