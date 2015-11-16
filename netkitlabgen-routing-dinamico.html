@@ -400,10 +400,23 @@
                 lab["file"][nk[mindex].name+".startup"] += "/etc/init.d/zebra start\n";
                 lab["folder"][nk[mindex].name+"/etc/zebra"] = "";
                 lab["file"][nk[mindex].name+"/etc/zebra/daemons"] = "zebra=yes\n";
+
+                lab["file"][nk[mindex].name+"/etc/zebra/zebra.conf"] = "";
+                lab["file"][nk[mindex].name+"/etc/zebra/zebra.conf"] += "hostname zebra\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/zebra.conf"] += "password zebra\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/zebra.conf"] += "enable password zebra\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/zebra.conf"] += "\nlog file /var/log/zebra/zebra.log\n";
             }
             if(nk[mindex].routing.rip.en){
                 lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ripd=yes\n";
                 lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] = "";
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "hostname ripd\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "password zebra\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "enable password zebra\n";
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "\n";
+
                 lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "router rip\n";
 
                 for(var n in nk[mindex].routing.rip.network)
@@ -418,6 +431,13 @@
             if(nk[mindex].routing.ospf.en){
                 lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ospfd=yes\n";
                 lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] = "";
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "hostname ospfd\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "password zebra\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "enable password zebra\n";
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "\n";
+
                 lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "router ospf\n";
 
                 for(var m in nk[mindex].routing.ospf.network)
@@ -446,6 +466,12 @@
                         lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "ospf cost " + nk[mindex].routing.ospf.if[face].cost + "\n";
                     }
                 }
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
+            }
+
+            if(nk[mindex].routing.rip.en) {
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n";
             }
 
         }
