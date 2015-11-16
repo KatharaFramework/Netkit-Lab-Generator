@@ -6,10 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Netkit Lab Generator</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+
+    <script src="js/angular.min.js"></script>
+    <script>
+        if (typeof(angular)=="undefined")
+            document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"><\/script>');
+    </script>
+    <script src="js/jszip.min.js"></script>
+    <script>
+        if (typeof(JSZip)=="undefined")
+            document.write('<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"><\/script>');
+    </script>
+    <script src="js/FileSaver.min.js"></script>
+    <script>
+        if (typeof(saveAs)=="undefined")
+            document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
+    </script>
+
     <style>
         body {
-            background: white;
             padding: 10px;
         }
         .ng-hide {
@@ -63,23 +79,6 @@
             background-color: #9e9e9e;
             border-color: #808080;
             opacity: 0.2 !important;
-        }
-        input {
-            border-radius: 0;
-            background-position: right center;
-            background-repeat: no-repeat;
-        }
-        input:required:invalid, input:focus:invalid, textarea:required:invalid, input:invalid {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAT1JREFUeNpi/P//PwMpgImBRMACY/x7/uDX39sXt/67cMoDyOVgMjBjYFbV/8kkqcCBrIER5KS/967s+rmkXxzI5wJiRSBm/v8P7NTfHHFFl5mVdIzhGv4+u///x+xmuAlcdXPB9KeqeLgYd3bDU2ZpRRmwH4DOeAI07QXIRKipYPD35184/nn17CO4p/+cOfjl76+/X4GYAYThGn7/g+Mfh/ZZwjUA/aABpJVhpv6+dQUjZP78Z0YEK7OezS2gwltg64GmfTu6i+HL+mUMP34wgvGvL78ZOEysf8M1sGgZvQIqfA1SDAL8iUUMPIFRQLf+AmMQ4DQ0vYYSrL9vXDz2sq9LFsiX4dLRA0t8OX0SHKzi5bXf2HUMBVA0gN356N7p7xdOS3w5fAgcfNxWtn+BJi9gVVBOQfYPQIABABvRq3BwGT3OAAAAAElFTkSuQmCC');
-        }
-        input:required:valid {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZZJREFUeNpi/P//PwMpgImBRMAy58QshrNPTzP8+vOLIUInisFQyYjhz98/DB9/fmT48/+35v7H+8KNhE2+WclZd+G0gZmJmYGThUNz1fUVMZtvbWT59eUXG9wGZIWMUPj993eJ5VeWxuy8veM/CzPL3yfvH/9H0QBSBDYZyOVm4mGYfn6q4cory5lYmFh+MrEwM/76/YsR7mk2ZjbWP///WP37/y8cqIDhx58fjvtu7XV6//ndT34G/v8FasUsDjKO/+A2PP3wpGLd+TVsfOz8XH6KAT+nHpokcu7h6d9q/BoMxToVbBYqlt9///+1GO4/WVdpXqY/zMqXn13/+vTjI9mj94/y//v9/3e9ZRObvYbDT0Y2xnm///x+wsfHB3GSGLf41jb3rv0O8nbcR66d+HPvxf2/+YZFTHaqjl8YWBnm/vv37yly5LL8+vuLgYuVa3uf/4T/Kd8SnSTZpb6FGUXwcvJxbAPKP2VkZESNOBDx8+9PBm4OwR1TwmYwcfzjsBUQFLjOxs52A2YyKysrXANAgAEA7buhysQuIREAAAAASUVORK5CYII=');
-        }
-        input:valid {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCMUU2QjQ1RjhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCMUU2QjQ2MDhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkIxRTZCNDVEOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkIxRTZCNDVFOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+WXXDRQAAAWBJREFUeNqUkT9rwlAUxW/eyx8kdHByCAFLhICgKYqDa8XNJX4LJ0c/kpBF8gG0Lg62FnHQZnARuySLOojEvCS9r9DQgh288JbHOff83nlCmqZwzxC4c0TXdcHzPIiiCFqtFpTLZWCMwfl8hjiOC6vVyjIMI6pUKi//JlBKQZblwnQ6rc1mM3K5XGiWcMsQhuHDeDyuzefzVBTF1Pd9uGkghICiKDAajbTJZCJgUozXAsfNNLiBJklSxPPEUa7Xa2mxWJSOxyPj5k6nQyzLyqoUgyB4xniqqqrUbDaZ4zjqZrNJNE2DbrdLURxhCe+ZYbfbfeq6bqzX63A4HOqHw4FzMy6uVqsMU98Q6ZQh5fP5j16vt8VN8nK5TPb7fWLbtlCv10MUvyLq6ffnEv4gZPX6/f7WNE2p0WhAu91WEHGLJZww7buIPy1xUy6X8waDAW/mEVN9FAU/myVJygxfAgwAp6GboqaPmLwAAAAASUVORK5CYII=');
-        }
-        input[type=file] {
-            background-image: none;
         }
         table {
             border-collapse: separate; border-spacing: 0 2px; box-sizing: border-box;
@@ -145,26 +144,33 @@
             color: #000;
             padding: 0.2em 0;
         }
+        /* heavy stuff */
+        .bg-logos {
+            padding: 10px;
+            background: white no-repeat top right url('data:image/gif;base64,R0lGODlhQQBBAPcAAAAAAP////9CSv5CT/idov9CUv5CUf5FVttCUPjM0Pfq6/9CVf5CV/5CWP9GWP1KXONCVNlCUvtOYfpUZftbbfxhcfdre/B3hOeUnfqqs+KhqPizu/i9w9K/wf5CWv1DWtpCVdlCVdlCV9dCVeFKXNhJXddOYdRod/uHldN1gtKKlNmQmtSbo92rsdKrsMuprdW1uffW2sqytdHJys7Gx+FFXdlDWdhDWthEW9hFXdhGXdZGXeFNYtZTZt9bbtVXadZabNN/i9CFkM2PmMi7vfbf4/by80JUmfv8/kJrpkJyq+fo6UR8sVqOvJGxznSgxqHA2dfk76/K38jb6uTu9evy9/j7/bnT5PD3+fH+//X//73Fxfb///D09PX4+MbJycPGxr7Bwf3//8DCwuzt7eLj49LT08XQz73HxrzGxcLLyvX+/cDIx8bOzcbT0b7FxMLJyPX8+8POzNLd27vAv7/HxcXNy9PW1cnMy0N3REJrQkJgQuDh4FR3SV99Uqu2oL/Ht/3/+56okX+KWYeIg7O0r5abYJydiZubmZaWlPz8+9HR0K+pb//yntTJhci9gMe6dpqWg5qZlP/qlv/rnJ2Zh5qWhZmVhfPdjPnkk//kkv/mlf/mmZuWhpqVhf/giP/ijufSlpiVjKGelfz47f/ejf/fjv/hkv/hlP/78f/Xfv/YhP/Zhf/bjv/cj//ekPzZjvvak/3elfzblKqWaOLIi+TLk97Wxf/67//Xhv/XiP/Yi//YjP/ZjvzakpiEXfLly//WjPvVkYFwUXdsV+bbx+XaxvrRj/7PiPvVnP3GhObk4vu9g/m2fP7o1fvz7bWnnfepd/eZa/Oecend1/eOXu+Ua/vJsfvVxPN8SPWEU/SFYO2HZu1oQ+9xTO7Jvu/Qx+tuUOt3W+2zpO69sO/Sy+uGcu/l4+lbQ+hnTulqVOhOQuVdUPbv78bCws/Nzfn4+P////7+/vz8/PX19fT09PHx8enp6ebm5uXl5dvb29bW1pycnJubm2tra0VFRSwAAAAAQQBBAAAI/wADCBxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIsaPHjyBDihxJ0qEXPm/UjNFXr6REeGW+pPkCw8UMN2/A8GnpUuE8Pni2wOmAwYIEHj+CuHhn5w0effB6EoTH5wsaOx00XJBQQIAFFiNA2EjqgsYZOGD00XN5bx8dOTO0TihQoIGHBRzm/BCRw0YIG0CUvnMTRidJOjNaXJjAoMACD5ALVDAyZ0iIHDp04BARAkdgF4vGkKyDYYBju5AhD8ig5Y47IDYyy74hIkIJGGxI2tGwAHVqDwUoKIhjRo1l2chtmOgAhqSZFg8Y/PbQYAABLl7MwCHSQwTyzCJ+0P/AQ/IODAmPfxeYUERLjBVwzggBgRm5iBPvzJDkQ2RC+tQDoLCGFgSQQIQb3HmHXAgptKEPSWS4U8F/HjDwQAxatEMBBEK0Id9lCwohRxkk1ROGBRQGOOAGBtRgAhFnEGHCDbLlEAILapBBkiJbXFBAagwckIAW9FgwQA0RBNFGG0GEUOMNLrzhBUnysIHBfwNc4IV7FVDgww8nwChDCbFppgMMYcxT0hu8QRYkB0S2I+c77tT5RRsp0KfDDcuJVhIeLThg1wAW1BPHgFxoMYccZ5xx55ixAfZOcyWZ90ADDRSwgRZecEDApysIoYIQL9hhRwpO3rfIFy6VIYMEDSz/QEE7aygwgQAGFADBCCIgcMIXZ7ywZwhK7uPSEkRQwMBqWmjBYmo17KCZDS+08cUJnKkARz4u2TOGkRQYocUaFvzowQfRYsbgGW7IoAMILNRxj0uK0HGBACgUUcQG0UGGrrR7mvACEUScgECU9vREhwYPOPDApb79KxsOJZhgQgknzECHPD29AwcMFywwAIUSZ4ZDCBEAwcKki0gVABl2sAHyAXX5Gy14IfywMht48ORyAPnUAUcLKD72r189qDADG2Do+HNB+dCBhwYUOFbDCCUE0cEZY8z79EHzmIEGDRhMQEIKHdiBBz5fL0SP2B3A0MYbD7bdkD1fsLEPx3b3/+3334AHLrhCfOBj+OGIJ674EssUY0wxjgPjDDCUS06545Bnrnnmt7SsENsV4bKKKqyw8gktv/wyzC+0rE4LJp+sUvrstJteiygLgU4RLrvkwksrmxDzD+qo/0MMMbS0UgovzDfvvCm1jJK7RbjwoksvvUzyCCOOdN/9I7QMkskpvGBv/vnQS/95AFNMIdAVUQw0BRRSXCEFFQHoo19U1evSSivNYIYymEHAAipDGc0IxivOx8D0Tc8JSRBIE5ogkCooQQlNUEIEqfGPfxCCDgFIhfVcoQlusEMd6UhhOFYYDnWIAxmnYCD6bKG+hLAtCkpwnxSUUIUAQEEJAlECFP8C4A9CwOMf/AhA/4AnDReK44nViGI1tsGNXixQhtiDniSmFwAmOMGHR3BfE54QgCdQkA+EEAgZErbETUwDHePoQhewwDdneIMbp3AFFrNIw0IowIYCMWMZjzBEJkyBCkf44iIKUZD+ZS8a6yBHFr5BDmxgwxnX8IY1NtGKPfJiErbwgx78cA6EgG4KhnyCE55wBSYEIApPSIITnmEsgjhyEtGAYxbEgY5s+FIb4pgGJ7HXCj1ijxeb4MQg9JAHPQDClAJBQhOY8AQrPIGaA5FCEuLXSOtlrxnoIEAWsoAFMXDsGt2YxiQ6yYtTcIJ8yFTmHpr5B0AGkpCDlMJAqJD/BH1283qbYEY6zEGOb5TjkgG4BjqiMYle8IISjhgEJjiRzEHMMw+CWJ9AtBk/KCSBClOI3xSUMEuB3IORIgSoMsLBjW+YYx3o2EZCF9pQVNSiD3vwAyooYdFmplGjr2xCD6dAwVi2sgmBkEQY+ODBEHpTE8gIhzmyQA1xbAMbAWBGN5qxzkkwYp56GMQymzkIaHAxAFi4QgXVWsYkCDV//miqEr15imA8ERzjFEMASDGNdDBjE71wxSa+2kxm7sEQyaghNCEiDzUJxJGveAU30sHScVwjGtoApjIA285GfNWwhmhEKBR7EN1NxJGtOMU0xJEOdKCjG90Ihzi4wYsrjta2EZDQw2EpMYnonfW0pfhEKUphCk3oohnS2MY2pBENZGgCFMONLihwa4hJbAIUNJyeIrbL3e5617tiIIUvYDGLWcRCFpygBCeEcYz0ckIW5Y2veWeRXln4AhXZVcg+EJEIRPj3vwAOMID7IQlLRMISCEawJyxxiEN0YsEJjrAlLtGJSlzCEpUgxE8TEhAAOw==');
+        }
+        input {
+            border-radius: 0;
+            background-position: right center;
+            background-repeat: no-repeat;
+        }
+        input:required:invalid, input:focus:invalid, textarea:required:invalid, input:invalid {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAT1JREFUeNpi/P//PwMpgImBRMACY/x7/uDX39sXt/67cMoDyOVgMjBjYFbV/8kkqcCBrIER5KS/967s+rmkXxzI5wJiRSBm/v8P7NTfHHFFl5mVdIzhGv4+u///x+xmuAlcdXPB9KeqeLgYd3bDU2ZpRRmwH4DOeAI07QXIRKipYPD35184/nn17CO4p/+cOfjl76+/X4GYAYThGn7/g+Mfh/ZZwjUA/aABpJVhpv6+dQUjZP78Z0YEK7OezS2gwltg64GmfTu6i+HL+mUMP34wgvGvL78ZOEysf8M1sGgZvQIqfA1SDAL8iUUMPIFRQLf+AmMQ4DQ0vYYSrL9vXDz2sq9LFsiX4dLRA0t8OX0SHKzi5bXf2HUMBVA0gN356N7p7xdOS3w5fAgcfNxWtn+BJi9gVVBOQfYPQIABABvRq3BwGT3OAAAAAElFTkSuQmCC');
+        }
+        input:required:valid {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZZJREFUeNpi/P//PwMpgImBRMAy58QshrNPTzP8+vOLIUInisFQyYjhz98/DB9/fmT48/+35v7H+8KNhE2+WclZd+G0gZmJmYGThUNz1fUVMZtvbWT59eUXG9wGZIWMUPj993eJ5VeWxuy8veM/CzPL3yfvH/9H0QBSBDYZyOVm4mGYfn6q4cory5lYmFh+MrEwM/76/YsR7mk2ZjbWP///WP37/y8cqIDhx58fjvtu7XV6//ndT34G/v8FasUsDjKO/+A2PP3wpGLd+TVsfOz8XH6KAT+nHpokcu7h6d9q/BoMxToVbBYqlt9///+1GO4/WVdpXqY/zMqXn13/+vTjI9mj94/y//v9/3e9ZRObvYbDT0Y2xnm///x+wsfHB3GSGLf41jb3rv0O8nbcR66d+HPvxf2/+YZFTHaqjl8YWBnm/vv37yly5LL8+vuLgYuVa3uf/4T/Kd8SnSTZpb6FGUXwcvJxbAPKP2VkZESNOBDx8+9PBm4OwR1TwmYwcfzjsBUQFLjOxs52A2YyKysrXANAgAEA7buhysQuIREAAAAASUVORK5CYII=');
+        }
+        input:valid {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCMUU2QjQ1RjhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCMUU2QjQ2MDhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkIxRTZCNDVEOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkIxRTZCNDVFOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+WXXDRQAAAWBJREFUeNqUkT9rwlAUxW/eyx8kdHByCAFLhICgKYqDa8XNJX4LJ0c/kpBF8gG0Lg62FnHQZnARuySLOojEvCS9r9DQgh288JbHOff83nlCmqZwzxC4c0TXdcHzPIiiCFqtFpTLZWCMwfl8hjiOC6vVyjIMI6pUKi//JlBKQZblwnQ6rc1mM3K5XGiWcMsQhuHDeDyuzefzVBTF1Pd9uGkghICiKDAajbTJZCJgUozXAsfNNLiBJklSxPPEUa7Xa2mxWJSOxyPj5k6nQyzLyqoUgyB4xniqqqrUbDaZ4zjqZrNJNE2DbrdLURxhCe+ZYbfbfeq6bqzX63A4HOqHw4FzMy6uVqsMU98Q6ZQh5fP5j16vt8VN8nK5TPb7fWLbtlCv10MUvyLq6ffnEv4gZPX6/f7WNE2p0WhAu91WEHGLJZww7buIPy1xUy6X8waDAW/mEVN9FAU/myVJygxfAgwAp6GboqaPmLwAAAAASUVORK5CYII=');
+        }
+        input[type=file] {
+            background-image: none;
+        }
     </style>
 
-    <script src="js/angular.min.js"></script>
-    <script>
-        if (typeof(angular)=="undefined")
-            document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"><\/script>');
-    </script>
-    <script src="js/jszip.min.js"></script>
-    <script>
-        if (typeof(JSZip)=="undefined")
-            document.write('<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"><\/script>');
-    </script>
-    <script src="js/FileSaver.min.js"></script>
-    <script>
-        if (typeof(saveAs)=="undefined")
-            document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
-    </script>
-
+    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
 </head>
-<body>
+<body class="bg-logos">
 <script>
     var isIE = navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0;
     if (isIE)
@@ -172,52 +178,52 @@
 </script>
 <h1>Netkit Lab Generator</h1>
 <hr />
-<div ng-app="napp" ng-controller="nc">
+<div data-ng-app="napp" data-ng-controller="nc">
 
-    <table id="netkit" border="0" cellspacing="0" cellpadding="0">
+    <table id="netkit">
         <tr>
             <th>Info Macchina</th>
             <th>Interfacce di Rete</th>
             <th>Gateway (statico):</th>
-            <th>Funzioni aggiuntive:</th>
+            <th colspan="4">Funzioni aggiuntive:</th>
         </tr>
 
         <tr data-ng-repeat="x in netkit track by $index">
             <td>
                 <div><label>Macchina {{x.row}}:</label>
-                    <input type="text" ng-model="x.name" class="form-control" placeholder="pc" required /></div>
-                <input type="radio" value="terminale" ng-model="x.type" /> Terminale<br />
-                <input type="radio" value="router" ng-model="x.type" /> Router<br />
-                <input type="radio" value="ns" ng-model="x.type" /> Name Server<br />
-                <input type="radio" value="ws" ng-model="x.type" /> Web Server<br />
+                    <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required /></div>
+                <input type="radio" value="terminale" data-ng-model="x.type" /> Terminale<br />
+                <input type="radio" value="router" data-ng-model="x.type" /> Router<br />
+                <input type="radio" value="ns" data-ng-model="x.type" /> Name Server<br />
+                <input type="radio" value="ws" data-ng-model="x.type" /> Web Server<br />
             </td>
             <td class="interfaces">
-                <div class="btn btn-success" ng-click="addInterface(x)">Aggiungi interfaccia</div>
-                <div class="btn btn-danger" ng-click="removeInterface(x)" ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
+                <div class="btn btn-success" data-ng-click="addInterface(x)">Aggiungi interfaccia</div>
+                <div class="btn btn-danger" data-ng-click="removeInterface(x)" data-ng-disabled="x.interfaces.counter<=1">Rimuovi ultima interfaccia</div><br />
                 <div class="hidelasthr" data-ng-repeat="i in x.interfaces.if">
                     <div><label>Eth{{i.eth.number}}: </label>
-                        <input type="text" ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
+                        <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
                     <div><label> IP/Net: </label>
-                        <input type="text" ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
+                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
                     <hr />
                 </div>
             </td>
             <td class="gateways">
-                <div class="btn btn-success" ng-click="addGateway(x)">Aggiungi gateway</div>
-                <div class="btn btn-danger" ng-click="removeGateway(x)" ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
+                <div class="btn btn-success" data-ng-click="addGateway(x)">Aggiungi gateway</div>
+                <div class="btn btn-danger" data-ng-click="removeGateway(x)" data-ng-disabled="x.gateways.counter<=1">Rimuovi ultimo gw</div><br />
                 <div class="hidelasthr" data-ng-repeat="j in x.gateways.gw">
                     <div><label>Route (vuoto per default gw):</label>
-                        <input type="text" ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
+                        <input type="text" data-ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
                     <div><label>GW (vuoto per non generare nulla):</label>
-                        <input type="text" ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" /></div>
+                        <input type="text" data-ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" /></div>
                     <div><label>Interface:</label>
-                        <select ng-model="j.if" class="form-control">
+                        <select data-ng-model="j.if" class="form-control">
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select></div>
                     <hr />
                 </div>
             </td>
-            <td  ng-show="x.type=='ns'">
+            <td  data-ng-show="x.type=='ns'">
                 <div>
                     Il supporto completo al DNS non <br />
                     &egrave; presente in questa versione.<br />
@@ -226,53 +232,53 @@
                     questa macchina e creato il file <br />
                     /etc/bind/named.conf (vuoto).</div>
             </td>
-            <td ng-show="x.type=='ws'">
-                <input type="checkbox" value="1" ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
+            <td data-ng-show="x.type=='ws'">
+                <input type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
             </td>
-            <td ng-show="x.type=='terminale'">
+            <td data-ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
-                <select ng-model="x.pc.ns">
-                    <option value=""> </option>
-                    <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
+                <select data-ng-model="x.pc.ns">
+                    <option value="">-</option>
+                    <option data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>
                 <!-- forma piu' corretta ma non permette valore di base a meno di aggiungere un elemento vuoto all'array -->
-                <!--<select ng-model="x.pc.ns"
-                        ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
+                <!--<select data-ng-model="x.pc.ns"
+                        data-ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
                         class="form-control">
                 </select>-->
             </td>
-            <td ng-show="x.type=='router'">
+            <td data-ng-show="x.type=='router'">
                 <label>Routing dinamico: </label><br /><br />
-                <div><input type="checkbox" value="router" ng-model="x.routing.rip.en" /> rip</div>
-                <div ng-show="x.routing.rip.en">
-                    <span class="btn btn-success btn-square" ng-click="addRipNetwork(x)">+</span>
-                    <span class="btn btn-danger btn-square" ng-click="removeRipNetwork(x)" ng-disabled="x.routing.rip.network.length<=1">-</span>
+                <div><input type="checkbox" value="router" data-ng-model="x.routing.rip.en" /> rip</div>
+                <div data-ng-show="x.routing.rip.en">
+                    <span class="btn btn-success btn-square" data-ng-click="addRipNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeRipNetwork(x)" data-ng-disabled="x.routing.rip.network.length<=1">-</span>
                     <div data-ng-repeat="rnet in x.routing.rip.network track by $index">
                         <label>Network: </label>
-                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.network[$index]" />
+                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.network[$index]" />
                     </div>
                     <div><label>Route (vuoto per omettere): </label>
-                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.route" /></div>
-                    <div><input type="checkbox" value="ns" ng-model="x.routing.rip.connected" /> redistribute connected</div>
+                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route" /></div>
+                    <div><input type="checkbox" value="ns" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
                 </div>
                 <hr />
-                <input type="checkbox" value="ns" ng-model="x.routing.ospf.en" /> ospf<br />
-                <div ng-show="x.routing.ospf.en">
-                    <span class="btn btn-success btn-square" ng-click="addOspfNetwork(x)">+</span>
-                    <span class="btn btn-danger btn-square" ng-click="removeOspfNetwork(x)" ng-disabled="x.routing.ospf.network.length<=1">-</span>
+                <input type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf<br />
+                <div data-ng-show="x.routing.ospf.en">
+                    <span class="btn btn-success btn-square" data-ng-click="addOspfNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeOspfNetwork(x)" data-ng-disabled="x.routing.ospf.network.length<=1">-</span>
                     <div data-ng-repeat="onet in x.routing.ospf.network track by $index">
                         <div>
                             <label>Network: </label>
-                            <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.ospf.network[$index]" />
+                            <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.ospf.network[$index]" />
                         </div>
                         <label>Area: </label>
-                        <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" ng-model="x.routing.ospf.area[$index]" />
+                        <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.ospf.area[$index]" />
                     </div>
-                    <div><input type="checkbox" value="ns" ng-model="x.routing.ospf.connected" /> redistribute connected</div>
+                    <div><input type="checkbox" value="ns" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
-                        <div><input type="text" placeholder="0" class="form-control" ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
-                        <select ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
+                        <div><input type="text" placeholder="0" class="form-control" data-ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
+                        <select data-ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select>
                     </div>
@@ -281,13 +287,13 @@
         </tr>
 
     </table>
-    <div class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
-    <div class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
-    <a class="btn btn-primary" download="script.netkit" href="{{ makeDownload(generateScript(netkit)) }}"><strong>Scarica il file .sh</strong></a>
-    <a class="btn btn-primary" ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
+    <div class="btn btn-success" data-ng-click="addMachine()">Aggiungi Macchina</div>
+    <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
+    <a class="btn btn-primary" data-ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
     <br />
-    <a class="btn btn-primary" ng-click="import()"><strong>Importa configurazione</strong></a>
-    <a class="btn btn-primary" download="netkit.config" href="{{ makeDownload(generateConfig(netkit)) }}"><strong>Esporta configurazione</strong></a>
+    <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
     <input type="file" id="file" name="file"/>
 
     <br />
@@ -306,7 +312,7 @@
 
 
 <script>
-    
+
     if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
             return JSON.parse(JSON.stringify(obj));
@@ -640,8 +646,9 @@
             }
         };
 
-        $scope.makeDownload = function(text) {
-            return 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+        $scope.makeDownload = function(text, filename) {
+            var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+            saveAs(blob, filename);
         };
 
         $scope.generateScript = function(nk) {
