@@ -367,7 +367,7 @@
                     lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "network "+nk[mindex].routing.rip.network[n]+"\n";
 
                 if (typeof(nk[mindex].routing.rip.route) != "undefined" && nk[mindex].routing.rip.route != "")
-                    lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route 0.0.0.0/0\n";
+                    lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route " + nk[mindex].routing.rip.route + "\n";
 
                 lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\n";
             }
