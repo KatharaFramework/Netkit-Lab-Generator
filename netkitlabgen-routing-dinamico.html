@@ -316,7 +316,7 @@
     <div class="file">
         <input type="file" id="file" name="file" class="form-control hidden"
                onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
-        <input id="file-text" type="text" class="form-control fakefile" title="file-text" readonly /><input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Choose file">
+        <input id="file-text" type="text" class="form-control fakefile" title="file-text" readonly /><input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Sfoglia...">
     </div>
     <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
     <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
