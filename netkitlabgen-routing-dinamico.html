@@ -166,7 +166,7 @@
                 </select>
             </td>
             <td ng-show="x.type=='router'">
-                <label>Routing dinamico: </label>
+                <label>Routing dinamico <br />(non fa generare quello statico): </label>
                 <div><input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input></div>
                 <div ng-show="x.routing.rip.en">
                     <label>Network: </label><input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.network" />
