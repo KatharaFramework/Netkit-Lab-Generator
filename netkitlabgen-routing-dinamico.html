@@ -21,6 +21,42 @@
             margin-bottom: 2px;
             height: 26px;
         }
+        ::-webkit-input-placeholder {
+            color: #9a9a9a !important;
+        }
+        ::-webkit-input-placeholder:before {
+            content: "suggerimento: " !important;
+            font-size: 80%;
+            color: #9a9a9a !important;
+        }
+        :-moz-placeholder {
+            color: #9a9a9a !important;
+            opacity:1;
+        }
+        :-moz-placeholder:before {
+            content: "suggerimento: " !important;
+            font-size: 80%;
+            color: #9a9a9a !important;
+            opacity:1;
+        }
+        ::-moz-placeholder {
+            color: #9a9a9a !important;
+            opacity:1;
+        }
+        ::-moz-placeholder:before {
+            content: "suggerimento: " !important;
+            font-size: 80%;
+            color: #9a9a9a !important;
+            opacity:1;
+        }
+        :-ms-input-placeholder {
+            color: #9a9a9a !important;
+        }
+        :-ms-input-placeholder:before {
+            content: "suggerimento: " !important;
+            font-size: 80%;
+            color: #9a9a9a !important;
+        }
         .btn {
             margin: 2px 0;
             padding: 4px 3px;
@@ -30,6 +66,11 @@
             height: 22px;
             width: 22px;
             padding: 0;
+        }
+        .btn-danger.disabled, .btn-danger.disabled.active, .btn-danger.disabled.focus, .btn-danger.disabled:active, .btn-danger.disabled:focus, .btn-danger.disabled:hover, .btn-danger[disabled], .btn-danger[disabled].active, .btn-danger[disabled].focus, .btn-danger[disabled]:active, .btn-danger[disabled]:focus, .btn-danger[disabled]:hover, fieldset[disabled] .btn-danger, fieldset[disabled] .btn-danger.active, fieldset[disabled] .btn-danger.focus, fieldset[disabled] .btn-danger:active, fieldset[disabled] .btn-danger:focus, fieldset[disabled] .btn-danger:hover {
+            background-color: #9e9e9e;
+            border-color: #808080;
+            opacity: 0.2 !important;
         }
         input {
             border-radius: 0;
@@ -68,7 +109,9 @@
             display:none;
         }
         th {
-            background-color: #fafafa;
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
         }
         hr {
             margin: 5px 0;
@@ -234,9 +277,9 @@
     <h4>Anteprima:</h4>
     <textarea rows="15" readonly>{{ generateScript(netkit) }}</textarea>
 
-    <div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
+    <!--<div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
     <div id="origin" class="hidden">{{netkit}}</div>
-    <pre id="highlight"></pre>
+    <pre id="highlight"></pre>-->
 
 </div>
 
