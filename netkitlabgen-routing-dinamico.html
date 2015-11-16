@@ -71,6 +71,13 @@
     label {
         margin-bottom: 0;
     }
+    pre {outline: 1px solid #ccc; padding: 5px; border-radius: 0; }
+    .string { color: green; }
+    .number { color: darkorange; }
+    .boolean { color: blue; }
+    .null { color: magenta; }
+    .key { color: red; }
+    .hidden {visibility:hidden; display:none; opacity:0;}
 </style>
 
 <script src="js/angular.min.js"></script>
@@ -179,14 +186,48 @@
     <h4>Anteprima:</h4>
     <textarea style="width:100%" rows="15" readonly>{{ generate(netkit) }}</textarea>
 
+    <div class="btn btn-success" onclick="debug()">Debug</div>
+    <div id="origin" class="hidden">{{netkit}}</div>
+    <pre id="highlight"></pre>
+
 </div>
 
 
 <script>
     if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
-            return JSON.parse(JSON.stringify(obj));
+            return JSON.parse(JSON.stringify(obj, undefined, 4));
         };
+    }
+
+    function highlight(json) {
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, undefined, 4);
+        }
+        else {
+            json = JSON.stringify(JSON.parse(json), undefined, 4);
+        }
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    function debug() {
+        var json = document.getElementById("origin").innerHTML;
+        document.getElementById("highlight").innerHTML=highlight(json);
     }
 
     var app = angular.module('napp', []);
@@ -250,8 +291,6 @@
 
         $scope.generate = function(nk) {
             var text="";
-
-            // conversione array in stringa html (con <br>, <hr>, <h4>, ecc) appesa a text
 
             text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
 
@@ -323,7 +362,6 @@
                 }
             }
 
-            //TODO testing
             for (var mindex in nk) {
                 if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
                     text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
