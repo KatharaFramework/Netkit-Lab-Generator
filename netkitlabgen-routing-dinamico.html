@@ -189,7 +189,7 @@
     </table>
     <div class="btn btn-success" ng-click="addMachine()">Aggiungi Macchina</div>
     <div class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
-    <a class="btn btn-primary" download="script.netkit" href="{{ makedownload(generate(netkit)) }}"><strong>Scarica il file .sh</strong></a><br /><br />
+    <a class="btn btn-primary" download="script.netkit" href="{{ makeDownload(generate(netkit)) }}"><strong>Scarica il file .sh</strong></a><br /><br />
 
     <hr />
     <br />
@@ -239,6 +239,249 @@
     function debug() {
         var json = document.getElementById("origin").innerHTML;
         document.getElementById("highlight").innerHTML=highlight(json);
+    }
+
+    function makeFileStructure(nk){
+        var lab = [];
+        lab["folder"] = [];
+        lab["file"] = [];
+
+        for(var mindex in nk){
+            if(nk[mindex].name.substring(0, 2)=='ns') {
+                lab["folder"][nk[mindex].name+"/etc/bind"]="";
+            } else {
+                lab["folder"][nk[mindex].name]="";
+            }
+        }
+
+        // generazione lab.conf
+        lab["file"]["lab.conf"]="";
+        for (var mindex in nk) {
+            for (var i in nk[mindex].interfaces.if){
+                lab["file"]["lab.conf"] += nk[mindex].name + "[" + nk[mindex].interfaces.if[i].eth.number + "]="+nk[mindex].interfaces.if[i].eth.domain + "\n";
+            }
+        }
+
+        // generazione macchina.startup
+        for (var mindex in nk) {
+            lab["file"][nk[mindex].name+".startup"]="";
+
+            for (var i in nk[mindex].interfaces.if){
+                //ifconfig eth_ SELFADDRESS/MASK up
+                lab["file"][nk[mindex].name+".startup"] += "ifconfig eth" + nk[mindex].interfaces.if[i].eth.number +
+                        " " + nk[mindex].interfaces.if[i].ip + " up\n";
+            }
+
+            for (var g in nk[mindex].gateways.gw) {
+                if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
+                    //route add default gw GATEWAY dev eth_
+                    if (nk[mindex].gateways.gw[g].route == "") {
+                        lab["file"][nk[mindex].name+".startup"] += "route add default gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                nk[mindex].gateways.gw[g].if + "\n";
+                    }
+                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                    else {
+                        lab["file"][nk[mindex].name+".startup"] += "route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                nk[mindex].gateways.gw[g].if + "\n";
+                    }
+                }
+            }
+
+            // ns
+            if(nk[mindex].type=='ns') {
+                lab["file"][nk[mindex].name+".startup"] += "/etc/init.d/bind start\n";
+                lab["folder"][nk[mindex].name+"/etc/bind"]="";
+                lab["file"][nk[mindex].name+"/etc/bind/named.conf"]="";
+            }
+            // ws
+            else if(nk[mindex].type=='ws') {
+                if(nk[mindex].ws.userdir==true) {
+                    lab["folder"][nk[mindex].name+"/home/guest/public_html"]="";
+                    lab["file"][nk[mindex].name+"/home/guest/public_html/index.html"]='<html><head><title>Guest Home</title></head><body>Guest Home</body></html>';
+                    lab["file"][nk[mindex].name+".startup"] += "a2enmod userdir\n";
+                }
+                lab["file"][nk[mindex].name+".startup"] += "/etc/init.d/apache2 start\n";
+            }
+            else if(nk[mindex].type=='terminale') {
+                lab["folder"][nk[mindex].name+"/etc"]="";
+                lab["file"][nk[mindex].name+"/etc/resolv.conf"]="nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
+                alert("ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
+            }
+        }
+// TODO finire
+        for (var mindex in nk) {
+            if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
+                text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
+                text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
+                text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+            }
+            if(nk[mindex].routing.rip.en){
+                text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+
+                var control = false;
+                for (var g in nk[mindex].gateways.gw) {
+                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "")
+                        control=true;
+                }
+                if(control) {
+                    text += "echo 'route 0.0.0.0/0' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                }
+                control = false;
+            }
+            if(nk[mindex].routing.ospf.en){
+                text += "echo 'ospfd=yes' >> " + nk[mindex].name + "/etc/zebra/daemons\n";
+                for(var face in nk[mindex].routing.ospf.if) {
+                    if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
+                        text += "echo 'interface eth" + nk[mindex].routing.ospf.if[face].interface + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                        text += "echo 'ospf cost " + nk[mindex].routing.ospf.if[face].cost + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                    }
+                }
+                text += "echo 'router ospf' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                text += "echo 'network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                // TODO aggiunta route statiche a ospf similmente a rip
+            }
+            if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
+                text += "echo 'redistribute ospf' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
+                text += "echo 'redistribute connected' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
+
+                text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+            }
+        }
+
+
+        text += "rm $0\n";
+
+        return text;
+
+    }
+
+    function makeScript(nk){
+        var text="";
+
+        text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
+
+        text += "#! /bin/sh\n";
+        text += "mkdir -p";
+
+        for(var mindex in nk){
+            if(nk[mindex].name.substring(0, 2)=='ns') {
+                text += " "+nk[mindex].name+"/etc/bind";
+            } else {
+                text += " "+nk[mindex].name;
+            }
+        }
+        text += "\n";
+
+        // generazione lab.conf
+        text += "touch lab.conf\n";
+        for (var mindex in nk) {
+            for (var i in nk[mindex].interfaces.if){
+                text += "echo "+nk[mindex].name + "[" + nk[mindex].interfaces.if[i].eth.number + "]="+nk[mindex].interfaces.if[i].eth.domain + " >> lab.conf\n";
+            }
+        }
+
+        // generazione macchina.startup
+        for (var mindex in nk) {
+            text += "touch " +  nk[mindex].name+".startup" +"\n";
+            for (var i in nk[mindex].interfaces.if){
+                //ifconfig eth_ SELFADDRESS/MASK up
+                text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
+                        nk[mindex].interfaces.if[i].ip + " up >> "+ nk[mindex].name+".startup"+"\n";
+            }
+
+            for (var g in nk[mindex].gateways.gw) {
+                if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
+                    //route add default gw GATEWAY dev eth_
+                    if (nk[mindex].gateways.gw[g].route == "") {
+                        text += "echo route add default gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
+                    }
+                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                    else {
+                        text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
+                                nk[mindex].gateways.gw[g].gw + " dev eth" +
+                                nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
+                    }
+                }
+            }
+
+            // ns
+            if(nk[mindex].type=='ns') {
+                text += "echo /etc/init.d/bind start >> " +  nk[mindex].name+".startup"+"\n";
+                text += "mkdir -p "+nk[mindex].name+"/etc/bind\n";
+                text += "touch "+nk[mindex].name+"/etc/bind/named.conf\n";
+            }
+            // ws
+            else if(nk[mindex].type=='ws') {
+                if(nk[mindex].ws.userdir==true) {
+                    text += "mkdir -p "+nk[mindex].name+"/home/guest/public_html\n";
+                    text += "touch "+nk[mindex].name+"/home/guest/public_html/index.html\n";
+                    text += "echo '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
+                    text += "echo a2enmod userdir >> " +  nk[mindex].name+".startup"+"\n";
+                }
+                text += "echo /etc/init.d/apache2 start >> " +  nk[mindex].name+".startup"+"\n";
+            }
+            else if(nk[mindex].type=='terminale') {
+                text += "mkdir -p "+nk[mindex].name+"/etc\n";
+                text += "touch "+nk[mindex].name+"/etc/resolv.conf\n";
+                text += "#ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia\n"
+                text += "echo nameserver " + nk[mindex].pc.ns.split("/")[0] + " >> "+nk[mindex].name+"/etc/resolv.conf\n"; //TODO ip nameserver (si puo' ricavare correttamente?)
+            }
+        }
+
+        for (var mindex in nk) {
+            if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
+                text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
+                text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
+                text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+            }
+            if(nk[mindex].routing.rip.en){
+                text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+
+                var control = false;
+                for (var g in nk[mindex].gateways.gw) {
+                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "")
+                        control=true;
+                }
+                if(control) {
+                    text += "echo 'route 0.0.0.0/0' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                }
+                control = false;
+            }
+            if(nk[mindex].routing.ospf.en){
+                text += "echo 'ospfd=yes' >> " + nk[mindex].name + "/etc/zebra/daemons\n";
+                for(var face in nk[mindex].routing.ospf.if) {
+                    if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
+                        text += "echo 'interface eth" + nk[mindex].routing.ospf.if[face].interface + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                        text += "echo 'ospf cost " + nk[mindex].routing.ospf.if[face].cost + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                    }
+                }
+                text += "echo 'router ospf' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                text += "echo 'network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                // TODO aggiunta route statiche a ospf similmente a rip
+            }
+            if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
+                text += "echo 'redistribute ospf' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
+                text += "echo 'redistribute connected' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
+
+                text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+            }
+        }
+
+
+        text += "rm $0\n";
+
+        return text;
+
     }
 
     var app = angular.module('napp', []);
@@ -296,132 +539,12 @@
             }
         };
 
-        $scope.makedownload = function(text) {
+        $scope.makeDownload = function(text) {
             return 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
         };
 
         $scope.generate = function(nk) {
-            var text="";
-
-            text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
-
-            text += "#! /bin/sh\n";
-            text += "mkdir -p";
-
-            for(var mindex in nk){
-                if(nk[mindex].name.substring(0, 2)=='ns') {
-                    text += " "+nk[mindex].name+"/etc/bind";
-                } else {
-                    text += " "+nk[mindex].name;
-                }
-            }
-            text += "\n";
-
-            // generazione lab.conf
-            text += "touch lab.conf\n";
-            for (var mindex in nk) {
-                for (var i in nk[mindex].interfaces.if){
-                    text += "echo "+nk[mindex].name + "[" + nk[mindex].interfaces.if[i].eth.number + "]="+nk[mindex].interfaces.if[i].eth.domain + " >> lab.conf\n";
-                }
-            }
-
-            // generazione macchina.startup
-            for (var mindex in nk) {
-                text += "touch " +  nk[mindex].name+".startup" +"\n";
-                for (var i in nk[mindex].interfaces.if){
-                    //ifconfig eth_ SELFADDRESS/MASK up
-                    text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
-                            nk[mindex].interfaces.if[i].ip + " up >> "+ nk[mindex].name+".startup"+"\n";
-                }
-
-                for (var g in nk[mindex].gateways.gw) {
-                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
-                        //route add default gw GATEWAY dev eth_
-                        if (nk[mindex].gateways.gw[g].route == "") {
-                            text += "echo route add default gw " +
-                                    nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
-                        }
-                        //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
-                        else {
-                            text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
-                                    nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
-                        }
-                    }
-                }
-
-                // ns
-                if(nk[mindex].type=='ns') {
-                    text += "echo /etc/init.d/bind start >> " +  nk[mindex].name+".startup"+"\n";
-                    text += "mkdir -p "+nk[mindex].name+"/etc/bind\n";
-                    text += "touch "+nk[mindex].name+"/etc/bind/named.conf\n";
-                }
-                // ws
-                else if(nk[mindex].type=='ws') {
-                    if(nk[mindex].ws.userdir==true) {
-                        text += "mkdir -p "+nk[mindex].name+"/home/guest/public_html\n";
-                        text += "touch "+nk[mindex].name+"/home/guest/public_html/index.html\n";
-                        text += "echo '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>' >> "+nk[mindex].name+"/home/guest/public_html/index.html\n";
-                        text += "echo a2enmod userdir >> " +  nk[mindex].name+".startup"+"\n";
-                    }
-                    text += "echo /etc/init.d/apache2 start >> " +  nk[mindex].name+".startup"+"\n";
-                }
-                else if(nk[mindex].type=='terminale') {
-                    text += "mkdir -p "+nk[mindex].name+"/etc\n";
-                    text += "touch "+nk[mindex].name+"/etc/resolv.conf\n";
-                    text += "#ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia\n"
-                    text += "echo nameserver " + nk[mindex].pc.ns.split("/")[0] + " >> "+nk[mindex].name+"/etc/resolv.conf\n"; //TODO ip nameserver (si puo' ricavare correttamente?)
-                }
-            }
-
-            for (var mindex in nk) {
-                if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
-                    text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
-                    text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
-                    text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
-                }
-                if(nk[mindex].routing.rip.en){
-                    text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
-                    text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-                    text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-
-                    var control = false;
-                    for (var g in nk[mindex].gateways.gw) {
-                        if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "")
-                            control=true;
-                    }
-                    if(control) {
-                        text += "echo 'route 0.0.0.0/0' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-                    }
-                    control = false;
-                }
-                if(nk[mindex].routing.ospf.en){
-                    text += "echo 'ospfd=yes' >> " + nk[mindex].name + "/etc/zebra/daemons\n";
-                    for(var face in nk[mindex].routing.ospf.if) {
-                        if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
-                            text += "echo 'interface eth" + nk[mindex].routing.ospf.if[face].interface + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                            text += "echo 'ospf cost " + nk[mindex].routing.ospf.if[face].cost + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                        }
-                    }
-                    text += "echo 'router ospf' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                    text += "echo 'network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                    // TODO aggiunta route statiche a ospf similmente a rip
-                }
-                if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
-                    text += "echo 'redistribute ospf' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
-                    text += "echo 'redistribute connected' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
-
-                    text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
-                    text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
-                }
-            }
-
-
-            text += "rm $0\n";
-
-            return text;
-
+            return makeScript(nk);
         };
     });
 
