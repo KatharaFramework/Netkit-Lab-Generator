@@ -75,6 +75,9 @@
         input:valid {
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCMUU2QjQ1RjhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCMUU2QjQ2MDhCRUUxMUU1ODdBQUU3MUJBOUZBMDU1MyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkIxRTZCNDVEOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkIxRTZCNDVFOEJFRTExRTU4N0FBRTcxQkE5RkEwNTUzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+WXXDRQAAAWBJREFUeNqUkT9rwlAUxW/eyx8kdHByCAFLhICgKYqDa8XNJX4LJ0c/kpBF8gG0Lg62FnHQZnARuySLOojEvCS9r9DQgh288JbHOff83nlCmqZwzxC4c0TXdcHzPIiiCFqtFpTLZWCMwfl8hjiOC6vVyjIMI6pUKi//JlBKQZblwnQ6rc1mM3K5XGiWcMsQhuHDeDyuzefzVBTF1Pd9uGkghICiKDAajbTJZCJgUozXAsfNNLiBJklSxPPEUa7Xa2mxWJSOxyPj5k6nQyzLyqoUgyB4xniqqqrUbDaZ4zjqZrNJNE2DbrdLURxhCe+ZYbfbfeq6bqzX63A4HOqHw4FzMy6uVqsMU98Q6ZQh5fP5j16vt8VN8nK5TPb7fWLbtlCv10MUvyLq6ffnEv4gZPX6/f7WNE2p0WhAu91WEHGLJZww7buIPy1xUy6X8waDAW/mEVN9FAU/myVJygxfAgwAp6GboqaPmLwAAAAASUVORK5CYII=');
         }
+        input[type=file] {
+            background-image: none;
+        }
         table {
             border-collapse: separate; border-spacing: 0 2px; box-sizing: border-box;
         }
@@ -164,7 +167,7 @@
             <th>Funzioni aggiuntive:</th>
         </tr>
 
-        <tr data-ng-repeat="x in netkit">
+        <tr data-ng-repeat="x in netkit track by $index">
             <td>
                 <div><label>Macchina {{x.row}}:</label>
                     <input type="text" ng-model="x.name" class="form-control" placeholder="pc" required /></div>
@@ -268,6 +271,10 @@
     <div class="btn btn-danger" ng-click="removeMachine()" ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
     <a class="btn btn-primary" download="script.netkit" href="{{ makeDownload(generateScript(netkit)) }}"><strong>Scarica il file .sh</strong></a>
     <a class="btn btn-primary" ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
+    <br />
+    <a class="btn btn-primary" ng-click="import()"><strong>Importa configurazione</strong></a>
+    <a class="btn btn-primary" download="netkit.config" href="{{ makeDownload(generateConfig(netkit)) }}"><strong>Esporta configurazione</strong></a>
+    <input type="file" id="file" name="file"/>
 
     <br />
     <br />
@@ -538,7 +545,7 @@
             "ws":{"userdir":false},
             "routing":{
                 "rip":{"en":false, "connected":true, "network":[""]},
-                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":[""]}
+                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":["0.0.0.0"]}
             }
         };
 
@@ -587,7 +594,7 @@
         };
         $scope.addOspfNetwork = function(machine) {
             machine.routing.ospf.network.push("");
-            machine.routing.ospf.area.push("");
+            machine.routing.ospf.area.push("0.0.0.0");
         };
         $scope.removeOspfNetwork = function(machine) {
             if(machine.routing.ospf.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
@@ -604,9 +611,25 @@
             return makeScript(makeFileStructure(nk));
         };
 
+        $scope.generateConfig = function(nk) {
+            return JSON.stringify(nk, undefined, 4);
+        };
+
         $scope.generateZip = function(nk) {
             return makeZip(makeFileStructure(nk));
         };
+
+        $scope.import = function(){
+            var f = document.getElementById('file').files[0];
+            var r = new FileReader();
+            if(typeof(f)!="undefined") {
+                r.onloadend = function (e) {
+                    $scope.netkit = JSON.parse(e.target.result);
+                    $scope.$apply();
+                };
+                r.readAsBinaryString(f);
+            }
+        }
     });
 
     // startup
