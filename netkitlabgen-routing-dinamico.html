@@ -26,6 +26,11 @@
             padding: 4px 3px;
             border-radius: 0;
         }
+        .btn-square {
+            height: 22px;
+            width: 22px;
+            padding: 0;
+        }
         input {
             border-radius: 0;
             background-position: right center;
@@ -170,21 +175,40 @@
                     <option value=""> </option>
                     <option data-ng-repeat="m in netkit" ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>
+                <!-- forma piu' corretta ma non permette valore di base a meno di aggiungere un elemento vuoto all'array -->
                 <!--<select ng-model="x.pc.ns"
                         ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
                         class="form-control">
                 </select>-->
             </td>
             <td ng-show="x.type=='router'">
-                <label>Routing dinamico: </label>
+                <label>Routing dinamico: </label><br /><br />
                 <div><input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input></div>
                 <div ng-show="x.routing.rip.en">
-                    <label>Network: </label><input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.network" />
+                    <span class="btn btn-success btn-square" ng-click="addRipNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" ng-click="removeRipNetwork(x)" ng-disabled="x.routing.rip.network.length<=1">-</span>
+                    <div data-ng-repeat="rnet in x.routing.rip.network track by $index">
+                        <label>Network: </label>
+                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.network[$index]" />
+                    </div>
+                    <div><label>Route (vuoto per omettere): </label>
+                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.route" /></div>
+                    <div><input type="checkbox" value="ns" ng-model="x.routing.rip.connected"> redistribute connected</input></div>
                 </div>
+                <hr />
                 <input type="checkbox" value="ns" ng-model="x.routing.ospf.en"> ospf</input><br />
                 <div ng-show="x.routing.ospf.en">
-                    <div><label>Network: </label><input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.ospf.network" /></div>
-                    <div><label>Area: </label><input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" ng-model="x.routing.ospf.area" /></div>
+                    <span class="btn btn-success btn-square" ng-click="addOspfNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" ng-click="removeOspfNetwork(x)" ng-disabled="x.routing.ospf.network.length<=1">-</span>
+                    <div data-ng-repeat="onet in x.routing.ospf.network track by $index">
+                        <div>
+                            <label>Network: </label>
+                            <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.ospf.network[$index]" />
+                        </div>
+                        <label>Area: </label>
+                        <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" ng-model="x.routing.ospf.area[$index]" />
+                    </div>
+                    <div><input type="checkbox" value="ns" ng-model="x.routing.ospf.connected"> redistribute connected</input></div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
                         <div><input type="text" placeholder="0" class="form-control" ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
@@ -338,38 +362,49 @@
                 lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ripd=yes\n";
                 lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] = "";
                 lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "router rip\n";
-                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "network "+nk[mindex].routing.rip.network+"\n";
 
-                for (var g in nk[mindex].gateways.gw) {
-                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
-                        if (typeof(nk[mindex].gateways.gw[g].route) == "undefined" || nk[mindex].gateways.gw[g].route == "")
-                            lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route 0.0.0.0/0\n";
-                        else
-                            lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route "+ nk[mindex].gateways.gw[g].route +"\n";
-                    }
-                }
+                for(var n in nk[mindex].routing.rip.network)
+                    lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "network "+nk[mindex].routing.rip.network[n]+"\n";
+
+                if (typeof(nk[mindex].routing.rip.route) != "undefined" && nk[mindex].routing.rip.route != "")
+                    lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route 0.0.0.0/0\n";
+
+                lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\n";
             }
+
             if(nk[mindex].routing.ospf.en){
                 lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ospfd=yes\n";
                 lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] = "";
-
-                for(var face in nk[mindex].routing.ospf.if) {
-                    if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
-                        lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "interface eth" + nk[mindex].routing.ospf.if[face].interface + "\n";
-                        lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "ospf cost " + nk[mindex].routing.ospf.if[face].cost + "\n";
-                    }
-                }
                 lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "router ospf\n";
-                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "\n";
-                // TODO aggiunta route statiche a ospf similmente a rip
+
+                for(var m in nk[mindex].routing.ospf.network)
+                    lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network[m] + " area " + nk[mindex].routing.ospf.area[m] + "\n"; // TODO potrebbero esserci più network
+
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "\n";
+            }
+
+            //nb: mantenere l'ordine
+            if(nk[mindex].routing.rip.en && nk[mindex].routing.rip.connected){
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "redistribute connected\n";
+            }
+            if(nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.connected){
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "redistribute connected\n";
             }
             if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
                 lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "redistribute ospf\n";
-                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "redistribute connected\n";
-
                 lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "redistribute rip\n";
-                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "redistribute connected\n";
             }
+
+            //nb: i costi vanno qui alla fine
+            if(nk[mindex].routing.ospf.en) {
+                for (var face in nk[mindex].routing.ospf.if) {
+                    if (nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
+                        lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "interface eth" + nk[mindex].routing.ospf.if[face].interface + "\n";
+                        lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "ospf cost " + nk[mindex].routing.ospf.if[face].cost + "\n";
+                    }
+                }
+            }
+
         }
         return lab;
     }
@@ -435,7 +470,10 @@
             "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
             "pc":{"ns":""},
             "ws":{"userdir":false},
-            "routing":{"rip":{"en":false}, "ospf":{"en":false, "if":[]}}
+            "routing":{
+                "rip":{"en":false, "connected":true, "network":[""]},
+                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":[""]}
+            }
         };
 
         $scope.netkit = [JSON.clone(backbone)];
@@ -471,6 +509,24 @@
             if(machine.gateways.counter>1 && confirm("Sicuro di voler rimuovere il gateway?")) {
                 machine.gateways.gw.pop();
                 machine.gateways.counter--;
+            }
+        };
+        $scope.addRipNetwork = function(machine) {
+            machine.routing.rip.network.push("");
+        };
+        $scope.removeRipNetwork = function(machine) {
+            if(machine.routing.rip.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+                machine.routing.rip.network.pop();
+            }
+        };
+        $scope.addOspfNetwork = function(machine) {
+            machine.routing.ospf.network.push("");
+            machine.routing.ospf.area.push("");
+        };
+        $scope.removeOspfNetwork = function(machine) {
+            if(machine.routing.ospf.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+                machine.routing.ospf.network.pop();
+                machine.routing.ospf.area.pop();
             }
         };
 
