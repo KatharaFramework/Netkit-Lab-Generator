@@ -307,52 +307,69 @@
             else if(nk[mindex].type=='terminale') {
                 lab["folder"][nk[mindex].name+"/etc"]="";
                 lab["file"][nk[mindex].name+"/etc/resolv.conf"]="nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
-                alert("ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
+                //alert("ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
             }
         }
-// TODO finire
         for (var mindex in nk) {
             if(nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en){
-                text += "echo /etc/init.d/zebra start >> " +  nk[mindex].name+".startup"+"\n";
-                text += "mkdir -p "+nk[mindex].name+"/etc/zebra\n";
-                text += "echo 'zebra=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
+                lab["file"][nk[mindex].name+".startup"] += "/etc/init.d/zebra start\n";
+                lab["folder"][nk[mindex].name+"/etc/zebra"] = "";
+                lab["file"][nk[mindex].name+"/etc/zebra/daemons"] = "zebra=yes\n";
             }
             if(nk[mindex].routing.rip.en){
-                text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
-                text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-                text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ripd=yes\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] = "";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "router rip\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "network "+nk[mindex].routing.rip.network+"\n";
 
-                var control = false;
                 for (var g in nk[mindex].gateways.gw) {
-                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "")
-                        control=true;
-                }
-                if(control) {
-                    text += "echo 'route 0.0.0.0/0' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
-                }
-                control = false;
-            }
-            if(nk[mindex].routing.ospf.en){
-                text += "echo 'ospfd=yes' >> " + nk[mindex].name + "/etc/zebra/daemons\n";
-                for(var face in nk[mindex].routing.ospf.if) {
-                    if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
-                        text += "echo 'interface eth" + nk[mindex].routing.ospf.if[face].interface + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                        text += "echo 'ospf cost " + nk[mindex].routing.ospf.if[face].cost + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
+                        if (typeof(nk[mindex].gateways.gw[g].route) == "undefined" || nk[mindex].gateways.gw[g].route == "")
+                            lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route 0.0.0.0/0\n";
+                        else
+                            lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route "+ nk[mindex].gateways.gw[g].route +"\n";
                     }
                 }
-                text += "echo 'router ospf' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
-                text += "echo 'network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+            }
+            if(nk[mindex].routing.ospf.en){
+                lab["file"][nk[mindex].name+"/etc/zebra/daemons"] += "ospfd=yes\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] = "";
+
+                for(var face in nk[mindex].routing.ospf.if) {
+                    if(nk[mindex].routing.ospf.if[face].cost != "" && typeof(nk[mindex].routing.ospf.if[face].cost) != "undefined") {
+                        lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "interface eth" + nk[mindex].routing.ospf.if[face].interface + "\n";
+                        lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "ospf cost " + nk[mindex].routing.ospf.if[face].cost + "\n";
+                    }
+                }
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "router ospf\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "\n";
                 // TODO aggiunta route statiche a ospf similmente a rip
             }
             if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
-                text += "echo 'redistribute ospf' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
-                text += "echo 'redistribute connected' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "redistribute ospf\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ripd.conf"] += "redistribute connected\n";
 
-                text += "echo 'redistribute rip' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
-                text += "echo 'redistribute connected' >> "+nk[mindex].name+"/etc/zebra/ospfd.conf\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "redistribute rip\n";
+                lab["file"][nk[mindex].name+"/etc/zebra/ospfd.conf"] += "redistribute connected\n";
             }
         }
+        return lab;
+    }
 
+    function makeScript(lab){
+        var text="";
+        text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
+        text += "#! /bin/sh\n";
+
+        for(var folderName in lab["folder"]){
+            text += "mkdir -p " + folderName + "\n";
+        }
+        for(var fileName in lab["file"]){
+            var lines = lab["file"][fileName].split("\n");
+            for(var lineIndex in lines) {
+                text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
+            }
+        }
 
         text += "rm $0\n";
 
@@ -360,7 +377,7 @@
 
     }
 
-    function makeScript(nk){
+    function makeScriptOLD(nk){
         var text="";
 
         text += "# Ricordati di usare prima chmod +x sullo script per renderlo eseguibile e che lo script si autodistrugge al termine\n\n";
@@ -544,7 +561,8 @@
         };
 
         $scope.generate = function(nk) {
-            return makeScript(nk);
+            //console.log(makeFileStructure(nk));
+            return makeScript(makeFileStructure(nk));
         };
     });
 
