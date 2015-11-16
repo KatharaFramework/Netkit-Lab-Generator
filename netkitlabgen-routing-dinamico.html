@@ -133,7 +133,7 @@
                 <div class="hidelasthr" data-ng-repeat="j in x.gateways.gw">
                     <div><label>Route (vuoto per default gw):</label>
                     <input type="text" ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
-                    <div><label>GW:</label>
+                    <div><label>GW (vuoto per non generare nulla):</label>
                     <input type="text" ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" /></div>
                     <div><label>Interface:</label>
                     <select ng-model="j.if" class="form-control">
@@ -166,7 +166,7 @@
                 </select>
             </td>
             <td ng-show="x.type=='router'">
-                <label>Routing dinamico <br />(non fa generare quello statico): </label>
+                <label>Routing dinamico: </label>
                 <div><input type="checkbox" value="router" ng-model="x.routing.rip.en"> rip</input></div>
                 <div ng-show="x.routing.rip.en">
                     <label>Network: </label><input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" ng-model="x.routing.rip.network" />
@@ -333,22 +333,24 @@
                     text += "echo ifconfig eth" + nk[mindex].interfaces.if[i].eth.number + " " +
                             nk[mindex].interfaces.if[i].ip + " up >> "+ nk[mindex].name+".startup"+"\n";
                 }
-                if(!(nk[mindex].type=='router' && (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en))) {
-                    for (var g in nk[mindex].gateways.gw) {
+
+                for (var g in nk[mindex].gateways.gw) {
+                    if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "") {
                         //route add default gw GATEWAY dev eth_
                         if (nk[mindex].gateways.gw[g].route == "") {
                             text += "echo route add default gw " +
                                     nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " +  nk[mindex].name+".startup" + "\n";
+                                    nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
                         }
                         //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
                         else {
                             text += "echo route add -net " + nk[mindex].gateways.gw[g].route + " gw " +
                                     nk[mindex].gateways.gw[g].gw + " dev eth" +
-                                    nk[mindex].gateways.gw[g].if + " >> " +  nk[mindex].name+".startup" + "\n";
+                                    nk[mindex].gateways.gw[g].if + " >> " + nk[mindex].name + ".startup" + "\n";
                         }
                     }
                 }
+
                 // ns
                 if(nk[mindex].type=='ns') {
                     text += "echo /etc/init.d/bind start >> " +  nk[mindex].name+".startup"+"\n";
@@ -383,6 +385,16 @@
                     text += "echo 'ripd=yes' >> "+nk[mindex].name+"/etc/zebra/daemons\n";
                     text += "echo 'router rip' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
                     text += "echo 'network "+nk[mindex].routing.rip.network+"' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+
+                    var control = false;
+                    for (var g in nk[mindex].gateways.gw) {
+                        if (typeof(nk[mindex].gateways.gw[g].gw) != "undefined" && nk[mindex].gateways.gw[g].gw != "")
+                            control=true;
+                    }
+                    if(control) {
+                        text += "echo 'route 0.0.0.0/0' >> "+nk[mindex].name+"/etc/zebra/ripd.conf\n";
+                    }
+                    control = false;
                 }
                 if(nk[mindex].routing.ospf.en){
                     text += "echo 'ospfd=yes' >> " + nk[mindex].name + "/etc/zebra/daemons\n";
@@ -394,6 +406,7 @@
                     }
                     text += "echo 'router ospf' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
                     text += "echo 'network " + nk[mindex].routing.ospf.network + " area " + nk[mindex].routing.ospf.area + "' >> " + nk[mindex].name + "/etc/zebra/ospfd.conf\n";
+                    // TODO aggiunta route statiche a ospf similmente a rip
                 }
                 if(nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en){
                     text += "echo 'redistribute ospf' >> " + nk[mindex].name + "/etc/zebra/ripd.conf\n";
