@@ -329,11 +329,7 @@
         lab["error"] = 0;
 
         for(var mindex in nk){
-            if(nk[mindex].name.substring(0, 2)=='ns') {
-                lab["folder"][nk[mindex].name+"/etc/bind"]="";
-            } else {
-                lab["folder"][nk[mindex].name]="";
-            }
+            lab["folder"][nk[mindex].name]="";
         }
 
         // generazione lab.conf
@@ -342,6 +338,7 @@
             for (var i in nk[mindex].interfaces.if){
                 lab["file"]["lab.conf"] += nk[mindex].name + "[" + nk[mindex].interfaces.if[i].eth.number + "]="+nk[mindex].interfaces.if[i].eth.domain + "\n";
             }
+            lab["file"]["lab.conf"] += "\n";
         }
 
         // generazione macchina.startup
