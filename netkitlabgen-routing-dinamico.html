@@ -320,7 +320,6 @@
             else if(nk[mindex].type=='terminale') {
                 lab["folder"][nk[mindex].name+"/etc"]="";
                 lab["file"][nk[mindex].name+"/etc/resolv.conf"]="nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
-                //alert("ATTENZIONE: l'ip scelto per il nameserver in "+nk[mindex].name+"/etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
             }
         }
         for (var mindex in nk) {
@@ -400,7 +399,9 @@
             zip.file(fileName, lab["file"][fileName]);
         }
         var content = zip.generate({type:"blob"});
-        saveAs(content, "example.zip");
+
+        alert("ATTENZIONE: l'ip scelto per il nameserver in /etc/resolv.conf potrebbe essere errato se il ns non ha una sola interfaccia");
+        saveAs(content, "lab.zip");
     }
 
     var app = angular.module('napp', []);
