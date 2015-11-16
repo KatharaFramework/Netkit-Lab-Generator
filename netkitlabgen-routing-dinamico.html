@@ -144,6 +144,27 @@
             color: #000;
             padding: 0.2em 0;
         }
+        .file {
+            width:300px;
+            margin-top: 3px;
+        }
+        .fakefile {
+            display: inline;
+            width: 200px;
+            background-color: white !important;
+            margin-top: 2px;
+        }
+        .btn-short {
+            height: 26px;
+            padding: 2px;
+            margin-top: -1px;
+        }
+        /*firefox only*/
+        @-moz-document url-prefix() {
+            .btn-short {
+                margin-top: 0;
+            }
+        }
         /* heavy stuff */
         .bg-logos {
             padding: 10px;
@@ -292,9 +313,13 @@
     <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
     <a class="btn btn-primary" data-ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
     <br />
+    <div class="file">
+        <input type="file" id="file" name="file" class="form-control hidden"
+               onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
+        <input id="file-text" type="text" class="form-control fakefile" title="file-text" readonly /><input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Choose file">
+    </div>
     <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
     <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
-    <input type="file" id="file" name="file"/>
 
     <br />
     <br />
@@ -317,6 +342,10 @@
         JSON.clone = function(obj) {
             return JSON.parse(JSON.stringify(obj));
         };
+    }
+
+    function lastElem(arr) {
+        return arr[arr.length - 1];
     }
 
     function highlight(json) {
@@ -583,7 +612,6 @@
         };
 
         $scope.netkit = [JSON.clone(backbone)];
-
         $scope.counter = 1;
 
         $scope.addMachine = function() {
@@ -668,11 +696,12 @@
             var r = new FileReader();
             if(typeof(f)!="undefined") {
                 r.onloadend = function (e) {
-                    $scope.netkit = JSON.parse(e.target.result);
+                    $scope.netkit = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
                     $scope.$apply();
                 };
                 r.readAsBinaryString(f);
             }
+            else alert("Nessun file selezionato");
         }
     });
 
