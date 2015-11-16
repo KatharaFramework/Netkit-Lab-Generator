@@ -306,6 +306,7 @@
 
 
 <script>
+    
     if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
             return JSON.parse(JSON.stringify(obj));
@@ -558,6 +559,7 @@
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/);
         }
     ]);
+
     app.controller('nc', function($scope) {
 
         var backbone = {
@@ -577,50 +579,60 @@
         $scope.netkit = [JSON.clone(backbone)];
 
         $scope.counter = 1;
+
         $scope.addMachine = function() {
             $scope.counter++;
             var p = JSON.clone(backbone);
             p.row=$scope.counter;
             $scope.netkit.push(p);
         };
+
         $scope.removeMachine = function() {
             if($scope.counter>1 && confirm("Sicuro di voler rimuovere la macchina?")) {
                 $scope.netkit.pop();
                 $scope.counter--;
             }
         };
+
         $scope.addInterface = function(machine) {
             machine.interfaces.if.push({"eth":{"number":machine.interfaces.counter}});
             machine.interfaces.counter++;
         };
+
         $scope.removeInterface = function(machine) {
             if(machine.interfaces.counter>1 && confirm("Sicuro di voler rimuovere l'interfaccia?")) {
                 machine.interfaces.if.pop();
                 machine.interfaces.counter--;
             }
         };
+
         $scope.addGateway = function(machine) {
             machine.gateways.counter++;
             machine.gateways.gw.push({"route":"", "if":0});
         };
+
         $scope.removeGateway = function(machine) {
             if(machine.gateways.counter>1 && confirm("Sicuro di voler rimuovere il gateway?")) {
                 machine.gateways.gw.pop();
                 machine.gateways.counter--;
             }
         };
+
         $scope.addRipNetwork = function(machine) {
             machine.routing.rip.network.push("");
         };
+
         $scope.removeRipNetwork = function(machine) {
             if(machine.routing.rip.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
                 machine.routing.rip.network.pop();
             }
         };
+
         $scope.addOspfNetwork = function(machine) {
             machine.routing.ospf.network.push("");
             machine.routing.ospf.area.push("0.0.0.0");
         };
+
         $scope.removeOspfNetwork = function(machine) {
             if(machine.routing.ospf.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
                 machine.routing.ospf.network.pop();
