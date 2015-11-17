@@ -266,16 +266,13 @@
                 <input title="userdir" type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
             </td>
             <td data-ng-show="x.type=='terminale'">
-                <label>Nameserver di riferimento:</label>
-                <select title="en" data-ng-model="x.pc.ns">
+                <label>DNS di riferimento:</label>
+                <select title="en" data-ng-model="x.pc.dns">
                     <option value="">-</option>
-                    <option data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
+                    <optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" label="{{m.name}}">
+                        <option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
+                    </optgroup>
                 </select>
-                <!-- forma piu' corretta ma non permette valore di base a meno di aggiungere un elemento vuoto all'array -->
-                <!--<select data-ng-model="x.pc.ns"
-                        data-ng-options="m.interfaces.if[0].ip as m.name+' '+m.interfaces.if[0].ip disable when m.type!='ns' for m in netkit"
-                        class="form-control">
-                </select>-->
             </td>
             <td data-ng-show="x.type=='router'">
                 <label>Routing dinamico: </label><br /><br />
@@ -458,9 +455,7 @@
             else if (nk[mindex].type == 'terminale') {
                 if (typeof(nk[mindex].pc.ns) != "undefined" && nk[mindex].pc.ns != "") {
                     lab["folder"][nk[mindex].name + "/etc"] = "";
-                    lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.ns.split("/")[0] + "\n";
-
-                    lab["warning"] = 1;
+                    lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.dns + "\n";
                 }
             }
             // router
@@ -649,9 +644,6 @@
         var text="";
 
         text += "# Ricordati di usare prima 'chmod +x' (o 'chmod 500') sullo script per renderlo eseguibile. Lo script si autodistrugge al termine\n";
-        if(lab["warning"] == 1) {
-            text += "# ATTENZIONE: l'ip scelto per il nameserver nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia\n";
-        }
 
         text += "\n";
 
@@ -683,10 +675,6 @@
             zip.file(fileName, lab["file"][fileName]);
         }
         var content = zip.generate({type:"blob"});
-        if(lab["warning"] == 1) {
-            alert("ATTENZIONE: l'ip scelto per il nameserver nella cartella /etc/resolv.conf di un terminale potrebbe essere errato se il ns non ha una sola interfaccia");
-        }
-
         saveAs(content, "lab.zip");
     }
 
@@ -711,7 +699,7 @@
             "type":"router",
             "interfaces":{"counter":1, "if":[{"eth":{"number":0}, "ip":""}]},
             "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
-            "pc":{"ns":""},
+            "pc":{"dns":""},
             "ws":{"userdir":false},
             "ns":{"recursion":true, "authority":true},
             "routing":{
