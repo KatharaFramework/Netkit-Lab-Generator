@@ -187,6 +187,12 @@
         input[type=file] {
             background-image: none;
         }
+
+        /*===============================================================================================================
+
+         Fine Style
+
+         ================================================================================================================*/
     </style>
 
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
@@ -340,6 +346,11 @@
 
 
 <script>
+    /*===============================================================================================================
+
+    Script
+
+     ================================================================================================================*/
 
     if (typeof JSON.clone !== "function") {
         JSON.clone = function(obj) {
@@ -459,17 +470,17 @@
         }
 
         //Gestione Nameserver
+        //variabili d'appoggio comuni ai vari cicli
         var authority = [];
         var root;
-
         //Trovo il root-ns e lo salvo
         for (var mindex in nk) {
             if(nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
                 root = nk[mindex];
             }
         }
-
         //Se non ho root-ns evito di generare una configurazione incoerente
+        //db.root in ogni macchina dns
         if(typeof(root)!="undefined"){
 
             for (var mindex in nk) {
@@ -487,19 +498,17 @@
                     lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n\ttype master;\n\tfile "/etc/bind/db.root";\n};\n\n';
                 }
             }
-
+            //entry in db.zona e named.conf per le altre macchine
             for (var mindex in nk) {
                 if(nk[mindex].type=="ns" && nk[mindex].ns.authority){
                     authority[nk[mindex].ns.zone] = nk[mindex];
                     if(nk[mindex].ns.zone != "."){
                         lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] = "@\t\t\t\tIN SOA "+nk[mindex].interfaces.if[0].name + " root."+nk[mindex].interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
-                        //lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += "@\t\t\t\tIN NS "+nk[mindex].interfaces.if[0].name+"\n";
-                        //lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[0].name+"\t\t\t\tIN  A "+nk[mindex].interfaces.if[0].ip.split("/")[0]+"\n";
                         lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "'+nk[mindex].ns.zone.slice(1,-1)+'" {\n\ttype master;\n\tfile "/etc/bind/db'+nk[mindex].ns.zone.slice(0,-1)+'";\n};\n\n';
                     }
                 }
             }
-
+            //entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
             for (var mindex in nk) {
                 for (var f in nk[mindex].interfaces.if){
                     var ip = nk[mindex].interfaces.if[f].ip.split("/")[0];
@@ -510,32 +519,36 @@
                             lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
-                        } else {
+                        }
+                        else {
 
                             var nome = nk[mindex].interfaces.if[f].name; //www.pluto.net.
                             var nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
-                            var autorita = ".";
-                            for (var i=1; i<nomediviso.length; i++){
-                                if(nomediviso[i]!=""){
-                                    autorita += nomediviso[i]+".";
+                            var a = ".";
+                            for (var i = 1; i < nomediviso.length; i++) {
+                                if (nomediviso[i] != "") {
+                                    a += nomediviso[i] + ".";
                                 }
                             }
 
-                            var fileExt = authority[autorita].ns.zone.slice(0,-1);
+                            if (typeof(authority[a]) != "undefined" && typeof(authority[a].ns.zone) != "undefined") {
 
-                            //Evito che entri in caso di root-ns
-                            if(fileExt!="") {
+                                var fileExt = authority[a].ns.zone.slice(0, -1);
 
-                                //se è un NS inserisco il glue record
-                                if(nk[mindex].type=="ns" && nk[mindex].ns.authority){
-                                    //Creo le linee relative a me stesso nel mio file db
-                                    lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
-                                    lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
-                                    lab["file"][authority[autorita].name + "/etc/bind/db"+fileExt] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                                //Evito che entri in caso di root-ns
+                                if (fileExt != "") {
+
+                                    //se è un NS inserisco il glue record
+                                    if (nk[mindex].type == "ns" && nk[mindex].ns.authority) {
+                                        //Creo le linee relative a me stesso nel mio file db
+                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
+                                        lab["file"][authority[a].name + "/etc/bind/db" + fileExt] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                                    }
+
+                                    //e poi inserisco anche il record A, altirmenti solo A
+                                    lab["file"][authority[a].name + "/etc/bind/db" + fileExt] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
                                 }
-
-                                //e poi inserisco anche il record A, altirmenti solo A
-                                lab["file"][authority[autorita].name + "/etc/bind/db"+fileExt] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
                             }
                         }
 
@@ -676,6 +689,12 @@
 
         saveAs(content, "lab.zip");
     }
+
+    /*===============================================================================================================
+
+     Controller
+
+     ================================================================================================================*/
 
     var app = angular.module('napp', []);
     app.config(['$compileProvider',
