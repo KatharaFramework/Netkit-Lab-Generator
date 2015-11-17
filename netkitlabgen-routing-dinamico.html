@@ -213,10 +213,10 @@
             <td>
                 <div><label>Macchina {{x.row}}:</label>
                     <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required /></div>
-                <input type="radio" value="terminale" data-ng-model="x.type" /> Terminale<br />
-                <input type="radio" value="router" data-ng-model="x.type" /> Router<br />
-                <input type="radio" value="ns" data-ng-model="x.type" /> Name Server<br />
-                <input type="radio" value="ws" data-ng-model="x.type" /> Web Server<br />
+                <input title="type" type="radio" value="terminale" data-ng-model="x.type" /> Terminale<br />
+                <input title="type" type="radio" value="router" data-ng-model="x.type" /> Router<br />
+                <input title="type" type="radio" value="ns" data-ng-model="x.type" /> Name Server<br />
+                <input title="type" type="radio" value="ws" data-ng-model="x.type" /> Web Server<br />
             </td>
             <td class="interfaces">
                 <div class="btn btn-success" data-ng-click="addInterface(x)">Aggiungi interfaccia</div>
@@ -240,7 +240,7 @@
                     <div><label>GW (vuoto per non generare nulla):</label>
                         <input type="text" data-ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" /></div>
                     <div><label>Interface:</label>
-                        <select data-ng-model="j.if" class="form-control">
+                        <select title="eth" data-ng-model="j.if" class="form-control">
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select></div>
                     <hr />
@@ -248,20 +248,20 @@
             </td>
             <td  data-ng-show="x.type=='ns'">
                 <div>
-                    <div><input type="checkbox" value="1" data-ng-model="x.ns.authority" /> Sono un Nameserver Authority<br />
+                    <div><input title="auth" type="checkbox" value="1" data-ng-model="x.ns.authority" /> Sono un Nameserver Authority<br />
                     </div>
                     <div data-ng-show="x.ns.authority"><label>Zona (Root &egrave; .):</label>
                         <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern="(^..*\.$)|^.$" /></div>
-                    <div><input type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Abilita risoluzioni ricorsive<br />
+                    <div><input title="rec" type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Abilita risoluzioni ricorsive<br />
                     </div>
                 </div>
             </td>
             <td data-ng-show="x.type=='ws'">
-                <input type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
+                <input title="userdir" type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
             </td>
             <td data-ng-show="x.type=='terminale'">
                 <label>Nameserver di riferimento:</label>
-                <select data-ng-model="x.pc.ns">
+                <select title="en" data-ng-model="x.pc.ns">
                     <option value="">-</option>
                     <option data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" value="{{m.interfaces.if[0].ip}}">{{m.name}}</option>
                 </select>
@@ -273,7 +273,7 @@
             </td>
             <td data-ng-show="x.type=='router'">
                 <label>Routing dinamico: </label><br /><br />
-                <div><input type="checkbox" value="router" data-ng-model="x.routing.rip.en" /> rip</div>
+                <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.rip.en" /> rip</div>
                 <div data-ng-show="x.routing.rip.en">
                     <span class="btn btn-success btn-square" data-ng-click="addRipNetwork(x)">+</span>
                     <span class="btn btn-danger btn-square" data-ng-click="removeRipNetwork(x)" data-ng-disabled="x.routing.rip.network.length<=1">-</span>
@@ -283,10 +283,10 @@
                     </div>
                     <div><label>Route (vuoto per omettere): </label>
                         <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route" /></div>
-                    <div><input type="checkbox" value="ns" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
+                    <div><input title="redistribute" type="checkbox" value="ns" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
                 </div>
                 <hr />
-                <input type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf<br />
+                <input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf<br />
                 <div data-ng-show="x.routing.ospf.en">
                     <span class="btn btn-success btn-square" data-ng-click="addOspfNetwork(x)">+</span>
                     <span class="btn btn-danger btn-square" data-ng-click="removeOspfNetwork(x)" data-ng-disabled="x.routing.ospf.network.length<=1">-</span>
@@ -298,11 +298,11 @@
                         <label>Area: </label>
                         <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.ospf.area[$index]" />
                     </div>
-                    <div><input type="checkbox" value="ns" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
+                    <div><input title="redistribute" type="checkbox" value="ns" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
                         <div><input type="text" placeholder="0" class="form-control" data-ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
-                        <select data-ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
+                        <select title="eth" data-ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select>
                     </div>
@@ -330,7 +330,7 @@
     <br />
 
     <h4>Anteprima:</h4>
-    <textarea rows="15" readonly>{{ generateScript(netkit) }}</textarea>
+    <textarea title="script" rows="15" readonly>{{ generateScript(netkit) }}</textarea>
 
     <!--<div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
     <div id="origin" class="hidden">{{netkit}}</div>
