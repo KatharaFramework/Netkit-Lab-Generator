@@ -516,7 +516,7 @@
 
                         //Caso particolare per ns di primo livello
                         if( (typeof(nk[mindex].ns.zone) != "undefined") && nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone.split(".").length == 3) {
-                            lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
+                            lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "    IN A " + ip + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[f].name + "     IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
                         }
@@ -541,8 +541,8 @@
                                     //se è un NS inserisco il glue record
                                     if (nk[mindex].type == "ns" && nk[mindex].ns.authority) {
                                         //Creo le linee relative a me stesso nel mio file db
-                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].ns.zone.substring(1) + "\t\t\t\tIN NS " + nk[mindex].interfaces.if[f].name + "\n";
-                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
+                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].interfaces.if[f].name + "    IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
                                         lab["file"][authority[a].name + "/etc/bind/db" + fileExt] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                                     }
 
