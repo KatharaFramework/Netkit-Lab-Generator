@@ -226,6 +226,8 @@
                         <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
                     <div><label> IP/Net: </label>
                         <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
+                    <div><label> Nome DNS Completo: </label>
+                        <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.prova.com" pattern=".*\.$"/></div>
                     <hr />
                 </div>
             </td>
@@ -246,12 +248,13 @@
             </td>
             <td  data-ng-show="x.type=='ns'">
                 <div>
-                    Il supporto completo al DNS non <br />
-                    &egrave; presente in questa versione.<br />
-                    Verr&agrave; comunque aggiunto l'avvio<br />
-                    di bind nel file di startup di <br />
-                    questa macchina e creato il file <br />
-                    /etc/bind/named.conf (vuoto).</div>
+                    <div><input type="checkbox" value="1" data-ng-model="x.ns.authority" /> Sono un Nameserver Authority<br />
+                    </div>
+                    <div data-ng-show="x.ns.authority"><label>Zona (Root &egrave; .):</label>
+                        <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern=".*\.$" /></div>
+                    <div><input type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Abilita risoluzioni ricorsive<br />
+                    </div>
+                </div>
             </td>
             <td data-ng-show="x.type=='ws'">
                 <input type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
@@ -455,6 +458,76 @@
             }
         }
 
+        //Gestione Nameserver
+        var authority = [];
+        var root;
+        
+        for (var mindex in nk) {
+        	if(nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
+                    root = nk[mindex];
+        	}
+        }
+
+        if(typeof(root)!="undefined"){
+        	
+	        for (var mindex in nk) {
+	            if(nk[mindex].type=='ns'){
+	            	lab["file"][nk[mindex].name + "/etc/bind/db.root"] = "";
+	            	if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
+	            		lab["file"][nk[mindex].name + "/etc/bind/db.root"] += "@\t\t\t\tIN SOA "+root.interfaces.if[0].name +
+	                    " root."+root.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
+	                }
+	                if(nk[mindex].ns.recursion){
+	            		lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'options {\n\tallow-recursion {0/0; };\n};\n\n';
+	                }
+	                lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".\t\t\t\tIN NS "+root.interfaces.if[0].name+"\n";
+	                lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"\t\t\t\tIN  A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
+	                lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n\ttype master;\n\tfile "/etc/bind/db.root";\n};\n\n';
+	            }
+	        }
+
+	        for (var mindex in nk) {
+	        	if(nk[mindex].type=="ns" && nk[mindex].ns.authority){
+	                authority[nk[mindex].ns.zone] = nk[mindex];
+	                if(nk[mindex].ns.zone != "."){
+		                lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] = "@\t\t\t\tIN SOA "+nk[mindex].interfaces.if[0].name + " root."+nk[mindex].interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
+						lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += "@\t\t\t\tIN NS "+nk[mindex].interfaces.if[0].name+"\n";
+						//lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[0].name+"\t\t\t\tIN  A "+nk[mindex].interfaces.if[0].ip.split("/")[0]+"\n";
+						lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "'+nk[mindex].ns.zone.slice(1,-1)+'" {\n\ttype master;\n\tfile "/etc/bind/db'+nk[mindex].ns.zone.slice(0,-1)+'";\n};\n\n';
+					}
+        		}
+        	}
+
+        	for (var mindex in nk) {
+	            for (var f in nk[mindex].interfaces.if){ 
+	                    var ip = nk[mindex].interfaces.if[f].ip.split("/")[0];
+	                    if(typeof(nk[mindex].interfaces.if[f].name)!="undefined"){
+
+	                    	if( (typeof(nk[mindex].ns.zone) != "undefined") && nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone.split(".").length == 3) { //primo livello
+		                    	lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
+		                    }
+		                   
+			                    var nome = nk[mindex].interfaces.if[f].name; //www.pluto.net.
+			                    var nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
+			                    var autorita = ".";
+			                    for (var i=1; i<nomediviso.length; i++){
+			                    	if(nomediviso[i]!=""){
+			                        	autorita += nomediviso[i]+".";
+			                		}
+			                    }
+
+								
+			                    var fileExt = authority[autorita].ns.zone.slice(0,-1);
+			                    if(fileExt=="") {
+			                    	fileExt=".root"; 
+			                	}
+			                    lab["file"][authority[autorita].name + "/etc/bind/db"+fileExt] += nk[mindex].interfaces.if[f].name + "\t\t\t\tIN A " + ip + "\n";
+			                
+		            }
+	            }
+			}
+		}
+
         // routing dinamico
         if (nk[mindex].type == 'router'){
             for (var mindex in nk) {
@@ -605,6 +678,7 @@
             "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
             "pc":{"ns":""},
             "ws":{"userdir":false},
+            "ns":{"recursion":true, "authority":true},
             "routing":{
                 "rip":{"en":false, "connected":true, "network":[""]},
                 "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":["0.0.0.0"]}

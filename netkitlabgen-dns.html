@@ -413,12 +413,10 @@
             //download('script-netkit-' + event.timeStamp + '', text);
         }
 
-        //TODO aggiungere spunta sulle opzioni del dns per allow recursion
-        //TODO aggiungere spunta per definire se un NS è authority su qualcosa o no!
+        
         // in caso non lo sia fargli evitare il primo for
-        //NOTE: in molti casi qui si necessita dell'ip della macchina senza subnet... forse sarebbe meglio separare i campi nella generazione dell'array?
+
         //TODO questo algoritmo è semi-ricorsivo... per ogni macchina questa si auto-aggiunge al suo Ns di riferimento, bisogna separare il caso in cui questa è "."
-        //TODO inserire menu a tendina vicino (sotto) scelta della zona così da parametrizzare quell'interfaccia 0 che io uso qui sotto
 
         function generaDNS(obj){
             var arr = obj;
