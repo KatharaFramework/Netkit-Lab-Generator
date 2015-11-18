@@ -490,7 +490,11 @@
                     }
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".    IN NS "+root.interfaces.if[0].name+"\n";
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"    IN  A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
-                    lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
+                    if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
+						lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
+                    } else {
+                    	lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
+                	}
                 }
             }
             //entry in db.zona e named.conf per le altre macchine
