@@ -257,7 +257,7 @@
                     <div><input title="auth" type="checkbox" value="1" data-ng-model="x.ns.authority" /> Sono un Nameserver Authority<br />
                     </div>
                     <div data-ng-show="x.ns.authority"><label>Zona (Root &egrave; .):</label>
-                        <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern="(^..*\.$)|^.$" /></div>
+                        <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern="(^\..*\.$)|^.$" /></div>
                     <div><input title="rec" type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Abilita risoluzioni ricorsive<br />
                     </div>
                 </div>
@@ -489,8 +489,12 @@
                         lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'options {\n allow-recursion {0/0; };\n};\n\n';
                     }
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".    IN NS "+root.interfaces.if[0].name+"\n";
-                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"    IN  A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
-                    lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
+                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"    IN A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
+                    if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
+						lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
+                    } else {
+                    	lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
+                	}
                 }
             }
             //entry in db.zona e named.conf per le altre macchine
@@ -511,6 +515,7 @@
 
                         //Caso particolare per ns di primo livello
                         if( (typeof(nk[mindex].ns.zone) != "undefined") && nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone.split(".").length == 3) {
+                        	lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "    IN A " + ip + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[f].name + "     IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
