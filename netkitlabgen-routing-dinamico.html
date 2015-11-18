@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Lykon, Lollo, Neeja" />
     <title>Netkit Lab Generator</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
@@ -165,6 +166,9 @@
                 margin-top: 0;
             }
         }
+        #description {
+            text-align: justify;
+        }
         /* heavy stuff */
         .bg-logos {
             padding: 10px;
@@ -204,6 +208,17 @@
         document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
 </script>
 <h1>Netkit Lab Generator</h1>
+<hr />
+<div id="description">
+    Questo tool permette di generare rapidamente i file e le cartelle necessari a far funzionare un laboratorio di Netkit.
+    Lo scopo è la rapidità, quindi moltissime funzionalità opzionali non sono personalizzabili tramite questo form e sono settate a valori di
+    default (ad esempio username e password di zebra). <strong>Gli autori di quest'applicazione non si assumono nessuna responsabilità
+    riguardo eventuali malfunzionamenti</strong>.
+    <br />
+    Una volta compilato correttamente il form è possibile esportare il lab in formato .zip oppure tramite uno script bash che,
+    al termine della sua esecuzione, provvederà a generare il lab e tutti i relativi file e cartelle. Inoltre è possibile esportare
+    la configurazione del form in modo da importarla in un secondo momento ed effettuare modifiche.
+</div>
 <hr />
 <div data-ng-app="napp" data-ng-controller="nc">
 
@@ -323,13 +338,15 @@
     <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
     <a class="btn btn-primary" data-ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
     <br />
-    <div class="file">
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
+    <br />
+    <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
+    <span class="file">
         <input type="file" id="file" name="file" class="form-control hidden"
                onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
-        <input id="file-text" type="text" class="form-control fakefile" title="file-text" readonly /><input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Sfoglia...">
-    </div>
-    <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
-    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
+        <input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Sfoglia..."><input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();" readonly />
+    </span>
+
 
     <br />
     <br />
@@ -802,17 +819,27 @@
             return makeZip(makeFileStructure(nk));
         };
 
-        $scope.import = function(){
-            var f = document.getElementById('file').files[0];
-            var r = new FileReader();
-            if(typeof(f)!="undefined") {
-                r.onloadend = function (e) {
-                    $scope.netkit = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
-                    $scope.$apply();
-                };
-                r.readAsBinaryString(f);
+        $scope.import = function() {
+            try {
+                var f = document.getElementById('file').files[0];
+                var r = new FileReader();
+                if (typeof(f) != "undefined") {
+                    r.onloadend = function (e) {
+                        try {
+                            $scope.netkit = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
+                            $scope.$apply();
+                        }
+                        catch (err) {
+                            alert("Errore: " + err);
+                        }
+                    };
+                    r.readAsBinaryString(f);
+                }
+                else alert("Nessun file selezionato");
             }
-            else alert("Nessun file selezionato");
+            catch (err) {
+                alert("Errore File Reader: " + err);
+            }
         }
     });
 
