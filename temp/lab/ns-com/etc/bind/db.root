@@ -1,2 +1,0 @@
-.    IN NS root-nameserver.
-root-nameserver.    IN  A 192.168.0.3
