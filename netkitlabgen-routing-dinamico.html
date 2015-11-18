@@ -298,9 +298,13 @@
                             <label>Network: </label>
                             <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.ospf.network[$index]" />
                         </div>
-                        <label>Area: </label>
-                        <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.ospf.area[$index]" />
+                        <div>
+                            <label>Area: </label>
+                            <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.ospf.area[$index]" />
+                        </div>
+                        <input title="stub" type="checkbox" value="1" data-ng-model="x.routing.ospf.stub[$index]" /> stub?
                     </div>
+
                     <div><input title="redistribute" type="checkbox" value="ns" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
@@ -345,7 +349,7 @@
 <script>
     /*===============================================================================================================
 
-    Script
+     Script
 
      ================================================================================================================*/
 
@@ -491,10 +495,10 @@
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".    IN NS "+root.interfaces.if[0].name+"\n";
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"    IN A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
                     if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
-						lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
+                        lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
                     } else {
-                    	lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
-                	}
+                        lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
+                    }
                 }
             }
             //entry in db.zona e named.conf per le altre macchine
@@ -515,7 +519,7 @@
 
                         //Caso particolare per ns di primo livello
                         if( (typeof(nk[mindex].ns.zone) != "undefined") && nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone.split(".").length == 3) {
-                        	lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                            lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][authority["."].name + "/etc/bind/db.root"] += nk[mindex].interfaces.if[f].name + "    IN A " + ip + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                             lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] += nk[mindex].interfaces.if[f].name + "     IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
@@ -604,9 +608,12 @@
 
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "router ospf\n";
 
-                    for (var m in nk[mindex].routing.ospf.network)
-                        lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network[m] + " area " + nk[mindex].routing.ospf.area[m] + "\n"; // TODO potrebbero esserci più network
-
+                    for (var m in nk[mindex].routing.ospf.network) {
+                        lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network[m] + " area " + nk[mindex].routing.ospf.area[m] + "\n";
+                        if(nk[mindex].routing.ospf.stub[m]) {
+                            lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "area " + nk[mindex].routing.ospf.area[m] + " stub\n";
+                        }
+                    }
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "\n";
                 }
 
@@ -709,7 +716,7 @@
             "ns":{"recursion":true, "authority":true},
             "routing":{
                 "rip":{"en":false, "connected":true, "network":[""]},
-                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":["0.0.0.0"]}
+                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]}
             }
         };
 
@@ -767,12 +774,14 @@
         $scope.addOspfNetwork = function(machine) {
             machine.routing.ospf.network.push("");
             machine.routing.ospf.area.push("0.0.0.0");
+            machine.routing.ospf.area.stub(false);
         };
 
         $scope.removeOspfNetwork = function(machine) {
             if(machine.routing.ospf.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
                 machine.routing.ospf.network.pop();
                 machine.routing.ospf.area.pop();
+                machine.routing.ospf.stub.pop();
             }
         };
 
