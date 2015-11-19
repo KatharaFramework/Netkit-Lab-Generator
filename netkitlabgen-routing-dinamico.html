@@ -301,7 +301,9 @@
                     </div>
                     <div><label>Route (vuoto per omettere): </label>
                         <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route" /></div>
-                    <div><input title="redistribute" type="checkbox" value="ns" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
+
+                    <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
+                    <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
                 </div>
                 <hr />
                 <input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf<br />
@@ -320,7 +322,8 @@
                         <input title="stub" type="checkbox" value="1" data-ng-model="x.routing.ospf.stub[$index]" /> stub?
                     </div>
 
-                    <div><input title="redistribute" type="checkbox" value="ns" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
+                    <div><input title="redistributer" type="checkbox" value="1" data-ng-model="x.routing.ospf.rip" /> redistribute rip</div>
+                    <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">
                         <div><input type="text" placeholder="0" class="form-control" data-ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
@@ -641,8 +644,10 @@
                 if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.connected) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute connected\n";
                 }
-                if (nk[mindex].routing.rip.en && nk[mindex].routing.ospf.en) {
+                if (nk[mindex].routing.rip.en && nk[mindex].routing.rip.ospf) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "redistribute ospf\n";
+                }
+                if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.rip){
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute rip\n";
                 }
 
@@ -732,8 +737,8 @@
             "ws":{"userdir":false},
             "ns":{"recursion":true, "authority":true},
             "routing":{
-                "rip":{"en":false, "connected":true, "network":[""]},
-                "ospf":{"en":false, "connected":true, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]}
+                "rip":{"en":false, "connected":true, "ospf": false, "network":[""]},
+                "ospf":{"en":false, "connected":true, "rip": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]}
             }
         };
 
