@@ -582,8 +582,11 @@
         }
 
         // routing dinamico
-        if (nk[mindex].type == 'router'){
-            for (var mindex in nk) {
+
+        for (var mindex in nk) {
+
+            if (nk[mindex].type == 'router') {
+
                 if (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en) {
                     lab["file"][nk[mindex].name + ".startup"] += "/etc/init.d/zebra start\n";
                     lab["folder"][nk[mindex].name + "/etc/zebra"] = "";
@@ -595,6 +598,7 @@
                     lab["file"][nk[mindex].name + "/etc/zebra/zebra.conf"] += "enable password zebra\n";
                     lab["file"][nk[mindex].name + "/etc/zebra/zebra.conf"] += "\nlog file /var/log/zebra/zebra.log\n";
                 }
+
                 if (nk[mindex].routing.rip.en) {
                     lab["file"][nk[mindex].name + "/etc/zebra/daemons"] += "ripd=yes\n";
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] = "";
@@ -630,7 +634,7 @@
 
                     for (var m in nk[mindex].routing.ospf.network) {
                         lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "network " + nk[mindex].routing.ospf.network[m] + " area " + nk[mindex].routing.ospf.area[m] + "\n";
-                        if(nk[mindex].routing.ospf.stub[m]) {
+                        if (nk[mindex].routing.ospf.stub[m]) {
                             lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "area " + nk[mindex].routing.ospf.area[m] + " stub\n";
                         }
                     }
@@ -641,13 +645,16 @@
                 if (nk[mindex].routing.rip.en && nk[mindex].routing.rip.connected) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "redistribute connected\n";
                 }
+
                 if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.connected) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute connected\n";
                 }
+
                 if (nk[mindex].routing.rip.en && nk[mindex].routing.rip.ospf) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "redistribute ospf\n";
                 }
-                if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.rip){
+
+                if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.rip) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute rip\n";
                 }
 
@@ -665,12 +672,13 @@
                 if (nk[mindex].routing.rip.en) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n";
                 }
+                
                 if (nk[mindex].routing.ospf.en) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
                 }
-
             }
         }
+
         return lab;
     }
 
@@ -753,7 +761,7 @@
         };
 
         $scope.removeMachine = function() {
-            if($scope.counter>1 && confirm("Sicuro di voler rimuovere la macchina?")) {
+            if($scope.netkit.length>1 && confirm("Sicuro di voler rimuovere la macchina?")) {
                 $scope.netkit.pop();
                 $scope.counter--;
             }
@@ -832,6 +840,7 @@
                     r.onloadend = function (e) {
                         try {
                             $scope.netkit = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
+                            $scope.counter = $scope.netkit.length;
                             $scope.$apply();
                         }
                         catch (err) {
