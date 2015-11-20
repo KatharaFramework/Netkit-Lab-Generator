@@ -299,8 +299,12 @@
                         <label>Network: </label>
                         <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.network[$index]" />
                     </div>
-                    <div><label>Route (vuoto per omettere): </label>
-                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route" /></div>
+                    <span class="btn btn-success btn-square" data-ng-click="addRipRoute(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeRipRoute(x)" data-ng-disabled="x.routing.rip.route.length<=1">-</span>
+                    <div data-ng-repeat="rroute in x.routing.rip.route track by $index">
+                        <label>Route (vuoto per omettere): </label>
+                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route[$index]" />
+                    </div>
 
                     <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
@@ -614,8 +618,10 @@
                     for (var n in nk[mindex].routing.rip.network)
                         lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "network " + nk[mindex].routing.rip.network[n] + "\n";
 
-                    if (typeof(nk[mindex].routing.rip.route) != "undefined" && nk[mindex].routing.rip.route != "")
-                        lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route " + nk[mindex].routing.rip.route + "\n";
+                    for (var r in nk[mindex].routing.rip.route) {
+                        if (typeof(nk[mindex].routing.rip.route[r]) != "undefined" && nk[mindex].routing.rip.route[r] != "")
+                            lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "route " + nk[mindex].routing.rip.route[r] + "\n";
+                    }
 
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\n";
                 }
@@ -745,7 +751,7 @@
             "ws":{"userdir":false},
             "ns":{"recursion":true, "authority":true},
             "routing":{
-                "rip":{"en":false, "connected":false, "ospf": false, "network":[""]},
+                "rip":{"en":false, "connected":false, "ospf": false, "network":[""], "route":[""]},
                 "ospf":{"en":false, "connected":false, "rip": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]}
             }
         };
@@ -798,6 +804,16 @@
         $scope.removeRipNetwork = function(machine) {
             if(machine.routing.rip.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
                 machine.routing.rip.network.pop();
+            }
+        };
+
+        $scope.addRipRoute = function(machine) {
+            machine.routing.rip.route.push("");
+        };
+
+        $scope.removeRipRoute = function(machine) {
+            if(machine.routing.rip.route.length>1 && confirm("Sicuro di voler rimuovere la route?")) {
+                machine.routing.rip.route.pop();
             }
         };
 
