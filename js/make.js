@@ -1,17 +1,11 @@
-
-
-function makeFileStructure(nk) {
-    var lab = [];
-    lab["folder"] = [];
-    lab["file"] = [];
-    lab["warning"] = 0;
-    lab["error"] = 0;
-
+function makeMachineFolder(nk, lab) {
     for (var mindex in nk) {
         lab["folder"][nk[mindex].name] = "";
     }
+    return lab;
+}
 
-    // generazione lab.conf
+function makeLabConf(nk, lab) {
     lab["file"]["lab.conf"] = "";
     for (var mindex in nk) {
         for (var i in nk[mindex].interfaces.if) {
@@ -19,10 +13,19 @@ function makeFileStructure(nk) {
         }
         lab["file"]["lab.conf"] += "\n";
     }
+    return lab;
+}
 
-    // generazione macchina.startup, resolver e apache
+function makeStartup(nk, lab) {
     for (var mindex in nk) {
         lab["file"][nk[mindex].name + ".startup"] = "";
+    }
+    return lab;
+}
+
+function makeStaticRouting(nk, lab) {
+    // generazione macchina.startup, resolver e apache
+    for (var mindex in nk) {
 
         for (var i in nk[mindex].interfaces.if) {
             //ifconfig eth_ SELFADDRESS/MASK up
@@ -46,15 +49,27 @@ function makeFileStructure(nk) {
                 }
             }
         }
+    }
 
-        // ns
-        if (nk[mindex].type == 'ns') {
-            lab["file"][nk[mindex].name + ".startup"] += "/etc/init.d/bind start\n";
-            lab["folder"][nk[mindex].name + "/etc/bind"] = "";
-            lab["file"][nk[mindex].name + "/etc/bind/named.conf"] = "";
+    return lab;
+}
+
+function makeTerminal(nk, lab) {
+    for (var mindex in nk) {
+        // terminale
+        if (nk[mindex].type == 'terminale') {
+            if (typeof(nk[mindex].pc.ns) != "undefined" && nk[mindex].pc.ns != "") {
+                lab["folder"][nk[mindex].name + "/etc"] = "";
+                lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.dns + "\n";
+            }
         }
-        // ws
-        else if (nk[mindex].type == 'ws') {
+    }
+    return lab;
+}
+
+function makeWebserver(nk, lab) {
+    for (var mindex in nk) {
+        if (nk[mindex].type == 'ws') {
             if (nk[mindex].ws.userdir == true) {
                 lab["folder"][nk[mindex].name + "/home/guest/public_html"] = "";
                 lab["file"][nk[mindex].name + "/home/guest/public_html/index.html"] = '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>';
@@ -62,16 +77,18 @@ function makeFileStructure(nk) {
             }
             lab["file"][nk[mindex].name + ".startup"] += "/etc/init.d/apache2 start\n";
         }
-        // terminale
-        else if (nk[mindex].type == 'terminale') {
-            if (typeof(nk[mindex].pc.ns) != "undefined" && nk[mindex].pc.ns != "") {
-                lab["folder"][nk[mindex].name + "/etc"] = "";
-                lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.dns + "\n";
-            }
-        }
-        // router
-        else if (nk[mindex].type == 'router') {
+    }
+    return lab;
+}
 
+function makeNameserver(nk, lab) {
+    // generazione file e cartelle comuni
+    for (var mindex in nk) {
+        // ns
+        if (nk[mindex].type == 'ns') {
+            lab["file"][nk[mindex].name + ".startup"] += "/etc/init.d/bind start\n";
+            lab["folder"][nk[mindex].name + "/etc/bind"] = "";
+            lab["file"][nk[mindex].name + "/etc/bind/named.conf"] = "";
         }
     }
 
@@ -168,8 +185,11 @@ function makeFileStructure(nk) {
         }
     }
 
-    // routing dinamico
+    return lab;
+}
 
+function makeRouter(nk, lab) {
+    // routing dinamico RIP e OSPF
     for (var mindex in nk) {
 
         if (nk[mindex].type == 'router') {
@@ -271,15 +291,30 @@ function makeFileStructure(nk) {
     return lab;
 }
 
+function makeFileStructure(nk) {
+    var lab = [];
+    lab["folder"] = [];
+    lab["file"] = [];
+    lab["warning"] = 0;
+    lab["error"] = 0;
+
+    makeMachineFolder(nk, lab);
+    makeLabConf(nk, lab);
+    makeStartup(nk, lab);
+    makeStaticRouting(nk, lab);
+    makeTerminal(nk, lab);
+    makeRouter(nk, lab);
+    makeWebserver(nk, lab);
+    makeNameserver(nk, lab);
+
+    return lab;
+}
+
 function makeScript(lab){
     var text="";
-
     text += "# Ricordati di usare prima 'chmod +x' (o 'chmod 500') sullo script per renderlo eseguibile. Lo script si autodistrugge al termine\n";
-
     text += "\n";
-
     text += "#! /bin/sh\n";
-
     for(var folderName in lab["folder"]){
         text += "mkdir -p " + folderName + "\n";
     }
@@ -290,7 +325,6 @@ function makeScript(lab){
             text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
         }
     }
-
     text += "rm $0\n";
 
     return text;
