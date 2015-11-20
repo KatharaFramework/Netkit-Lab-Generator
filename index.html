@@ -1,12 +1,71 @@
+<!DOCTYPE html>
 <html>
 <head>
-	<title>Indice Automatizzatore Netkit</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Lykon, Lollo, Neeja" />
+    <title>Netkit Lab Generator</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
 </head>
-<body>
-<ul>
-	<li>
-		<a href="netkitlabgen-routing-dinamico.html">Routing statico e dinamico (angular)</a>
-	</li>
-</ul>
+<body class="bg-logos">
+<script>
+    var isIE = navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0;
+    if (isIE)
+        document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
+</script>
+<h1>Netkit Lab Generator</h1>
+<hr />
+<div id="description">
+    Questo tool permette di generare rapidamente i file e le cartelle necessari a far funzionare un laboratorio di Netkit.
+    Lo scopo è la rapidità, quindi moltissime funzionalità opzionali non sono personalizzabili tramite questo form e sono settate a valori di
+    default (ad esempio username e password di zebra). <strong>Gli autori di quest'applicazione non si assumono nessuna responsabilità
+    riguardo eventuali malfunzionamenti</strong>.
+    <br />
+    Una volta compilato correttamente il form è possibile esportare il lab in formato .zip oppure tramite uno script bash che,
+    al termine della sua esecuzione, provvederà a generare il lab e tutti i relativi file e cartelle. Inoltre è possibile esportare
+    la configurazione del form in modo da importarla in un secondo momento ed effettuare modifiche.
+</div>
+<hr />
+
+<br />
+
+<div data-ng-app="napp" data-ng-controller="nc">
+    <div ng-include="app"></div>
+</div>
+
+
+<script src="js/vendor/angular.min.js"></script>
+<script>
+    if (typeof(angular)=="undefined")
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"><\/script>');
+</script>
+<script src="js/vendor/jszip.min.js"></script>
+<script>
+    if (typeof(JSZip)=="undefined")
+        document.write('<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"><\/script>');
+</script>
+<script src="js/vendor/FileSaver.min.js"></script>
+<script>
+    if (typeof(saveAs)=="undefined")
+        document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
+</script>
+
+<script src="js/helper.js"></script>
+<script src="js/make.js"></script>
+<script src="js/model.js"></script>
+<script src="js/controller.js"></script>
+
+
+<script>
+    window.onload= function() {
+        console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+        console.log(" =======================================\n Good job for finding this page. Your     \n life with Netkit will be a lot easier!      \n ======================================= ");
+    }
+</script>
+
 </body>
 </html>
