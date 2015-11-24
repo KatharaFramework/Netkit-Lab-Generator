@@ -672,7 +672,7 @@
                 if (nk[mindex].routing.rip.en) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n";
                 }
-                
+
                 if (nk[mindex].routing.ospf.en) {
                     lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
                 }
