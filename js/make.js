@@ -217,10 +217,12 @@ function makeRouter(nk, lab) {
 
                 lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
 
-                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "router bgpd " + nk[mindex].routing.bgp.as + "\n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "router bgpd " + nk[mindex].routing.bgp.as + "\n \n";
 
-                /*for (var n in nk[mindex].routing.bgpd.network)
-                    lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "network " + nk[mindex].routing.bgp.network[n] + "\n";*/
+                for (var n in nk[mindex].routing.bgp.network)
+                    lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "network " + nk[mindex].routing.bgp.network[n] + "\n";
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
 
                 for (var r in nk[mindex].routing.bgp.remote) {
                     if (typeof(nk[mindex].routing.bgp.remote[r]) != "undefined" && nk[mindex].routing.bgp.remote[r].neighbor != "") {
@@ -228,6 +230,9 @@ function makeRouter(nk, lab) {
                         lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " description " + nk[mindex].routing.bgp.remote[r].description + "\n";
                     }
                 }
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "log file /var/log/zebra/bgpd.log \n \n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "debug bgp \ndebug bgp events \ndebug bgp filters \ndebug bgp fsm \ndebug bgp keepalives \ndebug bgp updates";
 
                 lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
             }
