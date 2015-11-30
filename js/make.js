@@ -217,7 +217,7 @@ function makeRouter(nk, lab) {
 
                 lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
 
-                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "router bgpd " + nk[mindex].routing.bgp.as + "\n \n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "router bgpd " + nk[mindex].routing.bgp.as + "\n\n";
 
                 for (var n in nk[mindex].routing.bgp.network)
                     lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "network " + nk[mindex].routing.bgp.network[n] + "\n";
@@ -231,8 +231,8 @@ function makeRouter(nk, lab) {
                     }
                 }
 
-                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "log file /var/log/zebra/bgpd.log \n \n";
-                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "debug bgp \ndebug bgp events \ndebug bgp filters \ndebug bgp fsm \ndebug bgp keepalives \ndebug bgp updates";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "log file /var/log/zebra/bgpd.log\n\n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates";
 
                 lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
             }
