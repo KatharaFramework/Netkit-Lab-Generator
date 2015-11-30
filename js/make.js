@@ -225,9 +225,10 @@ function makeRouter(nk, lab) {
                 lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
 
                 for (var r in nk[mindex].routing.bgp.remote) {
-                    if (typeof(nk[mindex].routing.bgp.remote[r]) != "undefined" && nk[mindex].routing.bgp.remote[r].neighbor != "") {
+                    if (typeof(nk[mindex].routing.bgp.remote[r]) != "undefined" && nk[mindex].routing.bgp.remote[r].neighbor != "" && nk[mindex].routing.bgp.remote[r].as != "") {
                         lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " remote-as " + nk[mindex].routing.bgp.remote[r].as + "\n";
-                        lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " description " + nk[mindex].routing.bgp.remote[r].description + "\n";
+                        if(nk[mindex].routing.bgp.remote[r].description != "")
+                            lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " description " + nk[mindex].routing.bgp.remote[r].description + "\n";
                     }
                 }
 
