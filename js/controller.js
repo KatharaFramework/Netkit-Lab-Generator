@@ -97,7 +97,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.addBgpNeighbor = function(machine) {
-        machine.routing.bgp.remote.push("");
+        machine.routing.bgp.remote.push({"neighbor":"", "as":"", "description":""});
     };
 
     $scope.removeBgpNeighbor = function(machine) {
