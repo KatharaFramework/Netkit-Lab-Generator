@@ -122,7 +122,7 @@
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
                 </div>
                 <hr />
-                <input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf<br />
+                <div><input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf</div>
                 <div data-ng-show="x.routing.ospf.en">
                     <span class="btn btn-success btn-square" data-ng-click="addOspfNetwork(x)">+</span>
                     <span class="btn btn-danger btn-square" data-ng-click="removeOspfNetwork(x)" data-ng-disabled="x.routing.ospf.network.length<=1">-</span>
@@ -148,6 +148,27 @@
                         </select>
                     </div>
                 </div>
+                <hr />
+                <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.bgp.en" /> bgp</div>
+                <div data-ng-show="x.routing.bgp.en">
+                    <span class="btn btn-success btn-square" data-ng-click="addBgpNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeBgpNetwork(x)" data-ng-disabled="x.routing.bgp.network.length<=1">-</span>
+                    <div data-ng-repeat="bnet in x.routing.bgp.network track by $index">
+                        <label>Network: </label>
+                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.bgp.network[$index]" />
+                    </div>
+                    <span class="btn btn-success btn-square" data-ng-click="addBgpNeighbor(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeBgpNeighbor(x)" data-ng-disabled="x.routing.bgp.remote.length<=1">-</span>
+                    <div data-ng-repeat="bremote in x.routing.bgp.remote track by $index">
+                        <label>Neighbor (vuoto per omettere): </label>
+                        <input type="text" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].neighbor" />
+                        <label>Remote-as: </label>
+                        <input type="text" placeholder="0" pattern="^[1-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
+                        <label>Description: </label>
+                        <input type="text" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
+                    </div>
+                </div>
+                <hr />
             </td>
         </tr>
 

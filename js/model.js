@@ -9,6 +9,7 @@ var backbone = {
     "ns":{"recursion":true, "authority":true},
     "routing":{
         "rip":{"en":false, "connected":false, "ospf": false, "network":[""], "route":[""]},
-        "ospf":{"en":false, "connected":false, "rip": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]}
+        "ospf":{"en":false, "connected":false, "rip": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]},
+        "bgp":{"en":false, "network":[""], "remote":[{"neighbor":"", "as":"", "description":""}]}
     }
 };

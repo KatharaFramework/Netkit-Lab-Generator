@@ -84,6 +84,8 @@ app.controller('nc', function($scope) {
         }
     };
 
+    // TODO add and remove for bgp
+
     $scope.makeDownload = function(text, filename) {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
         saveAs(blob, filename);

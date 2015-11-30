@@ -189,6 +189,7 @@ function makeNameserver(nk, lab) {
 }
 
 function makeRouter(nk, lab) {
+    // TODO bgpd stuff (file in zebra folder, line in zebra config, stuff in bgpd.conf file)
     // routing dinamico RIP e OSPF
     for (var mindex in nk) {
 
