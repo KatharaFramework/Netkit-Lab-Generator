@@ -86,6 +86,27 @@ app.controller('nc', function($scope) {
 
     // TODO add and remove for bgp
 
+    $scope.addBgpNetwork = function(machine) {
+        machine.routing.bgp.network.push("");
+    };
+
+    $scope.removeBgpNetwork = function(machine) {
+        if(machine.routing.bgp.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+            machine.routing.bgp.network.pop();
+        }
+    };
+
+    $scope.addBgpNeighbor = function(machine) {
+        machine.routing.bgp.remote.push("");
+    };
+
+    $scope.removeBgpNeighbor = function(machine) {
+        if(machine.routing.bgp.remote.length>1 && confirm("Sicuro di voler rimuovere il neighbor?")) {
+            machine.routing.bgp.remote.pop();
+        }
+    };
+
+
     $scope.makeDownload = function(text, filename) {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
         saveAs(blob, filename);

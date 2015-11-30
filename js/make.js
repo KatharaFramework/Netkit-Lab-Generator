@@ -195,7 +195,7 @@ function makeRouter(nk, lab) {
 
         if (nk[mindex].type == 'router') {
 
-            if (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en) {
+            if (nk[mindex].routing.rip.en || nk[mindex].routing.ospf.en || nk[mindex].routing.bgp.en) {
                 lab["file"][nk[mindex].name + ".startup"] += "/etc/init.d/zebra start\n";
                 lab["folder"][nk[mindex].name + "/etc/zebra"] = "";
                 lab["file"][nk[mindex].name + "/etc/zebra/daemons"] = "zebra=yes\n";
@@ -205,6 +205,31 @@ function makeRouter(nk, lab) {
                 lab["file"][nk[mindex].name + "/etc/zebra/zebra.conf"] += "password zebra\n";
                 lab["file"][nk[mindex].name + "/etc/zebra/zebra.conf"] += "enable password zebra\n";
                 lab["file"][nk[mindex].name + "/etc/zebra/zebra.conf"] += "\nlog file /var/log/zebra/zebra.log\n";
+            }
+
+            if (nk[mindex].routing.bgp.en) {
+                lab["file"][nk[mindex].name + "/etc/zebra/daemons"] += "bgpd=yes\n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] = "";
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "hostname bgpd\n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "password zebra\n";
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "enable password zebra\n";
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "router bgpd " + nk[mindex].routing.bgp.as + "\n";
+
+                /*for (var n in nk[mindex].routing.bgpd.network)
+                    lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "network " + nk[mindex].routing.bgp.network[n] + "\n";*/
+
+                for (var r in nk[mindex].routing.bgp.remote) {
+                    if (typeof(nk[mindex].routing.bgp.remote[r]) != "undefined" && nk[mindex].routing.bgp.remote[r].neighbor != "") {
+                        lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " remote-as " + nk[mindex].routing.bgp.remote[r].as + "\n";
+                        lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "neighbor " + nk[mindex].routing.bgp.remote[r].neighbor + " description " + nk[mindex].routing.bgp.remote[r].description + "\n";
+                    }
+                }
+
+                lab["file"][nk[mindex].name + "/etc/zebra/bgpd.conf"] += "\n";
             }
 
             if (nk[mindex].routing.rip.en) {
