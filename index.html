@@ -119,6 +119,7 @@
                     </div>
 
                     <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
+                    <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.rip.bgp" /> redistribute bgp</div>
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
                 </div>
                 <hr />
@@ -139,6 +140,7 @@
                     </div>
 
                     <div><input title="redistributer" type="checkbox" value="1" data-ng-model="x.routing.ospf.rip" /> redistribute rip</div>
+                    <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.ospf.bgp" /> redistribute bgp</div>
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
                     <label>Cost: </label>
                     <div data-ng-repeat="o in x.interfaces.if">

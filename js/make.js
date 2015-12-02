@@ -294,9 +294,15 @@ function makeRouter(nk, lab) {
             if (nk[mindex].routing.rip.en && nk[mindex].routing.rip.ospf) {
                 lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "redistribute ospf\n";
             }
+            if (nk[mindex].routing.rip.en && nk[mindex].routing.rip.bgp) {
+                lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "redistribute bgp\n";
+            }
 
             if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.rip) {
                 lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute rip\n";
+            }
+            if (nk[mindex].routing.ospf.en && nk[mindex].routing.ospf.bgp) {
+                lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "redistribute bgp\n";
             }
 
             //nb: i costi vanno qui alla fine

@@ -8,8 +8,8 @@ var backbone = {
     "ws":{"userdir":false},
     "ns":{"recursion":true, "authority":true},
     "routing":{
-        "rip":{"en":false, "connected":false, "ospf": false, "network":[""], "route":[""]},
-        "ospf":{"en":false, "connected":false, "rip": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]},
+        "rip":{"en":false, "connected":false, "ospf": false, "bgp": false, "network":[""], "route":[""]},
+        "ospf":{"en":false, "connected":false, "rip": false, "bgp": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false]},
         "bgp":{"en":false, "as":"", "network":[""], "remote":[{"neighbor":"", "as":"", "description":""}]}
     }
 };
