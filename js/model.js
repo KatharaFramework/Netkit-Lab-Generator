@@ -18,9 +18,10 @@ var backbone = {
                 "neighbor":"",
                 "as":"",
                 "description":"",
-                "p-list":[{"name":"", "direction":""}]
+                "prefix_out":"",
+                "prefix_in":"",
             }],
-            "p-list": [{"name":"", "rules":[""]}]
+            "p_list": [] // each element is {"name":"", "rules":[""]}
         }
     }
 };

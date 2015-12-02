@@ -95,7 +95,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.addBgpNeighbor = function(machine) {
-        machine.routing.bgp.remote.push({"neighbor":"", "as":"", "description":"", "p-list":[{"name":"", "direction":""}]});
+        machine.routing.bgp.remote.push({"neighbor":"", "as":"", "description":"", "p_list":[{"name":"", "direction":""}]});
     };
 
     $scope.removeBgpNeighbor = function(machine) {
@@ -104,8 +104,25 @@ app.controller('nc', function($scope) {
         }
     };
 
-    //TODO add and remove p-list-name + rule. Needs to add p-list-name to each selector for each neighbor
+    $scope.addBgpPrefix = function(machine) {
+        machine.routing.bgp.p_list.push({"name":"", "rules":[""]});
+    };
 
+    $scope.removeBgpPrefix = function(machine) {
+        if(machine.routing.bgp.p_list.length>1 && confirm("Sicuro di voler rimuovere il p-list-name e le regole assegnate?")) {
+            machine.routing.bgp.p_list.pop();
+        }
+    };
+
+    $scope.addBgpRule = function(rules) {
+        rules.push("");
+    };
+
+    $scope.removeBgpRule = function(rules) {
+        if(rules.length>0 && confirm("Sicuro di voler rimuovere l'ultima regola?")) {
+            rules.pop();
+        }
+    };
 
     $scope.makeDownload = function(text, filename) {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
