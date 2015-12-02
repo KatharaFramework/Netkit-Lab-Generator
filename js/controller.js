@@ -84,8 +84,6 @@ app.controller('nc', function($scope) {
         }
     };
 
-    // TODO add and remove for bgp
-
     $scope.addBgpNetwork = function(machine) {
         machine.routing.bgp.network.push("");
     };
@@ -97,7 +95,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.addBgpNeighbor = function(machine) {
-        machine.routing.bgp.remote.push({"neighbor":"", "as":"", "description":""});
+        machine.routing.bgp.remote.push({"neighbor":"", "as":"", "description":"", "p-list":[{"name":"", "direction":""}]});
     };
 
     $scope.removeBgpNeighbor = function(machine) {
@@ -105,6 +103,8 @@ app.controller('nc', function($scope) {
             machine.routing.bgp.remote.pop();
         }
     };
+
+    //TODO add and remove p-list-name + rule. Needs to add p-list-name to each selector for each neighbor
 
 
     $scope.makeDownload = function(text, filename) {
