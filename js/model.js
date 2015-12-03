@@ -18,8 +18,8 @@ var backbone = {
                 "neighbor":"",
                 "as":"",
                 "description":"",
-                "prefix_out":"",
-                "prefix_in":"",
+                "prefix_out":"", //l'oggetto p_list corrispondente
+                "prefix_in":"", //Come sopra3
             }],
             "p_list": [] // each element is {"name":"", "rules":[""]}
         }
