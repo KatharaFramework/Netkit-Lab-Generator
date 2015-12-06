@@ -167,7 +167,7 @@
                         <label>Neighbor (vuoto per omettere): </label>
                         <input type="text" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].neighbor" />
                         <label>Remote-AS: </label>
-                        <input type="text" placeholder="0" pattern="^[1-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
+                        <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
                         <label>Description: </label>
                         <input type="text" title="description" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
                         <label>Prefix-List out: </label>
