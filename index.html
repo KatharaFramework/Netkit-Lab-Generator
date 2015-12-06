@@ -173,13 +173,13 @@
                         <label>Prefix-List out: </label>
                         <select title="out" data-ng-model="x.routing.bgp.remote[$index].prefix_out">
                             <option value="" selected>-</option>
-                            <option data-ng-repeat="rule_out in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index]}}">{{x.routing.bgp.p_list[$index].name}}</option>
+                            <option data-ng-repeat="rule_out in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index].name}}">{{x.routing.bgp.p_list[$index].name}}</option>
                         </select>
                         <br />
                         <label>Prefix-List in: </label>
                         <select title="in" data-ng-model="x.routing.bgp.remote[$index].prefix_in">
                             <option value="" selected>-</option>
-                            <option data-ng-repeat="rule_in in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index]}}">{{x.routing.bgp.p_list[$index].name}}</option>
+                            <option data-ng-repeat="rule_in in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index].name}}">{{x.routing.bgp.p_list[$index].name}}</option>
                         </select>
                     </div>
                     <span class="btn btn-success" data-ng-click="addBgpPrefix(x)">Add Prefix</span>

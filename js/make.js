@@ -341,12 +341,12 @@ function makeBgpConfiguration(router, lab){
             
             //Aggiungo la prefix in
             if(router.routing.bgp.remote[r].prefix_in!=""){
-               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + JSON.parse(router.routing.bgp.remote[r].prefix_in).name + " in\n";
+               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_in + " in\n";
             }
 
             //Aggiungo la prefix out
             if(router.routing.bgp.remote[r].prefix_out!=""){
-               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + JSON.parse(router.routing.bgp.remote[r].prefix_out).name + " out\n";
+               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_out + " out\n";
             }
 
         }
