@@ -319,7 +319,7 @@ function makeBgpConfiguration(router, lab){
     lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
 
     // Inserimento nome AS
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "router bgpd " + router.routing.bgp.as + "\n\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
 
     // Inserimento tutte le Network su cui annunciare BGP
     for (var n in router.routing.bgp.network) {
@@ -335,17 +335,17 @@ function makeBgpConfiguration(router, lab){
             lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " remote-as " + router.routing.bgp.remote[r].as + "\n";
             
             //Aggiungo la descrizione
-            if(router.routing.bgp.remote[r].description != ""){
+            if(typeof(router.routing.bgp.remote[r].description) != "undefined" && router.routing.bgp.remote[r].description != ""){
                 lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " description " + router.routing.bgp.remote[r].description + "\n";
             }
             
             //Aggiungo la prefix in
-            if(router.routing.bgp.remote[r].prefix_in!=""){
+            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_in!=""){
                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_in + " in\n";
             }
 
             //Aggiungo la prefix out
-            if(router.routing.bgp.remote[r].prefix_out!=""){
+            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_out!=""){
                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_out + " out\n";
             }
 
@@ -369,7 +369,7 @@ function makeBgpConfiguration(router, lab){
     set as-path prepend  20 20 20 
     */
 
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "log file /var/log/zebra/bgpd.log\n\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n";
     lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates";
 
     lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
