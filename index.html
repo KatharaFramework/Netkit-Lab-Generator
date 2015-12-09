@@ -191,7 +191,7 @@
                         <span class="btn btn-success" data-ng-click="addBgpRule(prefix.rules)">Add Filtering Rule</span>
                         <span class="btn btn-danger" data-ng-click="removeBgpRule(prefix.rules)" data-ng-disabled="prefix.rules.length<=0">Remove</span>
                         <div data-ng-repeat="rl in prefix.rules track by $index">
-                            <input type="text" placeholder="permit 195.11.14.0/24" class="form-control" data-ng-model="prefix.rules[$index]" />
+                            <input type="text" placeholder="permit 195.11.14.0/24" pattern="^((permit)|(deny))[ ]*(( any)|((( |\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}\/[0-9]+))$" class="form-control" data-ng-model="prefix.rules[$index]" />
                         </div>
                     </div>
                 </div>
