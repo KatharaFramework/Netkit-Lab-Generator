@@ -160,7 +160,7 @@
                 <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.bgp.en" /> bgp</div>
                 <div data-ng-show="x.routing.bgp.en">
                     <label>AS: </label>
-                    <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.as" />
+                    <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.as" required />
                     <span class="btn btn-success btn-square" data-ng-click="addBgpNetwork(x)">+</span>
                     <span class="btn btn-danger btn-square" data-ng-click="removeBgpNetwork(x)" data-ng-disabled="x.routing.bgp.network.length<=1">-</span>
                     <div data-ng-repeat="bnet in x.routing.bgp.network track by $index">
