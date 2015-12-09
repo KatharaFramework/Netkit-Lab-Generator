@@ -63,6 +63,8 @@
                         <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. o ROOT-SERVER." pattern=".*\.$"/></div>
                     <hr />
                 </div>
+                <label>Directly in {{x.name}}.startup:</label>
+                <textarea title="free" rows="3" class="form-control" data-ng-model="x.interfaces.free"></textarea>
             </td>
             <td class="gateways">
                 <div class="btn btn-success" data-ng-click="addGateway(x)">Aggiungi gateway</div>
@@ -121,6 +123,8 @@
                     <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
                     <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.rip.bgp" /> redistribute bgp</div>
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
+                    <label>Directly in ripd.conf:</label>
+                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.rip.free"></textarea>
                 </div>
                 <hr />
                 <div><input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf</div>
@@ -149,6 +153,8 @@
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select>
                     </div>
+                    <label>Directly in ospfd.conf:</label>
+                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.ospf.free"></textarea>
                 </div>
                 <hr />
                 <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.bgp.en" /> bgp</div>
@@ -193,6 +199,10 @@
                         <div data-ng-repeat="rl in prefix.rules track by $index">
                             <input type="text" placeholder="permit 195.11.14.0/24" pattern="^((permit)|(deny))[ ]*(( any)|( all)|((( |\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}\/[0-9]+))$" class="form-control" data-ng-model="prefix.rules[$index]" />
                         </div>
+                    </div>
+                    <div>
+                        <label>Directly in bgpd.conf:</label>
+                        <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.bgp.free"></textarea>
                     </div>
                 </div>
                 <hr />

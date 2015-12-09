@@ -49,6 +49,9 @@ function makeStaticRouting(nk, lab) {
                 }
             }
         }
+
+        if(typeof(nk[mindex].interfaces.free) != "undefined" && nk[mindex].interfaces.free != "")
+            lab["file"][nk[mindex].name + ".startup"] += "\n" + nk[mindex].interfaces.free + "\n";
     }
 
     return lab;
@@ -192,8 +195,77 @@ function makeZebraFolders(nk, lab){
     //TODO dopo sposto qui la generazione della cartella e degli script comuni di zebra
 }
 
+
+function makeBgpConf(router, lab){
+
+    lab["file"][router.name + "/etc/zebra/daemons"] += "bgpd=yes\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] = "";
+
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "hostname bgpd\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "password zebra\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "enable password zebra\n";
+
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
+
+    // Inserimento nome AS
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
+
+    // Inserimento tutte le Network su cui annunciare BGP
+    for (var n in router.routing.bgp.network) {
+        lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "network " + router.routing.bgp.network[n] + "\n";
+    }
+
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
+
+    //Inserisco tutti i Neibourgh
+    for (var r in router.routing.bgp.remote) {
+        if (typeof(router.routing.bgp.remote[r]) != "undefined" && router.routing.bgp.remote[r].neighbor != "" && router.routing.bgp.remote[r].as != "") {
+            //Aggiungo il remote-as
+            lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " remote-as " + router.routing.bgp.remote[r].as + "\n";
+
+            //Aggiungo la descrizione
+            if(typeof(router.routing.bgp.remote[r].description) != "undefined" && router.routing.bgp.remote[r].description != ""){
+                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " description " + router.routing.bgp.remote[r].description + "\n";
+            }
+
+            //Aggiungo la prefix in
+            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_in!=""){
+                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_in + " in\n";
+            }
+
+            //Aggiungo la prefix out
+            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_out!=""){
+                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_out + " out\n";
+            }
+
+        }
+    }
+
+    //Inserisco le prefix lists
+    for(var p in router.routing.bgp.p_list) {
+        if(typeof(router.routing.bgp.p_list[p])!="undefined" && router.routing.bgp.p_list[p].name != "") {
+            for (var prule in router.routing.bgp.p_list[p].rules){
+                if(typeof(router.routing.bgp.p_list[p].rules[prule])!="undefined" && router.routing.bgp.p_list[p].rules[prule] != "") {
+                    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "ip prefix-list " + router.routing.bgp.p_list[p].name + " " + router.routing.bgp.p_list[p].rules[prule] + "\n";
+                }
+            }
+        }
+    }
+
+    //Free conf
+    if(typeof(router.routing.bgp.free) != "undefined" && router.routing.bgp.free != "")
+        lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n";
+    //
+
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n";
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates";
+
+    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
+
+}
+
+
 function makeRouter(nk, lab) {
-    // TODO bgpd stuff (file in zebra folder, line in zebra config, stuff in bgpd.conf file)
     // routing dinamico RIP e OSPF
     for (var mindex in nk) {
 
@@ -257,7 +329,7 @@ function makeRouter(nk, lab) {
             }
 
             if (nk[mindex].routing.bgp.en) {
-                makeBgpConfiguration(nk[mindex], lab);
+                makeBgpConf(nk[mindex], lab);
             }
 
             //nb: mantenere l'ordine
@@ -293,6 +365,17 @@ function makeRouter(nk, lab) {
                 }
             }
 
+            //Free conf
+            if (nk[mindex].routing.ospf.en) {
+                if (typeof(nk[mindex].routing.ospf.free) != "undefined" && nk[mindex].routing.ospf.free != "")
+                    lab["file"][nk[mindex].name + "/etc/zebra/ospfd.conf"] += "\n" + nk[mindex].routing.ospf.free + "\n";
+            }
+            if (nk[mindex].routing.rip.en) {
+                if (typeof(nk[mindex].routing.rip.free) != "undefined" && nk[mindex].routing.rip.free != "")
+                    lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\n" + nk[mindex].routing.rip.free + "\n";
+            }
+            //
+
             //nb: e infine i log
             if (nk[mindex].routing.rip.en) {
                 lab["file"][nk[mindex].name + "/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n";
@@ -305,75 +388,6 @@ function makeRouter(nk, lab) {
     }
 
     return lab;
-}
-
-function makeBgpConfiguration(router, lab){
-    
-    lab["file"][router.name + "/etc/zebra/daemons"] += "bgpd=yes\n";
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] = "";
-
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "hostname bgpd\n";
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "password zebra\n";
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "enable password zebra\n";
-
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
-    // Inserimento nome AS
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
-
-    // Inserimento tutte le Network su cui annunciare BGP
-    for (var n in router.routing.bgp.network) {
-        lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "network " + router.routing.bgp.network[n] + "\n";
-    }
-
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
-    //Inserisco tutti i Neibourgh
-    for (var r in router.routing.bgp.remote) {
-        if (typeof(router.routing.bgp.remote[r]) != "undefined" && router.routing.bgp.remote[r].neighbor != "" && router.routing.bgp.remote[r].as != "") {
-            //Aggiungo il remote-as
-            lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " remote-as " + router.routing.bgp.remote[r].as + "\n";
-            
-            //Aggiungo la descrizione
-            if(typeof(router.routing.bgp.remote[r].description) != "undefined" && router.routing.bgp.remote[r].description != ""){
-                lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " description " + router.routing.bgp.remote[r].description + "\n";
-            }
-            
-            //Aggiungo la prefix in
-            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_in!=""){
-               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_in + " in\n";
-            }
-
-            //Aggiungo la prefix out
-            if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_out!=""){
-               lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_out + " out\n";
-            }
-
-        }
-    }
-
-    //Inserisco le prefix lists
-    for(var p in router.routing.bgp.p_list) {
-        if(typeof(router.routing.bgp.p_list[p])!="undefined" && router.routing.bgp.p_list[p].name != "") {
-            for (var prule in router.routing.bgp.p_list[p].rules){
-                if(typeof(router.routing.bgp.p_list[p].rules[prule])!="undefined" && router.routing.bgp.p_list[p].rules[prule] != "") {
-                    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "ip prefix-list " + router.routing.bgp.p_list[p].name + " " + router.routing.bgp.p_list[p].rules[prule] + "\n";
-                }
-            }   
-        }
-    }
-
-    //Aggiungo cazzatelle
-    /*
-    route-map dontUseMe permit 10
-    set as-path prepend  20 20 20 
-    */
-
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n";
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates";
-
-    lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
 }
 
 function makeFileStructure(nk) {
