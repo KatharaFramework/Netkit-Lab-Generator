@@ -17,11 +17,11 @@ var backbone = {
             "remote":[{
                 "neighbor":"",
                 "as":"",
-                "description":"",
+                "description":""/*,
                 "prefix_out":"",
-                "prefix_in":""
+                "prefix_in":"" */
             }],
-            "p_list": [],
+            /*"p_list": [],*/
             "free": ""
         }
     }

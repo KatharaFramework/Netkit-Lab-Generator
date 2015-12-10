@@ -227,7 +227,7 @@ function makeBgpConf(router, lab){
             if(typeof(router.routing.bgp.remote[r].description) != "undefined" && router.routing.bgp.remote[r].description != ""){
                 lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " description " + router.routing.bgp.remote[r].description + "\n";
             }
-
+            /*
             //Aggiungo la prefix in
             if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_in!=""){
                 lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_in + " in\n";
@@ -237,10 +237,10 @@ function makeBgpConf(router, lab){
             if(typeof(router.routing.bgp.remote[r].prefix_in) != "undefined" && router.routing.bgp.remote[r].prefix_out!=""){
                 lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " prefix-list " + router.routing.bgp.remote[r].prefix_out + " out\n";
             }
-
+            */
         }
     }
-
+    /*
     //Inserisco le prefix lists
     for(var p in router.routing.bgp.p_list) {
         if(typeof(router.routing.bgp.p_list[p])!="undefined" && router.routing.bgp.p_list[p].name != "") {
@@ -251,6 +251,7 @@ function makeBgpConf(router, lab){
             }
         }
     }
+    */
 
     //Free conf
     if(typeof(router.routing.bgp.free) != "undefined" && router.routing.bgp.free != "")

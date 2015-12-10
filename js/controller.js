@@ -103,7 +103,8 @@ app.controller('nc', function($scope) {
             machine.routing.bgp.remote.pop();
         }
     };
-
+    
+    /*
     $scope.addBgpPrefix = function(machine) {
         machine.routing.bgp.p_list.push({"name":"", "rules":[""]});
     };
@@ -113,6 +114,7 @@ app.controller('nc', function($scope) {
             machine.routing.bgp.p_list.pop();
         }
     };
+    */
 
     $scope.addBgpRule = function(rules) {
         rules.push("");

@@ -176,6 +176,7 @@
                         <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
                         <label>Description: </label>
                         <input type="text" title="description" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
+                        <!--
                         <label>Prefix-List out: </label>
                         <select title="out" data-ng-model="x.routing.bgp.remote[$index].prefix_out">
                             <option value="" selected>-</option>
@@ -187,7 +188,9 @@
                             <option value="" selected>-</option>
                             <option data-ng-repeat="rule_in in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index].name}}">{{x.routing.bgp.p_list[$index].name}}</option>
                         </select>
+                        -->
                     </div>
+                    <!--
                     <span class="btn btn-success" data-ng-click="addBgpPrefix(x)">Add Prefix</span>
                     <span class="btn btn-danger" data-ng-click="removeBgpPrefix(x)" data-ng-disabled="x.routing.bgp.p_list.length<=1">Remove</span>
                     <div data-ng-repeat="prefix in x.routing.bgp.p_list track by $index">
@@ -200,6 +203,7 @@
                             <input type="text" placeholder="permit 195.11.14.0/24" pattern="^((permit)|(deny))[ ]*(( any)|( all)|((( |\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}\/[0-9]+))$" class="form-control" data-ng-model="prefix.rules[$index]" />
                         </div>
                     </div>
+                    -->
                     <div>
                         <label>Directly in bgpd.conf:</label>
                         <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.bgp.free"></textarea>
