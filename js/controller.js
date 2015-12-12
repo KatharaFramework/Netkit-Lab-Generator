@@ -9,6 +9,7 @@ app.controller('nc', function($scope) {
 
     $scope.app = "include/app.html";
 
+    $scope.labInfo = JSON.clone(labInfo);
     $scope.netkit = [JSON.clone(backbone)];
     $scope.counter = 1;
 
@@ -104,18 +105,6 @@ app.controller('nc', function($scope) {
         }
     };
 
-    /*
-    $scope.addBgpPrefix = function(machine) {
-        machine.routing.bgp.p_list.push({"name":"", "rules":[""]});
-    };
-
-    $scope.removeBgpPrefix = function(machine) {
-        if(machine.routing.bgp.p_list.length>1 && confirm("Sicuro di voler rimuovere il p-list-name e le regole assegnate?")) {
-            machine.routing.bgp.p_list.pop();
-        }
-    };
-    */
-
     $scope.addBgpRule = function(rules) {
         rules.push("");
     };
@@ -131,16 +120,17 @@ app.controller('nc', function($scope) {
         saveAs(blob, filename);
     };
 
-    $scope.generateScript = function(nk) {
-        return makeScript(makeFileStructure(nk));
+    $scope.generateScript = function(nk, li) {
+        return makeScript(makeFileStructure(nk, li));
     };
 
-    $scope.generateConfig = function(nk) {
-        return JSON.stringify(nk, undefined, 4);
+    $scope.generateConfig = function(nk, li) {
+        var all = {"labInfo": li, "netkit": nk};
+        return JSON.stringify(all, undefined, 4);
     };
 
-    $scope.generateZip = function(nk) {
-        return makeZip(makeFileStructure(nk));
+    $scope.generateZip = function(nk, li) {
+        return makeZip(makeFileStructure(nk, li));
     };
 
     $scope.import = function() {
@@ -150,8 +140,10 @@ app.controller('nc', function($scope) {
             if (typeof(f) != "undefined") {
                 r.onloadend = function (e) {
                     try {
-                        $scope.netkit = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
+                        var app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
+                        $scope.netkit = app.netkit;
                         $scope.counter = $scope.netkit.length;
+                        $scope.labInfo = app.labInfo;
                         $scope.$apply();
                     }
                     catch (err) {
@@ -165,5 +157,6 @@ app.controller('nc', function($scope) {
         catch (err) {
             alert("Errore File Reader: " + err);
         }
-    }
+    };
+
 });

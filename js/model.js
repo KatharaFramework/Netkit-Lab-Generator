@@ -1,3 +1,11 @@
+var labInfo = {
+    "description": "",
+    "version": "",
+    "author": "",
+    "email": "",
+    "web": ""
+};
+
 var backbone = {
     "name":"",
     "row":1,
@@ -17,11 +25,8 @@ var backbone = {
             "remote":[{
                 "neighbor":"",
                 "as":"",
-                "description":""/*,
-                "prefix_out":"",
-                "prefix_in":"" */
+                "description":""
             }],
-            /*"p_list": [],*/
             "free": ""
         }
     }

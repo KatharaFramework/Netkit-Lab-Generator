@@ -32,8 +32,3 @@ function highlight(json) {
         return '<span class="' + cls + '">' + match + '</span>';
     });
 }
-
-function debug() {
-    var json = document.getElementById("origin").innerHTML;
-    document.getElementById("highlight").innerHTML=highlight(json);
-}

@@ -18,12 +18,14 @@
         document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
 </script>
 <h1>Netkit Lab Generator</h1>
+<h4><a href="https://github.com/Kidel/automatizzatore-netkit/" target="_blank">https://github.com/Kidel/automatizzatore-netkit</a></h4>
 <hr />
 <div id="description">
     Questo tool permette di generare rapidamente i file e le cartelle necessari a far funzionare un laboratorio di Netkit.
     Lo scopo è la rapidità, quindi moltissime funzionalità opzionali non sono personalizzabili tramite questo form e sono settate a valori di
-    default (ad esempio username e password di zebra). <strong>Gli autori di quest'applicazione non si assumono nessuna responsabilità
-    riguardo eventuali malfunzionamenti</strong>.
+    default (ad esempio username e password di zebra).
+    <strong>Gli <a href="https://github.com/Kidel/automatizzatore-netkit/graphs/contributors" target="_blank">autori</a>
+    di quest'applicazione non si assumono nessuna responsabilità riguardo eventuali malfunzionamenti</strong>.
     <br />
     Una volta compilato correttamente il form è possibile esportare il lab in formato .zip oppure tramite uno script bash che,
     al termine della sua esecuzione, provvederà a generare il lab e tutti i relativi file e cartelle. Inoltre è possibile esportare
@@ -58,12 +60,12 @@
                     <div><label>Eth{{i.eth.number}}: </label>
                         <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
                     <div><label> IP/Net: </label>
-                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
+                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" /></div>
                     <div><label> Nome DNS Completo: </label>
                         <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. o ROOT-SERVER." pattern=".*\.$"/></div>
                     <hr />
                 </div>
-                <label>Directly in {{x.name}}.startup:</label>
+                <label>Direttamente in {{x.name}}.startup:</label>
                 <textarea title="free" rows="3" class="form-control" data-ng-model="x.interfaces.free"></textarea>
             </td>
             <td class="gateways">
@@ -123,7 +125,7 @@
                     <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
                     <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.rip.bgp" /> redistribute bgp</div>
                     <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
-                    <label>Directly in ripd.conf:</label>
+                    <label>Direttamente in ripd.conf:</label>
                     <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.rip.free"></textarea>
                 </div>
                 <hr />
@@ -153,7 +155,7 @@
                             <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
                         </select>
                     </div>
-                    <label>Directly in ospfd.conf:</label>
+                    <label>Direttamente in ospfd.conf:</label>
                     <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.ospf.free"></textarea>
                 </div>
                 <hr />
@@ -176,36 +178,9 @@
                         <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
                         <label>Description: </label>
                         <input type="text" title="description" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
-                        <!--
-                        <label>Prefix-List out: </label>
-                        <select title="out" data-ng-model="x.routing.bgp.remote[$index].prefix_out">
-                            <option value="" selected>-</option>
-                            <option data-ng-repeat="rule_out in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index].name}}">{{x.routing.bgp.p_list[$index].name}}</option>
-                        </select>
-                        <br />
-                        <label>Prefix-List in: </label>
-                        <select title="in" data-ng-model="x.routing.bgp.remote[$index].prefix_in">
-                            <option value="" selected>-</option>
-                            <option data-ng-repeat="rule_in in x.routing.bgp.p_list track by $index" value="{{x.routing.bgp.p_list[$index].name}}">{{x.routing.bgp.p_list[$index].name}}</option>
-                        </select>
-                        -->
                     </div>
-                    <!--
-                    <span class="btn btn-success" data-ng-click="addBgpPrefix(x)">Add Prefix</span>
-                    <span class="btn btn-danger" data-ng-click="removeBgpPrefix(x)" data-ng-disabled="x.routing.bgp.p_list.length<=1">Remove</span>
-                    <div data-ng-repeat="prefix in x.routing.bgp.p_list track by $index">
-                        <label>Name: </label>
-                        <input type="text" placeholder="pName1" pattern="^[a-zA-Z0-9]+$" class="form-control" data-ng-model="x.routing.bgp.p_list[$index].name" />
-                        <label>Rules: </label>
-                        <span class="btn btn-success" data-ng-click="addBgpRule(prefix.rules)">Add Filtering Rule</span>
-                        <span class="btn btn-danger" data-ng-click="removeBgpRule(prefix.rules)" data-ng-disabled="prefix.rules.length<=0">Remove</span>
-                        <div data-ng-repeat="rl in prefix.rules track by $index">
-                            <input type="text" placeholder="permit 195.11.14.0/24" pattern="^((permit)|(deny))[ ]*(( any)|( all)|((( |\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}\/[0-9]+))$" class="form-control" data-ng-model="prefix.rules[$index]" />
-                        </div>
-                    </div>
-                    -->
                     <div>
-                        <label>Directly in bgpd.conf:</label>
+                        <label>Direttamente in bgpd.conf:</label>
                         <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.bgp.free"></textarea>
                     </div>
                 </div>
@@ -215,14 +190,44 @@
 
     </table>
 
+    <table id="labInfo">
+        <tr>
+            <th>Info Lab</th>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <label>Descrizione:</label>
+                    <input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
+                </div>
+                <div>
+                    <label>Versione:</label>
+                    <input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
+                </div>
+                <div>
+                    <label>Autore/i:</label>
+                    <input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
+                </div>
+                <div>
+                    <label>Email:</label>
+                    <input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
+                </div>
+                <div>
+                    <label>Sito Web:</label>
+                    <input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
     <br />
 
     <div class="btn btn-success" data-ng-click="addMachine()">Aggiungi Macchina</div>
     <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
-    <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
-    <a class="btn btn-primary" data-ng-click="generateZip(netkit)"><strong>Scarica il file .zip</strong></a>
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
+    <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Scarica il file .zip</strong></a>
     <br />
-    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit), 'netkit.config')"><strong>Esporta configurazione</strong></a>
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')"><strong>Esporta configurazione</strong></a>
     <br />
     <a class="btn btn-primary" data-ng-click="import()"><strong>Importa configurazione</strong></a>
     <span class="file">
@@ -238,11 +243,7 @@
     <br />
 
     <h4 align="left">Anteprima:</h4>
-    <textarea title="script" rows="15" readonly>{{ generateScript(netkit) }}</textarea>
-
-    <!--<div class="btn btn-success" onclick="debug()">Debug (non in tempo reale)</div>
-    <div id="origin" class="hidden">{{netkit}}</div>
-    <pre id="highlight"></pre>-->
+    <textarea title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
 
 </div>
 
