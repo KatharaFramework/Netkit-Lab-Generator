@@ -125,7 +125,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.generateConfig = function(nk, li) {
-        var all = {"labInfo": li, "netkit": nk};
+        var all = [{"labInfo": li, "netkit": nk}];
         return JSON.stringify(all, undefined, 4);
     };
 
@@ -140,10 +140,10 @@ app.controller('nc', function($scope) {
             if (typeof(f) != "undefined") {
                 r.onloadend = function (e) {
                     try {
-                        var app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica
-                        $scope.netkit = app.netkit;
+                        var app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica prima di '['
+                        $scope.netkit = app[0].netkit;
                         $scope.counter = $scope.netkit.length;
-                        $scope.labInfo = app.labInfo;
+                        $scope.labInfo = app[0].labInfo;
                         $scope.$apply();
                     }
                     catch (err) {
