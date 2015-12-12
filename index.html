@@ -190,6 +190,13 @@
 
     </table>
 
+    <br />
+
+    <div class="btn btn-success" data-ng-click="addMachine()">Aggiungi Macchina</div>
+    <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
+
+    <br />
+
     <table id="labInfo">
         <tr>
             <th>Info Lab</th>
@@ -222,8 +229,6 @@
 
     <br />
 
-    <div class="btn btn-success" data-ng-click="addMachine()">Aggiungi Macchina</div>
-    <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Rimuovi ultima Macchina</div><br />
     <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Scarica il file .sh</strong></a>
     <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Scarica il file .zip</strong></a>
     <br />
