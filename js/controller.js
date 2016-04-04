@@ -74,7 +74,7 @@ app.controller('nc', function($scope) {
     $scope.addOspfNetwork = function(machine) {
         machine.routing.ospf.network.push("");
         machine.routing.ospf.area.push("0.0.0.0");
-        machine.routing.ospf.area.stub(false);
+        machine.routing.ospf.stub.push(false);
     };
 
     $scope.removeOspfNetwork = function(machine) {
