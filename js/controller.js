@@ -21,7 +21,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeMachine = function() {
-        if($scope.netkit.length>1 && confirm("Sicuro di voler rimuovere la macchina?")) {
+        if($scope.netkit.length>1 && confirm("Are you sure you want to remove the machine?")) {
             $scope.netkit.pop();
             $scope.counter--;
         }
@@ -33,7 +33,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeInterface = function(machine) {
-        if(machine.interfaces.counter>1 && confirm("Sicuro di voler rimuovere l'interfaccia?")) {
+        if(machine.interfaces.counter>1 && confirm("Are you sure you want to remove the interface?")) {
             machine.interfaces.if.pop();
             machine.interfaces.counter--;
         }
@@ -45,7 +45,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeGateway = function(machine) {
-        if(machine.gateways.counter>1 && confirm("Sicuro di voler rimuovere il gateway?")) {
+        if(machine.gateways.counter>1 && confirm("Are you sure you want to remove the gateway?")) {
             machine.gateways.gw.pop();
             machine.gateways.counter--;
         }
@@ -56,7 +56,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeRipNetwork = function(machine) {
-        if(machine.routing.rip.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+        if(machine.routing.rip.network.length>1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.rip.network.pop();
         }
     };
@@ -66,7 +66,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeRipRoute = function(machine) {
-        if(machine.routing.rip.route.length>1 && confirm("Sicuro di voler rimuovere la route?")) {
+        if(machine.routing.rip.route.length>1 && confirm("Are you sure you want to remove the route?")) {
             machine.routing.rip.route.pop();
         }
     };
@@ -78,7 +78,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeOspfNetwork = function(machine) {
-        if(machine.routing.ospf.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+        if(machine.routing.ospf.network.length>1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.ospf.network.pop();
             machine.routing.ospf.area.pop();
             machine.routing.ospf.stub.pop();
@@ -90,7 +90,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeBgpNetwork = function(machine) {
-        if(machine.routing.bgp.network.length>1 && confirm("Sicuro di voler rimuovere il network?")) {
+        if(machine.routing.bgp.network.length>1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.bgp.network.pop();
         }
     };
@@ -100,7 +100,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeBgpNeighbor = function(machine) {
-        if(machine.routing.bgp.remote.length>1 && confirm("Sicuro di voler rimuovere il neighbor?")) {
+        if(machine.routing.bgp.remote.length>1 && confirm("Are you sure you want to remove the neighbor?")) {
             machine.routing.bgp.remote.pop();
         }
     };
@@ -110,7 +110,7 @@ app.controller('nc', function($scope) {
     };
 
     $scope.removeBgpRule = function(rules) {
-        if(rules.length>0 && confirm("Sicuro di voler rimuovere l'ultima regola?")) {
+        if(rules.length>0 && confirm("Are you sure you want to remove the last rule?")) {
             rules.pop();
         }
     };
@@ -147,15 +147,15 @@ app.controller('nc', function($scope) {
                         $scope.$apply();
                     }
                     catch (err) {
-                        alert("Errore: " + err);
+                        alert("Error: " + err);
                     }
                 };
                 r.readAsBinaryString(f);
             }
-            else alert("Nessun file selezionato");
+            else alert("No file selected");
         }
         catch (err) {
-            alert("Errore File Reader: " + err);
+            alert("Error in File Reader: " + err);
         }
     };
 

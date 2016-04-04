@@ -413,7 +413,7 @@ function makeFileStructure(nk, li) {
 
 function makeScript(lab){
     var text="";
-    text += "# Ricordati di usare prima 'chmod +x' (o 'chmod 500') sullo script per renderlo eseguibile. Lo script si autodistrugge al termine\n";
+    text += "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n";
     text += "\n";
     text += "#! /bin/sh\n";
     for(var folderName in lab["folder"]){
