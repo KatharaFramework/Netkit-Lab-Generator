@@ -10,7 +10,9 @@ Created by
    * Lorenzo Ariemma (lorenzo93)
    * Veronica Iovinella (Neeja)
 
+***
+
 ### FAQ
 
-* *Q*: How can I make a machine that is both a web server and a  name server?
-* *A*: Two machines with the same name are considered as the same machine. For any shared file, the configuration lines of the second machine are added right after the ones of the first machine. For any file that is not shared there is no conflict.
+* **Q**: How can I make a machine that is both a web server and a  name server?
+* **A**: Two machines with the same name are considered as the same machine. For any shared file, the configuration lines of the second machine are added right after the ones of the first machine. For any file that is not shared there is no conflict.
