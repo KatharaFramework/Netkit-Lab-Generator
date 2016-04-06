@@ -10,6 +10,11 @@ Created by
    * Lorenzo Ariemma (lorenzo93)
    * Veronica Iovinella (Neeja)
 
+### Links
+
+ * [**Netkit Home**](http://wiki.netkit.org/index.php/Main_Page)
+ * [**Netkit on GitHub**](https://github.com/maxonthegit/netkit-core)
+
 ***
 
 ### FAQ
