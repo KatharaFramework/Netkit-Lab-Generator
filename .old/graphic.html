@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Lykon, Lollo, Neeja" />
+    <title>Netkit Lab Generator</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
+
+    <script src="js/vendor/go.js"></script>
+</head>
+
+<script id="code">
+    function init() {
+        console.log("hi");
+        if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+        var $ = go.GraphObject.make;  //for conciseness in defining node templates
+        myDiagram =
+                $(go.Diagram, "myDiagramDiv",  //Diagram refers to its DIV HTML element by id
+                        { initialContentAlignment: go.Spot.Center, "undoManager.isEnabled": true });
+        // when the document is modified, add a "*" to the title and enable the "Save" button
+        myDiagram.addDiagramListener("Modified", function(e) {
+            var button = document.getElementById("SaveButton");
+            if (button) button.disabled = !myDiagram.isModified;
+            var idx = document.title.indexOf("*");
+            if (myDiagram.isModified) {
+                if (idx < 0) document.title += "*";
+            } else {
+                if (idx >= 0) document.title = document.title.substr(0, idx);
+            }
+        });
+        var nodeMenu =  // context menu for each Node
+                $(go.Adornment, "Vertical",
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Add top port"),
+                                { click: function (e, obj) { addPort("top"); } }),
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Add left port"),
+                                { click: function (e, obj) { addPort("left"); } }),
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Add right port"),
+                                { click: function (e, obj) { addPort("right"); } }),
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Add bottom port"),
+                                { click: function (e, obj) { addPort("bottom"); } })
+                );
+        var portSize = new go.Size(8, 8);
+        var portMenu =  // context menu for each port
+                $(go.Adornment, "Vertical",
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Remove port"),
+                                // in the click event handler, the obj.part is the Adornment; its adornedObject is the port
+                                { click: function (e, obj) { removePort(obj.part.adornedObject); } }),
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Change color"),
+                                { click: function (e, obj) { changeColor(obj.part.adornedObject); } }),
+                        $("ContextMenuButton",
+                                $(go.TextBlock, "Remove side ports"),
+                                { click: function (e, obj) { removeAll(obj.part.adornedObject); } })
+                );
+        // the node template
+        // includes a panel on each side with an itemArray of panels containing ports
+        myDiagram.nodeTemplate =
+                $(go.Node, "Table",
+                        { locationObjectName: "BODY",
+                            locationSpot: go.Spot.Center,
+                            selectionObjectName: "BODY",
+                            contextMenu: nodeMenu
+                        },
+                        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                        // the body
+                        $(go.Panel, "Auto",
+                                { row: 1, column: 1, name: "BODY",
+                                    stretch: go.GraphObject.Fill },
+                                $(go.Shape, "Rectangle",
+                                        { fill: "#AC193D", stroke: null, strokeWidth: 0,
+                                            minSize: new go.Size(56, 56) }),
+                                $(go.TextBlock,
+                                        { margin: 10, textAlign: "center", font: "14px  Segoe UI,sans-serif", stroke: "white" },
+                                        new go.Binding("text", "key"))
+                        ),  // end Auto Panel body
+                        // the Panel holding the left port elements, which are themselves Panels,
+                        // created for each item in the itemArray, bound to data.leftArray
+                        $(go.Panel, "Vertical",
+                                new go.Binding("itemArray", "leftArray"),
+                                { row: 1, column: 0,
+                                    itemTemplate:
+                                            $(go.Panel,
+                                                    { _side: "left",  // internal property to make it easier to tell which side it's on
+                                                        fromSpot: go.Spot.Left, toSpot: go.Spot.Left,
+                                                        fromLinkable: true, toLinkable: true, cursor: "pointer",
+                                                        contextMenu: portMenu },
+                                                    new go.Binding("portId", "portId"),
+                                                    $(go.Shape, "Rectangle",
+                                                            { stroke: null, strokeWidth: 0,
+                                                                desiredSize: portSize,
+                                                                margin: new go.Margin(1,0) },
+                                                            new go.Binding("fill", "portColor"))
+                                            )  // end itemTemplate
+                                }
+                        ),  // end Vertical Panel
+                        // the Panel holding the top port elements, which are themselves Panels,
+                        // created for each item in the itemArray, bound to data.topArray
+                        $(go.Panel, "Horizontal",
+                                new go.Binding("itemArray", "topArray"),
+                                { row: 0, column: 1,
+                                    itemTemplate:
+                                            $(go.Panel,
+                                                    { _side: "top",
+                                                        fromSpot: go.Spot.Top, toSpot: go.Spot.Top,
+                                                        fromLinkable: true, toLinkable: true, cursor: "pointer",
+                                                        contextMenu: portMenu },
+                                                    new go.Binding("portId", "portId"),
+                                                    $(go.Shape, "Rectangle",
+                                                            { stroke: null, strokeWidth: 0,
+                                                                desiredSize: portSize,
+                                                                margin: new go.Margin(0, 1) },
+                                                            new go.Binding("fill", "portColor"))
+                                            )  // end itemTemplate
+                                }
+                        ),  // end Horizontal Panel
+                        // the Panel holding the right port elements, which are themselves Panels,
+                        // created for each item in the itemArray, bound to data.rightArray
+                        $(go.Panel, "Vertical",
+                                new go.Binding("itemArray", "rightArray"),
+                                { row: 1, column: 2,
+                                    itemTemplate:
+                                            $(go.Panel,
+                                                    { _side: "right",
+                                                        fromSpot: go.Spot.Right, toSpot: go.Spot.Right,
+                                                        fromLinkable: true, toLinkable: true, cursor: "pointer",
+                                                        contextMenu: portMenu },
+                                                    new go.Binding("portId", "portId"),
+                                                    $(go.Shape, "Rectangle",
+                                                            { stroke: null, strokeWidth: 0,
+                                                                desiredSize: portSize,
+                                                                margin: new go.Margin(1, 0) },
+                                                            new go.Binding("fill", "portColor"))
+                                            )  // end itemTemplate
+                                }
+                        ),  // end Vertical Panel
+                        // the Panel holding the bottom port elements, which are themselves Panels,
+                        // created for each item in the itemArray, bound to data.bottomArray
+                        $(go.Panel, "Horizontal",
+                                new go.Binding("itemArray", "bottomArray"),
+                                { row: 2, column: 1,
+                                    itemTemplate:
+                                            $(go.Panel,
+                                                    { _side: "bottom",
+                                                        fromSpot: go.Spot.Bottom, toSpot: go.Spot.Bottom,
+                                                        fromLinkable: true, toLinkable: true, cursor: "pointer",
+                                                        contextMenu: portMenu },
+                                                    new go.Binding("portId", "portId"),
+                                                    $(go.Shape, "Rectangle",
+                                                            { stroke: null, strokeWidth: 0,
+                                                                desiredSize: portSize,
+                                                                margin: new go.Margin(0, 1) },
+                                                            new go.Binding("fill", "portColor"))
+                                            )  // end itemTemplate
+                                }
+                        )  // end Horizontal Panel
+                );  // end Node
+        // an orthogonal link template, reshapable and relinkable
+        myDiagram.linkTemplate =
+                $(CustomLink,  // defined below
+                        {
+                            routing: go.Link.AvoidsNodes,
+                            corner: 4,
+                            curve: go.Link.JumpGap,
+                            reshapable: true,
+                            resegmentable: true,
+                            relinkableFrom: true,
+                            relinkableTo: true
+                        },
+                        new go.Binding("points").makeTwoWay(),
+                        $(go.Shape, { stroke: "#2F4F4F", strokeWidth: 2 })
+                );
+        // support double-clicking in the background to add a copy of this data as a node
+        myDiagram.toolManager.clickCreatingTool.archetypeNodeData = {
+            key: "Unit",
+            leftArray: [],
+            rightArray: [],
+            topArray: [],
+            bottomArray: []
+        };
+        // load the diagram from JSON data
+        load();
+    }
+    // This custom-routing Link class tries to separate parallel links from each other.
+    // This assumes that ports are lined up in a row/column on a side of the node.
+    function CustomLink() {
+        go.Link.call(this);
+    };
+    go.Diagram.inherit(CustomLink, go.Link);
+    CustomLink.prototype.findSidePortIndexAndCount = function(node, port) {
+        var nodedata = node.data;
+        if (nodedata !== null) {
+            var portdata = port.data;
+            var side = port._side;
+            var arr = nodedata[side + "Array"];
+            var len = arr.length;
+            for (var i = 0; i < len; i++) {
+                if (arr[i] === portdata) return [i, len];
+            }
+        }
+        return [-1, len];
+    };
+    /** @override */
+    CustomLink.prototype.computeEndSegmentLength = function(node, port, spot, from) {
+        var esl = go.Link.prototype.computeEndSegmentLength.call(this, node, port, spot, from);
+        var other = this.getOtherPort(port);
+        if (port !== null && other !== null) {
+            var thispt = port.getDocumentPoint(this.computeSpot(from));
+            var otherpt = other.getDocumentPoint(this.computeSpot(!from));
+            if (Math.abs(thispt.x - otherpt.x) > 20 || Math.abs(thispt.y - otherpt.y) > 20) {
+                var info = this.findSidePortIndexAndCount(node, port);
+                var idx = info[0];
+                var count = info[1];
+                if (port._side == "top" || port._side == "bottom") {
+                    if (otherpt.x < thispt.x) {
+                        return esl + 4 + idx * 8;
+                    } else {
+                        return esl + (count - idx - 1) * 8;
+                    }
+                } else {  // left or right
+                    if (otherpt.y < thispt.y) {
+                        return esl + 4 + idx * 8;
+                    } else {
+                        return esl + (count - idx - 1) * 8;
+                    }
+                }
+            }
+        }
+        return esl;
+    };
+    /** @override */
+    CustomLink.prototype.hasCurviness = function() {
+        if (isNaN(this.curviness)) return true;
+        return go.Link.prototype.hasCurviness.call(this);
+    };
+    /** @override */
+    CustomLink.prototype.computeCurviness = function() {
+        if (isNaN(this.curviness)) {
+            var fromnode = this.fromNode;
+            var fromport = this.fromPort;
+            var fromspot = this.computeSpot(true);
+            var frompt = fromport.getDocumentPoint(fromspot);
+            var tonode = this.toNode;
+            var toport = this.toPort;
+            var tospot = this.computeSpot(false);
+            var topt = toport.getDocumentPoint(tospot);
+            if (Math.abs(frompt.x - topt.x) > 20 || Math.abs(frompt.y - topt.y) > 20) {
+                if ((fromspot.equals(go.Spot.Left) || fromspot.equals(go.Spot.Right)) &&
+                        (tospot.equals(go.Spot.Left) || tospot.equals(go.Spot.Right))) {
+                    var fromseglen = this.computeEndSegmentLength(fromnode, fromport, fromspot, true);
+                    var toseglen = this.computeEndSegmentLength(tonode, toport, tospot, false);
+                    var c = (fromseglen - toseglen) / 2;
+                    if (frompt.x + fromseglen >= topt.x - toseglen) {
+                        if (frompt.y < topt.y) return c;
+                        if (frompt.y > topt.y) return -c;
+                    }
+                } else if ((fromspot.equals(go.Spot.Top) || fromspot.equals(go.Spot.Bottom)) &&
+                        (tospot.equals(go.Spot.Top) || tospot.equals(go.Spot.Bottom))) {
+                    var fromseglen = this.computeEndSegmentLength(fromnode, fromport, fromspot, true);
+                    var toseglen = this.computeEndSegmentLength(tonode, toport, tospot, false);
+                    var c = (fromseglen - toseglen) / 2;
+                    if (frompt.x + fromseglen >= topt.x - toseglen) {
+                        if (frompt.y < topt.y) return c;
+                        if (frompt.y > topt.y) return -c;
+                    }
+                }
+            }
+        }
+        return go.Link.prototype.computeCurviness.call(this);
+    };
+    // end CustomLink class
+    // Add a port to the specified side of the selected nodes.
+    function addPort(side) {
+        myDiagram.startTransaction("addPort");
+        myDiagram.selection.each(function(node) {
+            // skip any selected Links
+            if (!(node instanceof go.Node)) return;
+            // compute the next available index number for the side
+            var i = 0;
+            while (node.findPort(side + i.toString()) !== node) i++;
+            // now this new port name is unique within the whole Node because of the side prefix
+            var name = side + i.toString();
+            // get the Array of port data to be modified
+            var arr = node.data[side + "Array"];
+            if (arr) {
+                // create a new port data object
+                var newportdata = {
+                    portId: name,
+                    portColor: go.Brush.randomColor()
+                    // if you add port data properties here, you should copy them in copyPortData above
+                };
+                // and add it to the Array of port data
+                myDiagram.model.insertArrayItem(arr, -1, newportdata);
+            }
+        });
+        myDiagram.commitTransaction("addPort");
+    }
+    // Remove the clicked port from the node.
+    // Links to the port will be redrawn to the node's shape.
+    function removePort(port) {
+        myDiagram.startTransaction("removePort");
+        var pid = port.portId;
+        var arr = port.panel.itemArray;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i].portId === pid) {
+                myDiagram.model.removeArrayItem(arr, i);
+                break;
+            }
+        }
+        myDiagram.commitTransaction("removePort");
+    }
+    // Remove all ports from the same side of the node as the clicked port.
+    function removeAll(port) {
+        myDiagram.startTransaction("removePorts");
+        var nodedata = port.part.data;
+        var side = port._side;  // there are four property names, all ending in "Array"
+        myDiagram.model.setDataProperty(nodedata, side + "Array", []);  // an empty Array
+        myDiagram.commitTransaction("removePorts");
+    }
+    // Change the color of the clicked port.
+    function changeColor(port) {
+        myDiagram.startTransaction("colorPort");
+        var data = port.data;
+        myDiagram.model.setDataProperty(data, "portColor", go.Brush.randomColor());
+        myDiagram.commitTransaction("colorPort");
+    }
+    // Save the model to / load it from JSON text shown on the page itself, not in a database.
+    function save() {
+        document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+        myDiagram.isModified = false;
+    }
+    function load() {
+        myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+        // When copying a node, we need to copy the data that the node is bound to.
+        // This JavaScript object includes properties for the node as a whole, and
+        // four properties that are Arrays holding data for each port.
+        // Those arrays and port data objects need to be copied too.
+        // Thus Model.copiesArrays and Model.copiesArrayObjects both need to be true.
+        // Link data includes the names of the to- and from- ports;
+        // the GraphLinksModel needs to set these property names:
+        // linkFromPortIdProperty and linkToPortIdProperty.
+    }
+
+</script>
+
+
+
+
+<body class="bg-logos">
+<script>
+    var isIE = navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0;
+    if (isIE)
+        document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
+</script>
+<h1>Netkit Lab Generator</h1>
+<h4><a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a></h4>
+<hr />
+<div id="description">
+    This tool allows to quickly generate most of the files and folders you need to run a working netkit lab.
+    The main purpose is to quickly generate the files and folders needed with low configuration options, so more
+    advanced funtionalities are omitted and some others are set by default (like zebra username and password).
+    <br />
+    Once the form is compiled just download the bash script or the .zip file with the whole lab.
+    It is also possible to export and import the form configuration for future changes.
+    DNS is still buggy.
+    <br />
+    <br />
+    The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
+    of this application do not take any responsibility for any malfunction.
+</div>
+<hr />
+
+<br />
+
+
+
+
+<div data-ng-app="napp" data-ng-controller="nc">
+
+    <button onclick="init()">INIT</button>
+    <div id="sample">
+        <div id="myDiagramDiv" style="width:600px; height:500px; border:1px solid black"></div>
+        Add port to selected nodes:
+        <button onclick="addPort('top')">Top</button>
+        <button onclick="addPort('bottom')">Bottom</button>
+        <button onclick="addPort('left')">Left</button>
+        <button onclick="addPort('right')">Right</button>
+        <p>
+            Double-click in the diagram background in order to add a new node there.
+            In this sample you can add ports to a selected nodes by clicking the above buttons or by using the context menu.
+            Draw links between ports by dragging between ports.
+            If you select a link you can relink or reshape it.
+            Right-click or touch-hold on a port to bring up a context menu that allows you to remove it or change its color.
+        </p>
+        <p>
+            <button id="SaveButton" onclick="save()">Save</button>
+            <button onclick="load()">Load</button>
+        </p>
+  <textarea id="mySavedModel" style="width:100%;height:200px">
+{ "class": "go.GraphLinksModel",
+  "copiesArrays": true,
+  "copiesArrayObjects": true,
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [
+{"key":"unit One", "loc":"101 204",
+ "leftArray":[ {"portColor":"#425e5c", "portId":"left0"} ],
+ "topArray":[ {"portColor":"#d488a2", "portId":"top0"} ],
+ "bottomArray":[ {"portColor":"#316571", "portId":"bottom0"} ],
+ "rightArray":[ {"portColor":"#923951", "portId":"right0"},{"portColor":"#ef3768", "portId":"right1"} ] },
+{"key":"unit Two", "loc":"320 152",
+ "leftArray":[ {"portColor":"#7d4bd6", "portId":"left0"},{"portColor":"#cc585c", "portId":"left1"},{"portColor":"#b1273a", "portId":"left2"} ],
+ "topArray":[ {"portColor":"#14abef", "portId":"top0"} ],
+ "bottomArray":[ {"portColor":"#dd45c7", "portId":"bottom0"},{"portColor":"#995aa6", "portId":"bottom1"},{"portColor":"#6b95cb", "portId":"bottom2"} ],
+ "rightArray":[  ] },
+{"key":"unit Three", "loc":"384 319",
+ "leftArray":[ {"portColor":"#bd8f27", "portId":"left0"},{"portColor":"#c14617", "portId":"left1"},{"portColor":"#47fa60", "portId":"left2"} ],
+ "topArray":[ {"portColor":"#d08154", "portId":"top0"} ],
+ "bottomArray":[ {"portColor":"#6cafdb", "portId":"bottom0"} ],
+ "rightArray":[  ] },
+{"key":"unit Four", "loc":"138 351",
+ "leftArray":[ {"portColor":"#491389", "portId":"left0"} ],
+ "topArray":[ {"portColor":"#77ac1e", "portId":"top0"} ],
+ "bottomArray":[ {"portColor":"#e9701b", "portId":"bottom0"} ],
+ "rightArray":[ {"portColor":"#24d05e", "portId":"right0"},{"portColor":"#cfabaa", "portId":"right1"} ] }
+ ],
+  "linkDataArray": [
+{"from":"unit Four", "to":"unit One", "fromPort":"top0", "toPort":"bottom0"},
+{"from":"unit Four", "to":"unit Two", "fromPort":"top0", "toPort":"bottom0"},
+{"from":"unit Three", "to":"unit Two", "fromPort":"top0", "toPort":"bottom1"},
+{"from":"unit Four", "to":"unit Three", "fromPort":"right0", "toPort":"left0"},
+{"from":"unit Four", "to":"unit Three", "fromPort":"right1", "toPort":"left2"},
+{"from":"unit One", "to":"unit Two", "fromPort":"right0", "toPort":"left1"},
+{"from":"unit One", "to":"unit Two", "fromPort":"right1", "toPort":"left2"}
+ ]}
+  </textarea>
+    </div>
+
+
+    <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
+    <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div>
+    <br />
+    <table id="netkit">
+        <tr>
+            <th>Machine informations</th>
+            <th>Network interfaces</th>
+            <th>Gateway (static):</th>
+            <th colspan="4">Additional functions</th>
+        </tr>
+
+        <tr data-ng-repeat="x in netkit track by $index">
+            <td>
+                <div><label>Machine {{x.row}}:</label>
+                    <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required /></div>
+                <input title="type" type="radio" value="terminale" data-ng-model="x.type" /> Terminal<br />
+                <input title="type" type="radio" value="router" data-ng-model="x.type" /> Router<br />
+                <input title="type" type="radio" value="ns" data-ng-model="x.type" /> Name Server<br />
+                <input title="type" type="radio" value="ws" data-ng-model="x.type" /> Web Server<br />
+            </td>
+            <td class="interfaces">
+                <div class="btn btn-success" data-ng-click="addInterface(x)">Add interface</div>
+                <div class="btn btn-danger" data-ng-click="removeInterface(x)" data-ng-disabled="x.interfaces.counter<=1">Remove last interface</div><br />
+                <div class="hidelasthr" data-ng-repeat="i in x.interfaces.if">
+                    <div><label>Eth{{i.eth.number}}: </label>
+                        <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
+                    <div><label> IP/Net: </label>
+                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" /></div>
+                    <div><label> Complete DNS Name: </label>
+                        <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$"/></div>
+                    <hr />
+                </div>
+                <label>Directly in {{x.name}}.startup:</label>
+                <textarea title="free" rows="3" class="form-control" data-ng-model="x.interfaces.free"></textarea>
+            </td>
+            <td class="gateways">
+                <div class="btn btn-success" data-ng-click="addGateway(x)">Add gateway</div>
+                <div class="btn btn-danger" data-ng-click="removeGateway(x)" data-ng-disabled="x.gateways.counter<=1">Remove last gw</div><br />
+                <div class="hidelasthr" data-ng-repeat="j in x.gateways.gw">
+                    <div><label>Route (empty for default gw):</label>
+                        <input type="text" data-ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
+                    <div><label>GW (empty to generate nothing):</label>
+                        <input type="text" data-ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" /></div>
+                    <div><label>Interface:</label>
+                        <select title="eth" data-ng-model="j.if" class="form-control">
+                            <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+                        </select></div>
+                    <hr />
+                </div>
+            </td>
+            <td  data-ng-show="x.type=='ns'">
+                <div>
+                    <div><input title="auth" type="checkbox" value="1" data-ng-model="x.ns.authority" /> I am a Nameserver Authority<br />
+                    </div>
+                    <div data-ng-show="x.ns.authority"><label>Zone (Root is .):</label>
+                        <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern="(^\..*\.$)|^.$" /></div>
+                    <div><input title="rec" type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Enable recursive<br />
+                    </div>
+                </div>
+            </td>
+            <td data-ng-show="x.type=='ws'">
+                <input title="userdir" type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable <strong>userdir</strong> module?
+            </td>
+            <td data-ng-show="x.type=='terminale'">
+                <label>Reference DNS (resolv.conf nameserver):</label>
+                <select title="en" data-ng-model="x.pc.dns">
+                    <option value="">-</option>
+                    <optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" label="{{m.name}}">
+                        <option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
+                    </optgroup>
+                </select>
+            </td>
+            <td data-ng-show="x.type=='router'">
+                <label>Dynamic routing: </label><br /><br />
+                <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.rip.en" /> rip</div>
+                <div data-ng-show="x.routing.rip.en">
+                    <span class="btn btn-success btn-square" data-ng-click="addRipNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeRipNetwork(x)" data-ng-disabled="x.routing.rip.network.length<=1">-</span>
+                    <div data-ng-repeat="rnet in x.routing.rip.network track by $index">
+                        <label>Network: </label>
+                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.network[$index]" />
+                    </div>
+                    <span class="btn btn-success btn-square" data-ng-click="addRipRoute(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeRipRoute(x)" data-ng-disabled="x.routing.rip.route.length<=1">-</span>
+                    <div data-ng-repeat="rroute in x.routing.rip.route track by $index">
+                        <label>Route (empty to omit): </label>
+                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.rip.route[$index]" />
+                    </div>
+
+                    <div><input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
+                    <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.rip.bgp" /> redistribute bgp</div>
+                    <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
+                    <label>Directly in ripd.conf:</label>
+                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.rip.free"></textarea>
+                </div>
+                <hr />
+                <div><input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf</div>
+                <div data-ng-show="x.routing.ospf.en">
+                    <span class="btn btn-success btn-square" data-ng-click="addOspfNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeOspfNetwork(x)" data-ng-disabled="x.routing.ospf.network.length<=1">-</span>
+                    <div data-ng-repeat="onet in x.routing.ospf.network track by $index">
+                        <div>
+                            <label>Network: </label>
+                            <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.ospf.network[$index]" />
+                        </div>
+                        <div>
+                            <label>Area: </label>
+                            <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.ospf.area[$index]" />
+                        </div>
+                        <input title="stub" type="checkbox" value="1" data-ng-model="x.routing.ospf.stub[$index]" /> stub?
+                    </div>
+
+                    <div><input title="redistributer" type="checkbox" value="1" data-ng-model="x.routing.ospf.rip" /> redistribute rip</div>
+                    <div><input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.ospf.bgp" /> redistribute bgp</div>
+                    <div><input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
+                    <label>Cost: </label>
+                    <div data-ng-repeat="o in x.interfaces.if">
+                        <div><input type="text" placeholder="0" class="form-control" data-ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" /></div>
+                        <select title="eth" data-ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control" style="margin-bottom: 4px;">
+                            <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+                        </select>
+                    </div>
+                    <label>Directly in ospfd.conf:</label>
+                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.ospf.free"></textarea>
+                </div>
+                <hr />
+                <div><input title="en" type="checkbox" value="router" data-ng-model="x.routing.bgp.en" /> bgp</div>
+                <div data-ng-show="x.routing.bgp.en">
+                    <label>AS: </label>
+                    <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.as" required />
+                    <span class="btn btn-success btn-square" data-ng-click="addBgpNetwork(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeBgpNetwork(x)" data-ng-disabled="x.routing.bgp.network.length<=1">-</span>
+                    <div data-ng-repeat="bnet in x.routing.bgp.network track by $index">
+                        <label>Network: </label>
+                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.bgp.network[$index]" />
+                    </div>
+                    <span class="btn btn-success btn-square" data-ng-click="addBgpNeighbor(x)">+</span>
+                    <span class="btn btn-danger btn-square" data-ng-click="removeBgpNeighbor(x)" data-ng-disabled="x.routing.bgp.remote.length<=1">-</span>
+                    <div data-ng-repeat="bremote in x.routing.bgp.remote track by $index">
+                        <label>Neighbor (empty to omit): </label>
+                        <input type="text" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].neighbor" />
+                        <label>Remote-AS: </label>
+                        <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as" />
+                        <label>Description: </label>
+                        <input type="text" title="description" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
+                    </div>
+                    <div>
+                        <label>Directly in bgpd.conf:</label>
+                        <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.bgp.free"></textarea>
+                    </div>
+                </div>
+                <hr />
+            </td>
+        </tr>
+
+    </table>
+
+    <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
+    <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div><br />
+
+    <br />
+
+    <table id="labInfo">
+        <tr>
+            <th>Lab informations</th>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <label>Description:</label>
+                    <input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
+                </div>
+                <div>
+                    <label>Version:</label>
+                    <input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
+                </div>
+                <div>
+                    <label>Author(s):</label>
+                    <input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
+                </div>
+                <div>
+                    <label>Email:</label>
+                    <input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
+                </div>
+                <div>
+                    <label>Website:</label>
+                    <input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br />
+
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Download .sh file</strong></a>
+    <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Download .zip file</strong></a>
+    <br />
+    <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')"><strong>Export configuration</strong></a>
+    <br />
+    <a class="btn btn-primary" data-ng-click="import()"><strong>Import configuration</strong></a>
+    <span class="file">
+        <input type="file" id="file" name="file" class="form-control hidden"
+               onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
+        <input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Browse..."><input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();" readonly />
+    </span>
+
+
+    <br />
+    <br />
+    <hr />
+    <br />
+
+    <h4 align="left">Bash file preview:</h4>
+    <textarea title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
+
+</div>
+
+
+<script src="js/vendor/angular.min.js"></script>
+<script>
+    if (typeof(angular)=="undefined")
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"><\/script>');
+</script>
+<script src="js/vendor/jszip.min.js"></script>
+<script>
+    if (typeof(JSZip)=="undefined")
+        document.write('<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"><\/script>');
+</script>
+<script src="js/vendor/FileSaver.min.js"></script>
+<script>
+    if (typeof(saveAs)=="undefined")
+        document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
+</script>
+
+<script src="js/helper.js"></script>
+<script src="js/make.js"></script>
+<script src="js/model.js"></script>
+<script src="js/controller.js"></script>
+
+
+
+
+<script>
+    window.onload= function() {
+        console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+    }
+</script>
+
+</body>
+</html>
