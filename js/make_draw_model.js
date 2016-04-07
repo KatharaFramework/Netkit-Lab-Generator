@@ -40,6 +40,7 @@ function binary_netmask_from_decimal(dec) {
 }
 
 function get_network_from_ip_net(ip_net) {
+    if(typeof(ip_net)=="undefined" || ip_net == null) return "";
     var split = ip_net.split("/");
     var ip = split[0];
     var net = split[1];
@@ -66,6 +67,8 @@ function find_destination_eth(lab, name, machine_name, eth_number){
 }
 
 function get_eth_ip_difference(network, ip) {
+    if(typeof(network)=="undefined" || network == null) return "";
+    if(typeof(ip)=="undefined" || ip == null) return "";
     var net_split = network.split("/")[0];
     var ip_split = ip.split("/")[0];
     var net_split_i = net_split.split(".");
@@ -129,6 +132,7 @@ function generate_nodes_edges(lab){
     var nodes = [];
     try {
         for (var m in lab) {
+            if(lab[m].name=="") continue;
             //each machine is a node. beware of duplicates
             var id = 'machine-'+lab[m].name;
             if(!contains_node({id:id}, nodes)) {
@@ -194,8 +198,10 @@ function generate_nodes_edges(lab){
             //for each interface of the machine
             for (var e in lab[m].interfaces.if) {
                 var domain_name = lab[m].interfaces.if[e].eth.domain;
+                if(typeof(domain_name) == "undefined" || domain_name=="") continue;
                 var if_name = "eth" + lab[m].interfaces.if[e].eth.number;
                 var domain_ip = get_network_from_ip_net(lab[m].interfaces.if[e].ip);
+                if(typeof(lab[m].interfaces.if[e].ip)  == "undefined" || lab[m].interfaces.if[e].ip=="") continue;
                 var if_ip = get_eth_ip_difference(domain_ip, lab[m].interfaces.if[e].ip);
 
                 // the domain is a new node. beware of duplicates.
