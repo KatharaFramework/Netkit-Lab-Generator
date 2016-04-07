@@ -12,6 +12,7 @@ app.controller('nc', function($scope) {
     $scope.labInfo = JSON.clone(labInfo);
     $scope.netkit = [JSON.clone(backbone)];
     $scope.counter = 1;
+    $scope.labInfo.toggle = "disable";
 
     $scope.addMachine = function() {
         $scope.counter++;
@@ -135,6 +136,13 @@ app.controller('nc', function($scope) {
 
     $scope.makeGraph = function(nk) {
         return makeGraph(nk);
+    };
+
+    $scope.toggleGraphUpdate = function () {
+        if($scope.labInfo.toggle=="disable"){
+            $scope.labInfo.toggle = "enable";
+        }
+        else $scope.labInfo.toggle="disable";
     };
 
     $scope.import = function() {

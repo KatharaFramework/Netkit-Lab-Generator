@@ -408,7 +408,9 @@ function makeFileStructure(nk, li) {
     makeWebserver(nk, lab);
     makeNameserver(nk, lab);
 
-    makeGraph(nk);
+    if(li.toggle=="disable") {
+        makeGraph(nk);
+    }
 
     return lab;
 }

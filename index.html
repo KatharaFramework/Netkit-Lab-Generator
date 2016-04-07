@@ -28,7 +28,7 @@
     <br />
     Once the form is compiled just download the bash script or the .zip file with the whole lab.
     It is also possible to export and import the form configuration for future changes.
-    DNS is still buggy.
+    DNS may not work with too many levels.
     <br />
     <br />
     The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
@@ -76,7 +76,8 @@
 
     <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
     <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div>
-    <div class="btn btn-primary load-graph" data-ng-click="makeGraph(netkit)"><strong>Preview</strong>(force)</div>
+    <div class="btn btn-primary load-graph" data-ng-click="makeGraph(netkit)"><strong>Preview</strong>(force)</div> &nbsp;&nbsp;&nbsp; &nbsp;
+    <div class="btn btn-default load-graph" data-ng-click="toggleGraphUpdate()">{{labInfo.toggle}} auto update</div>
 
     <br />
 
