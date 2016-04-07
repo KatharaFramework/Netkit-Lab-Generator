@@ -109,49 +109,44 @@ function get_edges(lab) {
             //for each interface of the machine
             for (var e in lab[m].interfaces.if) {
                 var name = lab[m].interfaces.if[e].eth.domain;
+                var edge_ip = get_network_from_ip_net(lab[m].interfaces.if[e].ip);
+                var ip_diff = get_eth_ip_difference(edge_ip, lab[m].interfaces.if[e].ip);
+
                 var source = {
                     "type": "eth-eth",
                     "machine": lab[m].name,
                     "eth_number": lab[m].interfaces.if[e].eth.number,
                     "domain": name,
-                    "edge_ip": get_network_from_ip_net(lab[m].interfaces.if[e].ip),
-                    "ip": get_eth_ip_difference(get_network_from_ip_net(lab[m].interfaces.if[e].ip), lab[m].interfaces.if[e].ip),
+                    "edge_ip": edge_ip,
+                    "ip": ip_diff,
                     "warnings":""
                 };
                 if(name!=""){
-                    var edge_s = {
+                    var edge_ee = {
                         "type": "machine-eth",
                         "machine": lab[m].name,
                         "eth_number": lab[m].interfaces.if[e].eth.number,
                         "domain": name,
-                        "edge_ip": get_network_from_ip_net(lab[m].interfaces.if[e].ip),
-                        "ip": get_eth_ip_difference(get_network_from_ip_net(lab[m].interfaces.if[e].ip), lab[m].interfaces.if[e].ip),
-                        "warnings": ""
-                    };
-                    var edge_d = {
-                        "type": "machine-eth",
-                        "machine": lab[m].name,
-                        "eth_number": lab[m].interfaces.if[e].eth.number,
-                        "domain": name,
-                        "edge_ip": get_network_from_ip_net(lab[m].interfaces.if[e].ip),
-                        "ip": get_eth_ip_difference(get_network_from_ip_net(lab[m].interfaces.if[e].ip), lab[m].interfaces.if[e].ip),
+                        "edge_ip": edge_ip,
+                        "ip": ip_diff,
                         "warnings": ""
                     };
                 }
-                sources.push(edge_s);
-                destinations.push(edge_d);
+                sources.push(edge_ee);
+                destinations.push(edge_ee);
                 if(!contains_edge(source, destinations)) {
                     // now look for the same domain for a different machine or at least a different eth
                     var app = find_destination_eth(lab, name, lab[m].name, lab[m].interfaces.if[e].eth.number);
                     try {
+                        var edge_ip_d = get_network_from_ip_net(lab[app.n].interfaces.if[app.f].ip);
                         var destination = {
                             "type": "eth-eth",
                             "realtype": "",
                             "machine": lab[app.n].name,
                             "eth_number": lab[app.n].interfaces.if[app.f].eth.number,
                             "domain": name,
-                            "edge_ip": get_network_from_ip_net(lab[app.n].interfaces.if[app.f].ip),
-                            "ip": get_eth_ip_difference(get_network_from_ip_net(lab[app.n].interfaces.if[app.f].ip), lab[app.n].interfaces.if[app.f].ip),
+                            "edge_ip": edge_ip_d,
+                            "ip": get_eth_ip_difference(edge_ip_d, lab[app.n].interfaces.if[app.f].ip),
                             "warnings": ""
                         };
                     }
@@ -162,12 +157,11 @@ function get_edges(lab) {
                         destination.warnings += " internet?,";
                         source.warnings += " to internet?,";
                     }
-
                     if (destination.edge_ip != source.edge_ip) {
                         destination.warnings += " different subnet,";
                         source.warnings += " different subnet,";
                     }
-                    // trovata una destinazione e le destinazioni non contengono già la sorgente trovata
+                    // found a destination
                     if (app != null) {
                         sources.push(source);
                         destinations.push(destination);
@@ -181,7 +175,7 @@ function get_edges(lab) {
         console.log(e);
         return [];
     }
-    return {"sources": sources, "destinations": destinations};
+    return destinations;
 }
 
 function generate_nodes(lab) {
@@ -200,13 +194,14 @@ function generate_nodes(lab) {
             //for each interface of the machine
             for (var e in lab[m].interfaces.if) {
                 var name = lab[m].interfaces.if[e].eth.domain;
+                var edge_ip = get_network_from_ip_net(lab[m].interfaces.if[e].ip);
                 var node = {
                     "type": "node-eth",
                     "machine": lab[m].name,
                     "eth_number": lab[m].interfaces.if[e].eth.number,
                     "domain": name,
-                    "edge_ip": get_network_from_ip_net(lab[m].interfaces.if[e].ip),
-                    "ip": get_eth_ip_difference(get_network_from_ip_net(lab[m].interfaces.if[e].ip), lab[m].interfaces.if[e].ip),
+                    "edge_ip": edge_ip,
+                    "ip": get_eth_ip_difference(edge_ip, lab[m].interfaces.if[e].ip),
                     "warnings": ""
                 };
                 nodes.push(node);
@@ -229,10 +224,9 @@ function generate_nodes(lab) {
  */
 
 function make_draw_data(nodes, edges) {
-    var sources = edges.sources;
-    var destinations = edges.destinations;
+    //edges is basically only destinations
 
 
     // for each node in nodes I make a node, lol
-    // and for each couple source-destination I make and edge
+    // and for each destination in destinations I make and edge
 }
