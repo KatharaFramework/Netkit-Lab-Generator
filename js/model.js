@@ -10,7 +10,7 @@ var backbone = {
     "name":"",
     "row":1,
     "type":"router",
-    "interfaces":{"counter":1, "if":[{"eth":{"number":0}, "ip":""}], "free": ""},
+    "interfaces":{"counter":1, "if":[{"eth":{"number":0, "domain":""}, "ip":""}], "free": ""},
     "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
     "pc":{"dns":""},
     "ws":{"userdir":false},

@@ -391,6 +391,10 @@ function makeRouter(nk, lab) {
 }
 
 function makeFileStructure(nk, li) {
+    console.log("test");
+    console.log(get_edges(nk));
+    console.log(generate_nodes(nk));
+
     var lab = [];
     lab["folder"] = [];
     lab["file"] = [];
