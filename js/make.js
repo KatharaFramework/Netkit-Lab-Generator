@@ -408,6 +408,8 @@ function makeFileStructure(nk, li) {
     makeWebserver(nk, lab);
     makeNameserver(nk, lab);
 
+    makeGraph(nk);
+
     return lab;
 }
 

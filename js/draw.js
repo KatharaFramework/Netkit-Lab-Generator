@@ -5,10 +5,11 @@ var LENGTH_MAIN = 350,
     WIDTH_SCALE = 3,
     GREEN = 'green',
     RED = '#C5000B',
-    ORANGE = '#FF9900',
+    ORANGE = '#f1db8d',
     GRAY = 'gray',
     LGRAY = "#dddddd",
     LLGRAY = "#efefef",
+    WHITE = "#fafafa",
     BLUE = "#2B7CE9",
     BLACK = '#2B1B17';
 var DIR = "images/";
@@ -31,10 +32,11 @@ function draw(nodes, edges) {
         edges: {
             color: BLACK
         },
-        /*physics:{
-            barnesHut:{gravitationalConstant:-30000},
-            stabilization: {iterations:2500}
-        },*/
+        physics:{
+            enabled: true,
+            barnesHut:{gravitationalConstant:-1200}
+            //, stabilization: {iterations:200000}
+        },
         groups: {
             'router': {
                 color: ORANGE,
@@ -69,7 +71,7 @@ function draw(nodes, edges) {
                 font: {color:'#dddddd'}
             },
             'eth': {
-                color: LLGRAY,
+                color: WHITE,
                 shape: 'box'
             },
             'domain-ip': {
