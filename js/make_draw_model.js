@@ -157,7 +157,7 @@ function generate_nodes_edges(lab){
                     }
                 }
                 if(lab[m].routing.ospf.en) {
-                    if(!contains({id:'label-ospf-' + lab[m].name}, nodes)) {
+                    if(!contains_node({id:'label-ospf-' + lab[m].name}, nodes)) {
                         nodes.push({
                             id: 'label-ospf-' + lab[m].name,
                             label: 'OSPF',
@@ -174,10 +174,10 @@ function generate_nodes_edges(lab){
                     }
                 }
                 if(lab[m].routing.bgp.en) {
-                    if(!contains({id:'label-bgp-' + lab[m].name}, nodes)) {
+                    if(!contains_node({id:'label-bgp-' + lab[m].name}, nodes)) {
                         nodes.push({
                             id: 'label-bgp-' + lab[m].name,
-                            label: lab[m].routing.bgp.as + " " + lab[m].routing.bgp.network,
+                            label: "AS " + lab[m].routing.bgp.as + "\n" + lab[m].routing.bgp.network,
                             group: 'bgp',
                             value: 2
                         });

@@ -39,9 +39,43 @@
 <br />
 
 <div data-ng-app="napp" data-ng-controller="nc">
+    <table id="labInfo">
+        <tr>
+            <th>Lab informations</th>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <label>Description:</label>
+                    <input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
+                </div>
+                <div>
+                    <label>Version:</label>
+                    <input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
+                </div>
+                <div>
+                    <label>Author(s):</label>
+                    <input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
+                </div>
+                <div>
+                    <label>Email:</label>
+                    <input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
+                </div>
+                <div>
+                    <label>Website:</label>
+                    <input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div id="mynetwork"></div>
+
+    <div class="clear"></div>
 
     <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
     <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div>
+    <div class="btn btn-primary load-graph" data-ng-click="makeGraph(netkit)"><strong>Preview</strong> (beta)</div>
 
     <br />
 
@@ -204,38 +238,6 @@
 
     <br />
 
-    <table id="labInfo">
-        <tr>
-            <th>Lab informations</th>
-        </tr>
-        <tr>
-            <td>
-                <div>
-                    <label>Description:</label>
-                    <input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
-                </div>
-                <div>
-                    <label>Version:</label>
-                    <input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
-                </div>
-                <div>
-                    <label>Author(s):</label>
-                    <input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
-                </div>
-                <div>
-                    <label>Website:</label>
-                    <input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <br />
-
     <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Download .sh file</strong></a>
     <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Download .zip file</strong></a>
     <br />
@@ -256,9 +258,6 @@
 
     <h4 align="left">Bash file preview:</h4>
     <textarea title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
-
-    <a class="btn btn-primary" data-ng-click="makeGraph(netkit)"><strong>Test Graph</strong></a>
-    <div id="mynetwork"></div>
 
 </div>
 
