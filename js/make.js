@@ -446,6 +446,6 @@ function makeZip(lab){
 
 function makeGraph(nk){
     var graph = generate_nodes_edges(nk);
-    console.log(graph);
+    //console.log(graph);
     draw(graph.nodes, graph.edges);
 }
