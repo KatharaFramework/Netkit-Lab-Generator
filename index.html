@@ -257,7 +257,7 @@
     <h4 align="left">Bash file preview:</h4>
     <textarea title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
 
-    <button onclick="draw([],[])">Test</button>
+    <a class="btn btn-primary" data-ng-click="makeGraph(netkit)"><strong>Test Graph</strong></a>
     <div id="mynetwork"></div>
 
 </div>
@@ -281,12 +281,12 @@
 
 <script src="js/helper.js"></script>
 <script src="js/make_draw_model.js"></script>
+<script src="js/vendor/vis.js"></script>
+<script src="js/draw.js"></script>
 <script src="js/make.js"></script>
 <script src="js/model.js"></script>
 <script src="js/controller.js"></script>
 
-<script src="js/vendor/vis.js"></script>
-<script src="js/draw.js"></script>
 
 
 <script>

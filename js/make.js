@@ -391,9 +391,6 @@ function makeRouter(nk, lab) {
 }
 
 function makeFileStructure(nk, li) {
-    console.log("test");
-    console.log(generate_nodes_edges(nk));
-
     var lab = [];
     lab["folder"] = [];
     lab["file"] = [];
@@ -445,4 +442,10 @@ function makeZip(lab){
     }
     var content = zip.generate({type:"blob"});
     saveAs(content, "lab.zip");
+}
+
+function makeGraph(nk){
+    var graph = generate_nodes_edges(nk);
+    console.log(graph);
+    draw(graph.nodes, graph.edges);
 }

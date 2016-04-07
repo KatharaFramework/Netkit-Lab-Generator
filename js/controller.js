@@ -133,6 +133,10 @@ app.controller('nc', function($scope) {
         return makeZip(makeFileStructure(nk, li));
     };
 
+    $scope.makeGraph = function(nk) {
+        return makeGraph(nk);
+    };
+
     $scope.import = function() {
         try {
             var f = document.getElementById('file').files[0];

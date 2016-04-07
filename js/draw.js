@@ -1,7 +1,3 @@
-var nodes = null;
-var edges = null;
-var network = null;
-
 var LENGTH_MAIN = 350,
     LENGTH_SERVER = 150,
     LENGTH_SUB = 50,
@@ -23,6 +19,7 @@ function draw(nodes, edges) {
 
     var DIR = "images/";
 
+    /*
     nodes.push({id: 1, label: '192.168.0.1', group: 'switch', value: 10, image: DIR + 'Network-Pipe-icon.png', shape: 'image'});
     nodes.push({id: 2, label: '192.168.0.2', group: 'switch', value: 8, image: DIR + 'Network-Pipe-icon.png', shape: 'image'});
     nodes.push({id: 3, label: '192.168.0.3', group: 'switch', value: 6, image: DIR + 'Network-Pipe-icon.png', shape: 'image'});
@@ -72,7 +69,7 @@ function draw(nodes, edges) {
 
 
     // legend
-    /*
+
     var mynetwork = document.getElementById('mynetwork');
     var x = - mynetwork.clientWidth / 2 + 50;
     var y = - mynetwork.clientHeight / 2 + 50;
@@ -106,27 +103,51 @@ function draw(nodes, edges) {
             stabilization: {iterations:2500}
         },
         groups: {  /* TODO: icons go here */
-            switch: {
-                shape: 'triangle',
-                color: '#FF9900' // orange
+            'switch': {
+                color: '#FF9900', // orange
+                image: DIR + 'Network-Drive-icon.png',
+                shape: 'image'
             },
-            desktop: {
-                shape: 'dot',
-                color: "#2B7CE9" // blue
+            'terminale': {
+                color: "#2B7CE9", // blue
+                image: DIR + 'Network-Drive-icon.png',
+                shape: 'image'
             },
-            mobile: {
-                shape: 'dot',
-                color: "#5A1E5C" // purple
+            'ns': {
+                color: "#5A1E5C", // purple
+                image: DIR + 'Network-Drive-icon.png',
+                shape: 'image'
             },
-            server: {
-                shape: 'square',
-                color: "#C5000B" // red
+            'ws': {
+                color: "#C5000B", // red
+                image: DIR + 'Network-Drive-icon.png',
+                shape: 'image'
             },
-            internet: {
-                shape: 'square',
-                color: "#109618" // green
+            'domain': {
+                color: "#66666", // grey
+                shape: 'circle'
+            },
+            'eth': {
+                color: "#dddddd", // very light grey
+                shape: 'square'
+            },
+            'domain-ip': {
+                color: "#dddddd", // very light grey
+                shape: 'square'
+            },
+            'ospf': {
+                color: "#FF9900", // very light grey
+                shape: 'square'
+            },
+            'rip': {
+                color: "#FF9900", // very light grey
+                shape: 'square'
+            },
+            'bgp': {
+                color: "#FF9900", // very light grey
+                shape: 'square'
             }
         }
     };
-    network = new vis.Network(container, data, options);
+    var network = new vis.Network(container, data, options);
 }

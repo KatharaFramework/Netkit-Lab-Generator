@@ -84,7 +84,7 @@ function get_eth_ip_difference(network, ip) {
 
 function same_obj(obj1, obj2){
     try {
-        return (obj2.id  == obj1.id);
+        return (obj2.id  == obj1.id || (obj2.from  == obj1.from && obj2.to  == obj1.to));
     }
     catch (e) {
         return false;
@@ -135,7 +135,8 @@ function generate_nodes_edges(lab){
                             value: 2
                         });
                         app_from.to = 'label-rip-' + lab[m].name;
-                        edges.push(app_from);
+                        if(!contains(app_from, edges))
+                            edges.push(app_from);
                     }
                 }
                 if(lab[m].routing.ospf.en) {
@@ -147,7 +148,8 @@ function generate_nodes_edges(lab){
                             value: 2
                         });
                         app_from.to = 'label-ospf-' + lab[m].name;
-                        edges.push(app_from);
+                        if(!contains(app_from, edges))
+                            edges.push(app_from);
                     }
                 }
                 if(lab[m].routing.bgp.en) {
@@ -159,7 +161,8 @@ function generate_nodes_edges(lab){
                             value: 2
                         });
                         app_from.to = 'label-bgp-' + lab[m].name;
-                        edges.push(app_from);
+                        if(!contains(app_from, edges))
+                            edges.push(app_from);
                     }
                 }
             }
@@ -175,7 +178,7 @@ function generate_nodes_edges(lab){
                 var app_from_dom = {
                     from: domain_id,
                     to: "",
-                    length: LENGTH_SUB, color: GRAY, width: WIDTH_SCALE
+                    length: LENGTH_SERVER, color: GRAY, width: WIDTH_SCALE
                 };
                 if(!contains({id:domain_id}, nodes)) {
                     nodes.push({
@@ -191,17 +194,24 @@ function generate_nodes_edges(lab){
                         value: 4
                     });
                     app_from_dom.to = "iplabel-" + domain_id;
-                    edges.push(app_from_dom);
+                    app_from_dom.length = LENGTH_SUB;
+                    if(!contains(app_from_dom, edges))
+                        edges.push(app_from_dom);
                 }
                 //each eth is a new node, linked to its domain and its machine. can't be duplicated
                 nodes.push({
                     id: "eth-" + app_from.from + "-" + if_name,
-                    label: + if_ip + " " + if_name,
+                    label: if_ip + " " + if_name,
                     group: 'eth',
                     value: 2
                 });
                 app_from_dom.to = "eth-" + app_from.from + "-" + if_name;
-                edges.push(app_from_dom);
+                app_from_dom.length = LENGTH_SERVER;
+                if(!contains(app_from_dom, edges))
+                    edges.push(app_from_dom);
+                app_from.to = "eth-" + app_from.from + "-" + if_name;
+                if(!contains(app_from, edges))
+                    edges.push(app_from);
             }
         }
         return {nodes:nodes, edges:edges};
