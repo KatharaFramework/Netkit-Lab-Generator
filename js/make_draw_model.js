@@ -233,13 +233,13 @@ function generate_nodes_edges(lab){
                 }
                 //each eth is a new node, linked to its domain and its machine. can't be duplicated
                 nodes.push({
-                    id: "eth-" + id + "-" + if_name,
+                    id: "eth-" + id + "-" + if_name + "-" +m,
                     label: if_ip + "\n" + if_name,  /*TODO: br and line?*/
                     group: 'eth',
                     value: 2
                 });
                 //eth to domain
-                var app_to_eth = "eth-" + id + "-" + if_name;
+                var app_to_eth = "eth-" + id + "-" + if_name + "-" +m;
                 if(!contains_edge({from: domain_id, to: app_to_eth}, edges)){
                     edges.push({
                         from: domain_id,
