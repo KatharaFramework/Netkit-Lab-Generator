@@ -106,7 +106,7 @@ function draw(nodes, edges) {
             stabilization: {iterations:2500}
         },
         groups: {  /* TODO: icons go here */
-            'switch': {
+            switch: {
                 shape: 'triangle',
                 color: '#FF9900' // orange
             },
