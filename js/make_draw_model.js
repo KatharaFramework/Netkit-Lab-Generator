@@ -82,19 +82,38 @@ function get_eth_ip_difference(network, ip) {
     return 0;
 }
 
-function same_obj(obj1, obj2){
+function same_edge(obj1, obj2){
     try {
-        return (obj2.id  == obj1.id || (obj2.from  == obj1.from && obj2.to  == obj1.to));
+        return (obj2.from  == obj1.from && obj2.to  == obj1.to);
     }
     catch (e) {
         return false;
     }
 }
 
-function contains(obj, list) {
+function same_node(obj1, obj2){
+    try {
+        return (obj2.id  == obj1.id);
+    }
+    catch (e) {
+        return false;
+    }
+}
+
+function contains_node(obj, list) {
     var i;
     for (i = 0; i < list.length; i++) {
-        if (same_obj(list[i], obj)) {
+        if (same_node(obj, list[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function contains_edge(obj, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (same_edge(obj, list[i])) {
             return true;
         }
     }
@@ -112,31 +131,29 @@ function generate_nodes_edges(lab){
         for (var m in lab) {
             //each machine is a node. beware of duplicates
             var id = 'machine-'+lab[m].name;
-            var app_from = {
-                from: id,
-                to: "",
-                length: LENGTH_SUB, color: GRAY, width: WIDTH_SCALE
-            };
-            if(!contains({id:id}, nodes)) {
+            if(!contains_node({id:id}, nodes)) {
                 nodes.push({
                     id: id,
                     label: lab[m].name,
-                    group: lab[m].type,
-                    value: 10
+                    group: lab[m].type
                 });
             }
             if(lab[m].type=='router'){
                 if(lab[m].routing.rip.en) {
-                    if(!contains({id:'label-rip-' + lab[m].name}, nodes)) {
+                    if(!contains_node({id:'label-rip-' + lab[m].name}, nodes)) {
                         nodes.push({
                             id: 'label-rip-' + lab[m].name,
                             label: 'RIP',
                             group: 'rip',
                             value: 2
                         });
-                        app_from.to = 'label-rip-' + lab[m].name;
-                        if(!contains(app_from, edges))
-                            edges.push(app_from);
+                        var r_app_to = 'label-rip-' + lab[m].name;
+                        if(!contains_edge({from:id, to:r_app_to}, edges))
+                            edges.push({
+                                from: id,
+                                to: r_app_to,
+                                length: LENGTH_CLOSE, width: WIDTH_SCALE/100, dashes:true
+                            });
                     }
                 }
                 if(lab[m].routing.ospf.en) {
@@ -147,9 +164,13 @@ function generate_nodes_edges(lab){
                             group: 'ospf',
                             value: 2
                         });
-                        app_from.to = 'label-ospf-' + lab[m].name;
-                        if(!contains(app_from, edges))
-                            edges.push(app_from);
+                        var r_app_to = 'label-ospf-' + lab[m].name;
+                        if(!contains_edge({from:id, to:r_app_to}, edges))
+                            edges.push({
+                                from: id,
+                                to: r_app_to,
+                                length: LENGTH_CLOSE, width: WIDTH_SCALE/100, dashes:true
+                            });
                     }
                 }
                 if(lab[m].routing.bgp.en) {
@@ -160,9 +181,13 @@ function generate_nodes_edges(lab){
                             group: 'bgp',
                             value: 2
                         });
-                        app_from.to = 'label-bgp-' + lab[m].name;
-                        if(!contains(app_from, edges))
-                            edges.push(app_from);
+                        var r_app_to = 'label-bgp-' + lab[m].name;
+                        if(!contains_edge({from:id, to:r_app_to}, edges))
+                            edges.push({
+                                from: id,
+                                to: r_app_to,
+                                length: LENGTH_CLOSE, width: WIDTH_SCALE/100, dashes:true
+                            });
                     }
                 }
             }
@@ -173,14 +198,11 @@ function generate_nodes_edges(lab){
                 var domain_ip = get_network_from_ip_net(lab[m].interfaces.if[e].ip);
                 var if_ip = get_eth_ip_difference(domain_ip, lab[m].interfaces.if[e].ip);
 
-                // the domain is a new node. beware of duplicates. domain ad a child node with the ip
+                // the domain is a new node. beware of duplicates.
+                // domain should have a child node with the ip description
+                // so edge for that and the eth
                 var domain_id = 'domain-'+domain_name;
-                var app_from_dom = {
-                    from: domain_id,
-                    to: "",
-                    length: LENGTH_SERVER, color: GRAY, width: WIDTH_SCALE
-                };
-                if(!contains({id:domain_id}, nodes)) {
+                if(!contains_node({id:domain_id}, nodes)) {
                     nodes.push({
                         id: domain_id,
                         label: domain_name,
@@ -188,30 +210,45 @@ function generate_nodes_edges(lab){
                         value: 5
                     });
                     nodes.push({
-                        id: "iplabel-" + domain_id,
+                        id: "iplabel-" + domain_name + "-domain_ip",
                         label: domain_ip,
                         group: 'domain-ip',
                         value: 4
                     });
-                    app_from_dom.to = "iplabel-" + domain_id;
-                    app_from_dom.length = LENGTH_SUB;
-                    if(!contains(app_from_dom, edges))
-                        edges.push(app_from_dom);
+                    //connecting domain and its label
+                    var app_to = "iplabel-" + domain_name + "-domain_ip";
+                    if(!contains_edge({from: domain_id, to: app_to}, edges)){
+                        edges.push({
+                            from: domain_id,
+                            to: app_to,
+                            length: LENGTH_CLOSE, width: WIDTH_SCALE/100, dashes:true
+                        });
+                    }
                 }
                 //each eth is a new node, linked to its domain and its machine. can't be duplicated
                 nodes.push({
-                    id: "eth-" + app_from.from + "-" + if_name,
-                    label: if_ip + " " + if_name,
+                    id: "eth-" + id + "-" + if_name,
+                    label: if_ip + "\n" + if_name,  /*TODO: br and line?*/
                     group: 'eth',
                     value: 2
                 });
-                app_from_dom.to = "eth-" + app_from.from + "-" + if_name;
-                app_from_dom.length = LENGTH_SERVER;
-                if(!contains(app_from_dom, edges))
-                    edges.push(app_from_dom);
-                app_from.to = "eth-" + app_from.from + "-" + if_name;
-                if(!contains(app_from, edges))
-                    edges.push(app_from);
+                //eth to domain
+                var app_to_eth = "eth-" + id + "-" + if_name;
+                if(!contains_edge({from: domain_id, to: app_to_eth}, edges)){
+                    edges.push({
+                        from: domain_id,
+                        to: app_to_eth,
+                        length: LENGTH_SERVER, width: WIDTH_SCALE
+                    });
+                }
+                // eth to machine
+                if(!contains_edge({from: id, to: app_to_eth}, edges)){
+                    edges.push({
+                        from: id,
+                        to: app_to_eth,
+                        length: LENGTH_CLOSE, width: WIDTH_SCALE
+                    });
+                }
             }
         }
         return {nodes:nodes, edges:edges};
