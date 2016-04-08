@@ -12,7 +12,7 @@ app.controller('nc', function($scope) {
     $scope.labInfo = JSON.clone(labInfo);
     $scope.netkit = [JSON.clone(backbone)];
     $scope.counter = 1;
-    $scope.labInfo.toggle = "disable";
+    $scope.labInfo.toggle = "enable";
 
     $scope.addMachine = function() {
         $scope.counter++;

@@ -42,7 +42,7 @@ function draw(nodes, edges) {
                 color: ORANGE,
                 image: DIR + 'router.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white'},
+                font: {strokeWidth: 2, strokeColor: 'white', size: 15},
                 value: 6
             },
             'terminale': {
