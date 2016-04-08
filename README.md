@@ -8,6 +8,8 @@ Now supports network topology preview (requires a modern browser).
 
 [Demo](http://bytearound.com/jobs/nlg/) (may not always be up to date).
 
+[Screenshot](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screenshot.png)
+
 Created by
 
    * Gaetano Bonofiglio (Kidel)
