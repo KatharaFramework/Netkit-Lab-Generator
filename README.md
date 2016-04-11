@@ -14,8 +14,8 @@ Now supports network topology preview (requires a modern browser).
 ####Created by
 
    * Gaetano Bonofiglio (Kidel)
-   * Lorenzo Ariemma (lorenzo93)
    * Veronica Iovinella (Neeja)
+   * Lorenzo Ariemma (lorenzo93)
 
 ### Links
 
