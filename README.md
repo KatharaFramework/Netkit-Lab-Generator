@@ -6,11 +6,12 @@ It is also possible to export and import the form configuration for future chang
 
 Now supports network topology preview (requires a modern browser).
 
-[Demo](http://bytearound.com/jobs/nlg/) (may not always be up to date).
+* [Demo](http://bytearound.com/jobs/nlg/) (may not always be up to date).
+* [Screenshot (configuration)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-1460378558427.png)
+* [Screenshot (runtime generated graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-1460378572119.png)
 
-[Screenshot](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screenshot.png)
 
-Created by
+####Created by
 
    * Gaetano Bonofiglio (Kidel)
    * Lorenzo Ariemma (lorenzo93)
