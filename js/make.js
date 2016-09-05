@@ -82,13 +82,14 @@ function makeStaticRouting(nk, lab) {
 
 function makeTerminal(nk, lab) {
     for (var mindex in nk) {
-        if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
+        if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "") {
             if (nk[mindex].type == 'terminale') {
-                if (typeof(nk[mindex].pc.ns) != "undefined" && nk[mindex].pc.ns != "") {
+                if (typeof(nk[mindex].pc.dns) != "undefined" && nk[mindex].pc.dns != "") {
                     lab["folder"][nk[mindex].name + "/etc"] = "";
                     lab["file"][nk[mindex].name + "/etc/resolv.conf"] = "nameserver " + nk[mindex].pc.dns + "\n";
                 }
             }
+        }
     }
     return lab;
 }
