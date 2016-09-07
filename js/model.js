@@ -12,7 +12,7 @@ var backbone = {
     "type":"router",
     "interfaces":{"counter":1, "if":[{"eth":{"number":0, "domain":""}, "ip":""}], "free": ""},
     "gateways":{"counter":1, "gw":[{"route":"", "if":0}]},
-    "pc":{"dns":""},
+    "pc":{"dns":"-"},
     "ws":{"userdir":false},
     "ns":{"recursion":true, "authority":true},
     "routing":{
