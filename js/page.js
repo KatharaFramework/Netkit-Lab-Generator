@@ -1,4 +1,4 @@
-function toggle_tab(elem) {
+function toggle_tab(event, elem) {
     event.preventDefault();
     var elems = document.getElementsByClassName("tab-pane");
     for(var j in elems) {
