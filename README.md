@@ -1,5 +1,7 @@
 # Netkit Lab Generator
-A client-side JavaScript tool to configure a netkit lab and generate all the files you need.
+A **client-side JavaScript** tool to configure a netkit lab and generate all the files you need.
+
+![Angular 1](https://angular.io/resources/images/logos/standard/logo-nav.png)
 
 Simply fill the form and download the bash script or the .zip file with the whole lab. 
 It is also possible to export and import the form configuration for future changes.
