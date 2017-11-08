@@ -123,42 +123,45 @@ function makeNameserver(nk, lab) {
     //Gestione Nameserver
     //variabili d'appoggio comuni ai vari cicli
     var authority = [];
-    var root;
+    var nsroot;
     //Trovo il root-ns e lo salvo
     for (var mindex in nk) {
         if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
             if(nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
-                root = nk[mindex];
+                nsroot = nk[mindex];
             }
     }
     //Se non ho root-ns evito di generare una configurazione incoerente
     //db.root in ogni macchina dns
-    if(typeof(root)!="undefined"){
+    if(typeof(nsroot)!="undefined"){
 
         for (var mindex in nk) {
-            if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
-                if(nk[mindex].type=='ns'){
+            if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != ""){
+            	if(nk[mindex].type=='ns'){
                     lab["file"][nk[mindex].name + "/etc/bind/db.root"] = "";
                     if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
-                        lab["file"][nk[mindex].name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA "+root.interfaces.if[0].name +
-                            " root."+root.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
+                        lab["file"][nk[mindex].name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA "+nsroot.interfaces.if[0].name +
+                            " root."+nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
                     }
                     if(nk[mindex].ns.recursion){
                         lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'options {\n allow-recursion {0/0; };\n};\n\n';
                     }
-                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".    IN NS "+root.interfaces.if[0].name+"\n";
-                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += root.interfaces.if[0].name+"    IN A "+root.interfaces.if[0].ip.split("/")[0]+"\n";
+                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += ".    IN NS "+nsroot.interfaces.if[0].name+"\n";
+                    lab["file"][nk[mindex].name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name+"    IN A "+ nsroot.interfaces.if[0].ip.split("/")[0]+"\n";
                     if(nk[mindex].ns.authority && nk[mindex].ns.zone == "."){
                         lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
                     } else {
                         lab["file"][nk[mindex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
                     }
                 }
+            }
+                
         }
         //entry in db.zona e named.conf per le altre macchine
         for (var mindex in nk) {
             if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
                 if(nk[mindex].type=="ns" && nk[mindex].ns.authority){
+                	console.log("Zone: " + nk[mindex].ns.zone + "NkMindex: " + nk[mindex]);
                     authority[nk[mindex].ns.zone] = nk[mindex];
                     if(nk[mindex].ns.zone != "."){
                         lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] = "$TTL   60000\n@    IN SOA "+nk[mindex].interfaces.if[0].name + " root."+nk[mindex].interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
@@ -166,12 +169,16 @@ function makeNameserver(nk, lab) {
                     }
                 }
         }
+        console.log(authority);
         //entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
         for (var mindex in nk) {
             if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
-                    for (var f in nk[mindex].interfaces.if){
-                    var ip = nk[mindex].interfaces.if[f].ip.split("/")[0];
-                    if(typeof(nk[mindex].interfaces.if[f].name)!="undefined"){
+                for (var f in nk[mindex].interfaces.if){
+                	var ip;
+                	if(typeof(nk[mindex].interfaces.if[f].ip)!="undefined"){
+                		ip = nk[mindex].interfaces.if[f].ip.split("/")[0];
+                	}
+                    if(typeof(nk[mindex].interfaces.if[f].name)!="undefined"){ //Entrano tutte le interfacce di tutte le macchine con un nome ns
 
                         //Caso particolare per ns di primo livello
                         if( (typeof(nk[mindex].ns.zone) != "undefined") && nk[mindex].type=="ns" && nk[mindex].ns.authority && nk[mindex].ns.zone.split(".").length == 3) {
@@ -185,6 +192,8 @@ function makeNameserver(nk, lab) {
                             var nome = nk[mindex].interfaces.if[f].name; //www.pluto.net.
                             var nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
                             var a = ".";
+
+                            //Questo for toglie il primo pezzo www.pluto.net. => pluto.net.
                             for (var i = 1; i < nomediviso.length; i++) {
                                 if (nomediviso[i] != "") {
                                     a += nomediviso[i] + ".";
@@ -201,8 +210,18 @@ function makeNameserver(nk, lab) {
                                     //se è un NS inserisco il glue record
                                     if (nk[mindex].type == "ns" && nk[mindex].ns.authority) {
                                         //Creo le linee relative a me stesso nel mio file db
-                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
-                                        lab["file"][nk[mindex].name + "/etc/bind/db" + nk[mindex].ns.zone.slice(0, -1)] += nk[mindex].interfaces.if[f].name + "    IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
+                                        var aSup = ".";
+                                        var nomediviso2 = authority[a].ns.zone.split(".");
+
+			                            //Questo for toglie il primo pezzo .www.pluto.net. => pluto.net.
+			                            for (var i = 2; i < nomediviso2.length; i++) {
+			                                if (nomediviso2[i] != "") {
+			                                    aSup += nomediviso2[i] + ".";
+			                                }
+			                            }
+
+                                        lab["file"][authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
+                                        lab["file"][authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] += nk[mindex].interfaces.if[f].name + "    IN A " + nk[mindex].interfaces.if[f].ip.split("/")[0] + "\n";
                                         lab["file"][authority[a].name + "/etc/bind/db" + fileExt] += nk[mindex].ns.zone.substring(1) + "    IN NS " + nk[mindex].interfaces.if[f].name + "\n";
                                     }
 
