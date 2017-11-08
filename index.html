@@ -154,7 +154,7 @@
                             <label>Reference DNS (resolv.conf nameserver):</label>
                             <select title="en" data-ng-model="x.pc.dns">
                                 <option value="-" selected>-</option>
-                                <optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns'" label="{{m.name}}">
+                                <optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns' && m.ns.recursion" label="{{m.name}}">
                                     <option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
                                 </optgroup>
                             </select>
