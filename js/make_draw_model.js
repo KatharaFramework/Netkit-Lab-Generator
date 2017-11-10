@@ -73,7 +73,7 @@ function get_eth_ip_difference(network, ip) {
     var ip_split = ip.split("/")[0];
     var net_split_i = net_split.split(".");
     var ip_split_i = ip_split.split(".");
-    if(net_split.length != ip_split.length) return 0;
+    if(net_split_i.length != ip_split_i.length) return 0;
     for(var i in net_split_i) {
         if(net_split_i[i]!=ip_split_i[i]) {
             if(i==3) return ip_split_i[i];
@@ -203,7 +203,6 @@ function generate_nodes_edges(lab){
                 var domain_ip = get_network_from_ip_net(lab[m].interfaces.if[e].ip);
                 if(typeof(lab[m].interfaces.if[e].ip)  == "undefined" || lab[m].interfaces.if[e].ip=="") continue;
                 var if_ip = get_eth_ip_difference(domain_ip, lab[m].interfaces.if[e].ip);
-
                 // the domain is a new node. beware of duplicates.
                 // domain should have a child node with the ip description
                 // so edge for that and the eth
