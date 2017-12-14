@@ -255,7 +255,9 @@ function makeBgpConf(router, lab){
 
     // Inserimento tutte le Network su cui annunciare BGP
     for (var n in router.routing.bgp.network) {
-        lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "network " + router.routing.bgp.network[n] + "\n";
+    	if (typeof(router.routing.bgp.network[n]) != "undefined" && router.routing.bgp.network[n] != ""){
+    		lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "network " + router.routing.bgp.network[n] + "\n";
+    	}        
     }
 
     lab["file"][router.name + "/etc/zebra/bgpd.conf"] += "\n";

@@ -221,7 +221,7 @@
                                 <span class="btn btn-danger btn-square" data-ng-click="removeBgpNetwork(x)" data-ng-disabled="x.routing.bgp.network.length<=1">-</span>
                                 <div data-ng-repeat="bnet in x.routing.bgp.network track by $index">
                                     <label>Network: </label>
-                                    <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.bgp.network[$index]" />
+                                    <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control" data-ng-model="x.routing.bgp.network[$index]" />
                                 </div>
                                 <span class="btn btn-success btn-square" data-ng-click="addBgpNeighbor(x)">+</span>
                                 <span class="btn btn-danger btn-square" data-ng-click="removeBgpNeighbor(x)" data-ng-disabled="x.routing.bgp.remote.length<=1">-</span>
