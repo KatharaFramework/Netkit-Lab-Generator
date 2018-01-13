@@ -457,9 +457,13 @@ function makeFileStructure(nk, li) {
 
 function makeScript(lab){
     var text="";
+    text += "#! /bin/sh\n";
     text += "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n";
     text += "\n";
-    text += "#! /bin/sh\n";
+    text += 'rm -rf "$(dirname "$0")/lab"\n';
+    text += 'mkdir "$(dirname "$0")/lab"\n';
+    text += 'cd "$(dirname "$0")/lab"\n';
+    text += "\n";
     for(var folderName in lab["folder"]){
         text += "mkdir -p " + folderName + "\n";
     }
@@ -470,7 +474,7 @@ function makeScript(lab){
             text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
         }
     }
-    text += "rm $0\n";
+    text += "rm ../../$0\n";
 
     return text;
 }

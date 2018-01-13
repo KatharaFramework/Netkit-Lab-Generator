@@ -41,14 +41,7 @@
 <br />
 
 <div data-ng-app="napp" data-ng-controller="nc">
-    <div class="col-xs-1">
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs tabs-left">
-            <li id="tab-home" class="tab-label active"><a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)">Home</a></li>
-            <li id="tab-graph" class="tab-label"><a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)">Graph</a></li>
-        </ul>
-    </div>
-    <div class="col-xs-10">
+    <div id="col10" class="col-xs-10">
         <!-- Tab panes -->
         <div class="tab-content">
             <div class="tab-pane active" id="home">
@@ -264,7 +257,11 @@
                 <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div><br />
 
                 <br />
-
+                <div id="executeDiv" class="ng-hide">
+                        <a class="btn btn-primary" id="copyLab"><strong>Copy lab on Host</strong></a> <a class="btn btn-primary" id="lstart"><strong>Run LStart on Host</strong></a> <a class="btn btn-primary" id="lclean"><strong>Run LClean on Host</strong></a>
+                    <br />
+                    (requires Kathar&aacute; installed on Host, Python 2.x as default and PATH configured correctly with NETKIT_HOME variable)
+                </div>
                 <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Download .sh file</strong></a>
                 <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Download .zip file</strong></a>
                 <br />
@@ -284,7 +281,7 @@
                 <br />
 
                 <h4>Bash file preview:</h4>
-                <textarea title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
+                <textarea id="sh_script" title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
             </div>
 
             <div class="tab-pane" id="graph">
@@ -296,6 +293,21 @@
         </div>
     </div>
 
+    <div id="col1" class="col-xs-2" align="right">
+        <!-- Nav tabs 
+        <ul class="nav nav-tabs tabs-right" style="border-left: 1px slid #ddd">
+            <li id="tab-home" class="tab-label active"><a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)">Home</a></li>
+            <li id="tab-graph" class="tab-label"><a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)">Graph</a></li>
+        </ul> -->
+        <div class="fixed right-margin">
+            <div align="right">
+                <a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)" class="btn btn-primary"><i class="glyphicon glyphicon-home"></i> <strong>Home</strong></a>
+            </div>
+            <div align="right">
+                <a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)" class="btn btn-primary"><i class="glyphicon glyphicon-picture"></i> <strong>Graph</strong></a>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -328,6 +340,40 @@
 <script>
     window.onload= function() {
         console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+
+        function isElectron() {
+            return window && window.process && window.process.type;
+        }
+
+        var electron;
+        
+        function copyLab(e){
+            e.preventDefault();
+            var script = document.querySelector('#sh_script').value;
+            const {ipcRenderer} = electron;
+            //console.log(script);
+            ipcRenderer.send('script:copy', script);
+        }
+        function executeStart(e){
+            e.preventDefault();
+            const {ipcRenderer} = electron;
+            //console.log(script);
+            ipcRenderer.send('script:execute');
+        }
+        function executeClean(e){
+            e.preventDefault();
+            const {ipcRenderer} = electron;
+            ipcRenderer.send('script:clean');
+        }
+
+        if(isElectron()) {
+            electron = require('electron');
+            var buttonExecDiv = document.getElementById("executeDiv");
+            buttonExecDiv.classList.remove("ng-hide");
+            document.querySelector('#copyLab').addEventListener('click', copyLab);
+            document.querySelector('#lstart').addEventListener('click', executeStart);
+            document.querySelector('#lclean').addEventListener('click', executeClean);
+        }
     }
 </script>
 

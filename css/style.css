@@ -184,3 +184,9 @@ input[type=file] {
     left: 8.33333333%;
     margin-left: -63px;
 }
+.fixed {
+    position: fixed;
+}
+.right-margin {
+    right: 24px;
+}
