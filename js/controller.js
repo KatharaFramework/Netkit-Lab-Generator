@@ -1,3 +1,5 @@
+var changed = true;
+
 var app = angular.module('napp', []);
 app.config(['$compileProvider',
     function ($compileProvider) {
@@ -19,24 +21,32 @@ app.controller('nc', function($scope) {
         var p = JSON.clone(backbone);
         p.row=$scope.counter;
         $scope.netkit.push(p);
+
+        changed = true;
     };
 
     $scope.removeMachine = function() {
         if($scope.netkit.length>1 && confirm("Are you sure you want to remove the machine?")) {
             $scope.netkit.pop();
             $scope.counter--;
+
+            changed = true;
         }
     };
 
     $scope.addInterface = function(machine) {
         machine.interfaces.if.push({"eth":{"number":machine.interfaces.counter}});
         machine.interfaces.counter++;
+
+        changed = true;
     };
 
     $scope.removeInterface = function(machine) {
         if(machine.interfaces.counter>1 && confirm("Are you sure you want to remove the interface?")) {
             machine.interfaces.if.pop();
             machine.interfaces.counter--;
+
+            changed = true;
         }
     };
 
@@ -66,11 +76,15 @@ app.controller('nc', function($scope) {
 
     $scope.addRipNetwork = function(machine) {
         machine.routing.rip.network.push("");
+
+        changed = true;
     };
 
     $scope.removeRipNetwork = function(machine) {
         if(machine.routing.rip.network.length>1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.rip.network.pop();
+
+            changed = true;
         }
     };
 
@@ -88,6 +102,8 @@ app.controller('nc', function($scope) {
         machine.routing.ospf.network.push("");
         machine.routing.ospf.area.push("0.0.0.0");
         machine.routing.ospf.stub.push(false);
+
+        changed = true;
     };
 
     $scope.removeOspfNetwork = function(machine) {
@@ -95,16 +111,22 @@ app.controller('nc', function($scope) {
             machine.routing.ospf.network.pop();
             machine.routing.ospf.area.pop();
             machine.routing.ospf.stub.pop();
+
+            changed = true;
         }
     };
 
     $scope.addBgpNetwork = function(machine) {
         machine.routing.bgp.network.push("");
+
+        changed = true;
     };
 
     $scope.removeBgpNetwork = function(machine) {
         if(machine.routing.bgp.network.length>1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.bgp.network.pop();
+
+            changed = true;
         }
     };
 
@@ -148,6 +170,14 @@ app.controller('nc', function($scope) {
 
     $scope.makeGraph = function(nk) {
         return makeGraph(nk);
+    };
+
+    $scope.makeGraphIfChanged = function(nk) {
+        if(changed) {
+            console.log("graph");
+            changed = false;
+            return makeGraph(nk);
+        }
     };
 
     $scope.toggleGraphUpdate = function () {

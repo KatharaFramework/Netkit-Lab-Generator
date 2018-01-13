@@ -45,7 +45,7 @@
         <!-- Nav tabs -->
         <ul class="nav nav-tabs tabs-left">
             <li id="tab-home" class="tab-label active"><a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)">Home</a></li>
-            <li id="tab-graph" class="tab-label"><a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)">Graph</a></li>
+            <li id="tab-graph" class="tab-label"><a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)">Graph</a></li>
         </ul>
     </div>
     <div class="col-xs-10">
@@ -289,8 +289,8 @@
 
             <div class="tab-pane" id="graph">
                 <div class="btn btn-primary" data-ng-click="makeGraph(netkit)"><strong>Preview</strong>(force)</div>
-                <div class="btn btn-default" data-ng-click="toggleGraphUpdate()">{{labInfo.toggle}} auto update</div>
-                <span class="bg-warning">(enabling auto update may cause performance issues depending on your machine)</span>
+                <!--<div class="btn btn-default" data-ng-click="toggleGraphUpdate()">{{labInfo.toggle}} auto update</div>
+                <span class="bg-warning">(enabling auto update may cause performance issues depending on your machine)</span>-->
                 <div id="mynetwork"></div>
             </div>
         </div>
