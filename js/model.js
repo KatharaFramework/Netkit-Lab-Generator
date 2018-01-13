@@ -15,6 +15,7 @@ var backbone = {
     "pc":{"dns":"-"},
     "ws":{"userdir":false},
     "ns":{"recursion":true, "authority":true},
+    "other": {"image":"", "files":[], "fileCounter":0},
     "routing":{
         "rip":{"en":false, "connected":false, "ospf": false, "bgp": false, "network":[""], "route":[""], "free": ""},
         "ospf":{"en":false, "connected":false, "rip": false, "bgp": false, "if":[], "network":[""], "area":["0.0.0.0"], "stub":[false], "free": ""},

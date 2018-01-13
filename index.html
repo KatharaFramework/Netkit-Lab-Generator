@@ -7,9 +7,7 @@
     <meta name="author" content="Lykon, Lollo, Neeja" />
     <title>Netkit Lab Generator</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/bootstrap.vertical-tabs.min.css">
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/dbtek/bootstrap-vertical-tabs/master/bootstrap.vertical-tabs.min.css" />
     <link rel="stylesheet" href="css/vis.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
@@ -27,7 +25,8 @@
 <div id="description">
     This tool allows to quickly generate most of the files and folders you need to run a working netkit lab.
     The main purpose is to quickly generate the files and folders needed with low configuration options, so more
-    advanced funtionalities are omitted and some others are set by default (like zebra username and password).
+    advanced funtionalities are omitted and some others are set by default (like zebra username and password). 
+    The tool also allows to visualize the topology in the 'Graph' tab.
     <br />
     Once the form is compiled just download the bash script or the .zip file with the whole lab.
     It is also possible to export and import the form configuration for future changes.
@@ -35,7 +34,7 @@
     <br />
     <br />
     The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
-    of this application do not take any responsibility for any malfunction.
+    of this application do not take any responsibility for any malfunction. Remember to check the final configuration for exams and production.
 </div>
 <hr />
 
@@ -106,6 +105,10 @@
                             <input title="type" type="radio" value="router" data-ng-model="x.type" /> Router<br />
                             <input title="type" type="radio" value="ns" data-ng-model="x.type" /> Name Server<br />
                             <input title="type" type="radio" value="ws" data-ng-model="x.type" /> Web Server<br />
+                            <input title="type" type="radio" value="other" data-ng-model="x.type" /> Other<br />
+                            <div data-ng-show="x.type == 'other'"><label>Image Name:</label>
+                                <input type="text" data-ng-model="x.other.image" class="form-control" required placeholder="e.g.: p4" required /></div>
+                            <div>
                         </td>
                         <td class="interfaces">
                             <div class="btn btn-success" data-ng-click="addInterface(x)">Add interface</div>
@@ -158,6 +161,19 @@
                                     <option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
                                 </optgroup>
                             </select>
+                        </td>
+                        <td data-ng-show="x.type=='other'">
+                            <div class="btn btn-success" data-ng-click="addFile(x)">Add file</div>
+                            <div class="btn btn-danger" data-ng-click="removeFile(x)" data-ng-disabled="x.other.files<=1">Remove last file</div><br />
+                            <div>(files will be stored in /etc/scripts/)</div>
+                            <div class="hidelasthr" data-ng-repeat="fl in x.other.files">
+                                <div><label>File name:</label>
+                                    <input type="text" data-ng-model="fl.name" class="form-control" placeholder="e.g: my_switch.p4" required /></div>
+                                <div><label>File contents:</label>
+                                    <textarea title="free" rows="3" class="form-control" data-ng-model="fl.contents"></textarea>
+                                </div>
+                                <hr />
+                            </div>
                         </td>
                         <td data-ng-show="x.type=='router'">
                             <label>Dynamic routing: </label><br /><br />

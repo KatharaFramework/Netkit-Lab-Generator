@@ -52,6 +52,18 @@ app.controller('nc', function($scope) {
         }
     };
 
+    $scope.addFile = function(machine) {
+        machine.other.fileCounter++;
+        machine.other.files.push({"name":"", "contents":""});
+    };
+
+    $scope.removeGateway = function(machine) {
+        if(machine.other.fileCounter>1 && confirm("Are you sure you want to remove the file?")) {
+            machine.other.files.pop();
+            machine.other.fileCounter--;
+        }
+    };
+
     $scope.addRipNetwork = function(machine) {
         machine.routing.rip.network.push("");
     };

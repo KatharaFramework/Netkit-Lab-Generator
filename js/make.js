@@ -109,6 +109,23 @@ function makeWebserver(nk, lab) {
     return lab;
 }
 
+function makeOther(nk, lab) {
+    for (var mindex in nk) {
+        if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "") {
+            if (nk[mindex].type == 'other') {
+                if (typeof(nk[mindex].other.image) != "undefined") {
+                    // TODO
+                    lab["file"]["lab.conf"] += nk[mindex].name + "[image]=" + nk[mindex].other.image + "\n";
+                    for(var findex in nk[mindex].other.files) {
+                        lab["file"]["/etc/scripts/" + nk[mindex].other.files[findex].name] = nk[mindex].other.files[findex].contents;
+                    }
+                }
+            }
+        }
+    }
+    return lab;
+}
+
 function makeNameserver(nk, lab) {
     // generazione file e cartelle comuni
     for (var mindex in nk) {
@@ -429,6 +446,7 @@ function makeFileStructure(nk, li) {
     makeRouter(nk, lab);
     makeWebserver(nk, lab);
     makeNameserver(nk, lab);
+    makeOther(nk, lab);
 
     if(li.toggle=="disable") {
         makeGraph(nk);

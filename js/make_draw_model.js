@@ -138,7 +138,7 @@ function generate_nodes_edges(lab){
             if(!contains_node({id:id}, nodes)) {
                 nodes.push({
                     id: id,
-                    label: lab[m].name,
+                    label: (lab[m].type == "other") ? lab[m].name + " (" + lab[m].other.image + ")": lab[m].name,
                     group: lab[m].type
                 });
             }

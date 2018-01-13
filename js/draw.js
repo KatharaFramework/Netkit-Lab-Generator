@@ -59,6 +59,13 @@ function draw(nodes, edges) {
                 font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8
             },
+            'other': {
+                color: GREEN,
+                image: DIR + 'other.png',
+                shape: 'image',
+                font: {strokeWidth: 2, strokeColor: 'white'},
+                value: 8
+            },
             'ws': {
                 color: RED,
                 image: DIR + 'webserver.png',
