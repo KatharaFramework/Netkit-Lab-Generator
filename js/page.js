@@ -14,10 +14,17 @@ function toggle_tab(event, elem) {
         }
         catch(e) { }
     }
-    var id = elem.getAttribute("href").replace("#",'');
+    var href = elem.getAttribute("href").replace("#",'');
     var tab_id = "tab-" + elem.getAttribute("href").replace("#",'');
-    var tab = document.getElementById(id);
+    var tab = document.getElementById(href);
     tab.className += " active";
+    var col1 = document.getElementById("col1");
+    if(href == "home") {
+        col1.classList.remove("ng-hide");
+    }
+    else {
+        col1.classList.add("ng-hide");
+    }
 }
 
 function collapseDisclaimer(e) {
