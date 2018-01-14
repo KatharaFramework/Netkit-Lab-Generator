@@ -67,8 +67,8 @@ app.controller('nc', function($scope) {
         machine.other.files.push({"name":"", "contents":""});
     };
 
-    $scope.removeGateway = function(machine) {
-        if(machine.other.fileCounter>1 && confirm("Are you sure you want to remove the file?")) {
+    $scope.removeFile = function(machine) {
+        if(machine.other.fileCounter>0 && confirm("Are you sure you want to remove the file?")) {
             machine.other.files.pop();
             machine.other.fileCounter--;
         }
