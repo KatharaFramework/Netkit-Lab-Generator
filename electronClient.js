@@ -12,7 +12,9 @@ process.env.NODE_ENV = 'development';
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 
 let mainWindow;
-let addWindow;
+
+var tmp_folder = app.getPath('userData');
+//console.log(tmp_folder);
 
 // Listen for app to be ready
 app.on('ready', function(){
@@ -24,6 +26,7 @@ app.on('ready', function(){
     protocol: 'file:',
     slashes:true
   }));
+  mainWindow.isWin = isWin;
   // Quit app when closed
   mainWindow.on('closed', function(){
     app.quit();
@@ -38,13 +41,14 @@ app.on('ready', function(){
 
 ipcMain.on('script:copy', function(e, script){
   //console.log(script);
-  fs.writeFile("./tmp/script.sh", script, function(err) {
+  console.log("Saving to " + path.join(tmp_folder, "script.sh"));
+  fs.writeFile(path.join(tmp_folder, "script.sh"), script, function(err) {
     if(err) {
         return console.log(err);
     }
-    console.log("The script file was saved!");
-    console.log("Running script.sh");
-    exec('bash ./tmp/script.sh', function (err, stdout, stderr) {
+    console.log("The script file was saved to " + path.join(tmp_folder, "script.sh"));
+    console.log("Running " + path.join(tmp_folder, "script.sh"));
+    exec((isWin ? '':'bash ') + path.join(tmp_folder, "script.sh"), function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
@@ -52,15 +56,15 @@ ipcMain.on('script:copy', function(e, script){
   
 });
 ipcMain.on('script:execute', function(e){
-  console.log("Running LStart");
+  console.log("Running LStart on " + path.join(tmp_folder, "lab"));
   if(isWin) {
-    exec('start cmd /c "%NETKIT_HOME%\\lstart -d ./tmp/lab/"', function (err, stdout, stderr) {
+    exec('start cmd /c "%NETKIT_HOME%\\lstart -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
   }
   else {
-    exec('bash -c "$NETKIT_HOME%/lstart -d ./tmp/lab/"', function (err, stdout, stderr) {
+    exec('bash -c "$NETKIT_HOME%/lstart -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
@@ -68,15 +72,15 @@ ipcMain.on('script:execute', function(e){
 });
 
 ipcMain.on('script:clean', function(e){ 
-  console.log("Running LClean");
+  console.log("Running LClean on " + path.join(tmp_folder, "lab"));
   if(isWin) {
-    exec('start cmd /c "%NETKIT_HOME%\\lclean -d ./tmp/lab/"', function (err, stdout, stderr) {
+    exec('start cmd /c "%NETKIT_HOME%\\lclean -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
   }
   else {
-    exec('bash -c "$NETKIT_HOME%/lclean -d ./tmp/lab/"', function (err, stdout, stderr) {
+    exec('bash -c "$NETKIT_HOME%/lclean -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });

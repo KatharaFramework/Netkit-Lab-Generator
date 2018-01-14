@@ -13,7 +13,7 @@
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
     <script src="js/page.js"></script>
 </head>
-<body class="bg-logos">
+<body id="logos" class="bg-logos">
 <script>
     var isIE = navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0;
     if (isIE)
@@ -258,9 +258,11 @@
 
                 <br />
                 <div id="executeDiv" class="ng-hide">
-                        <a class="btn btn-primary" id="copyLab"><strong>Copy lab on Host</strong></a> <a class="btn btn-primary" id="lstart"><strong>Run LStart on Host</strong></a> <a class="btn btn-primary" id="lclean"><strong>Run LClean on Host</strong></a>
+                        <a class="btn btn-primary" id="copyLab"><strong>Copy lab on Host *</strong></a> <a class="btn btn-primary" id="lstart"><strong>Run LStart on Host **</strong></a> <a class="btn btn-primary" id="lclean"><strong>Run LClean on Host **</strong></a>
                     <br />
-                    (requires Kathar&aacute; installed on Host, Python 2.x as default and PATH configured correctly with NETKIT_HOME variable)
+                    * On Windows it requires something to run .sh files (like Git bash), or you can unpack the .zip file (button below) to &lt;application data&gt;/KatharaUI/lab.
+                    <br />
+                    ** Requires Kathar&aacute; (or eventually Netkit) installed on Host and PATH configured correctly with NETKIT_HOME variable.
                 </div>
                 <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Download .sh file</strong></a>
                 <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Download .zip file</strong></a>
@@ -346,6 +348,7 @@
         }
 
         var electron;
+        var isWin;
         
         function copyLab(e){
             e.preventDefault();
@@ -368,11 +371,16 @@
 
         if(isElectron()) {
             electron = require('electron');
+            var currentWindow = electron.remote.getCurrentWindow();
+            isWin = currentWindow.isWin;
             var buttonExecDiv = document.getElementById("executeDiv");
             buttonExecDiv.classList.remove("ng-hide");
             document.querySelector('#copyLab').addEventListener('click', copyLab);
             document.querySelector('#lstart').addEventListener('click', executeStart);
             document.querySelector('#lclean').addEventListener('click', executeClean);
+
+            var logos = document.getElementById("logos");
+            logos.classList.add("bg-logos-electron");
         }
     }
 </script>
