@@ -3,7 +3,7 @@ A **client-side JavaScript** tool to configure a Kathará or a Netkit lab and ge
 
 It works as stand-alone HTML file or using Electron for some advanced capabilities (like the ability to directly run a lab from inside the UI).
 
-![Screenshot (graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801141.png)
+![Screenshot (graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801143.png)
 
 Simply fill the form and download the bash script or the .zip file with the whole lab. 
 It is also possible to export and import the form configuration for future changes.
