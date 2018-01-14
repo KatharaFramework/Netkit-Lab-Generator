@@ -12,8 +12,8 @@ Now supports network topology preview (requires a modern browser or the Electrum
 
 * [Demo](http://bytearound.com/jobs/nlg/) **(may not always be up to date)**
 * [Example configuration](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/examples/example_lab.config) (can be imported to generate the files or the graph)
-* [Screenshot (form)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801140.png)
-* [Screenshot (graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801141.png)
+* [Screenshot (form)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801142.png)
+* [Screenshot (graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801143.png)
 
 
 #### Created by
