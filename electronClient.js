@@ -7,7 +7,7 @@ const fs = require('fs');
 var isWin = /^win/.test(process.platform);
 
 // SET ENV
-process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
 
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 
@@ -32,10 +32,12 @@ app.on('ready', function(){
     app.quit();
   });
 
-  // Build menu from template
-  const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
-  // Insert menu
-  Menu.setApplicationMenu(mainMenu);
+  if(process.env.NODE_ENV !== 'production'){
+    // Build menu from template
+    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+    // Insert menu
+    Menu.setApplicationMenu(mainMenu);
+  }
 });
 
 
@@ -90,7 +92,7 @@ ipcMain.on('script:clean', function(e){
 // Create menu template
 const mainMenuTemplate =  [
   // Each object is a dropdown
-  {
+  /*{
     label: 'File',
     submenu:[
       {
@@ -101,7 +103,7 @@ const mainMenuTemplate =  [
         }
       }
     ]
-  }
+  }*/
 ];
 
 // If OSX, add empty object to menu
