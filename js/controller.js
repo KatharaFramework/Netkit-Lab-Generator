@@ -174,7 +174,7 @@ app.controller('nc', function($scope) {
 
     $scope.makeGraphIfChanged = function(nk) {
         if(changed) {
-            console.log("graph");
+            console.log("Reloading graph");
             changed = false;
             return makeGraph(nk);
         }

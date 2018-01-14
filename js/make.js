@@ -178,7 +178,7 @@ function makeNameserver(nk, lab) {
         for (var mindex in nk) {
             if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
                 if(nk[mindex].type=="ns" && nk[mindex].ns.authority){
-                	console.log("Zone: " + nk[mindex].ns.zone + "NkMindex: " + nk[mindex]);
+                	//console.log("Zone: " + nk[mindex].ns.zone + "NkMindex: " + nk[mindex]);
                     authority[nk[mindex].ns.zone] = nk[mindex];
                     if(nk[mindex].ns.zone != "."){
                         lab["file"][nk[mindex].name + "/etc/bind/db"+nk[mindex].ns.zone.slice(0,-1)] = "$TTL   60000\n@    IN SOA "+nk[mindex].interfaces.if[0].name + " root."+nk[mindex].interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
@@ -186,7 +186,7 @@ function makeNameserver(nk, lab) {
                     }
                 }
         }
-        console.log(authority);
+        //console.log(authority);
         //entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
         for (var mindex in nk) {
             if (typeof(nk[mindex].name)!="undefined" && nk[mindex].name != "")
