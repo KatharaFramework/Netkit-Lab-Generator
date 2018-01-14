@@ -17,7 +17,28 @@ function toggle_tab(event, elem) {
     var id = elem.getAttribute("href").replace("#",'');
     var tab_id = "tab-" + elem.getAttribute("href").replace("#",'');
     var tab = document.getElementById(id);
-    var label = document.getElementById(tab_id);
     tab.className += " active";
-    label.className += " active";
+}
+
+function collapseDisclaimer(e) {
+    e.preventDefault();
+    var disclaimer = document.getElementById("disclaimer");
+    disclaimer.classList.add("ng-hide");
+}
+
+function toggle_submenu(e, number, total) {
+    for(var i=0; i<total; i++) {
+        var current_submenu = document.getElementById("submenu-"+i);
+        if(i==number) {
+            current_submenu.classList.remove("ng-hide");
+        }
+        else {
+            current_submenu.classList.add("ng-hide");
+        }
+    }
+}
+
+function toggle_tab_and_submenu(event, elem, total_submenus) {
+    toggle_submenu(event, -1, total_submenus);
+    toggle_tab(event, elem);
 }

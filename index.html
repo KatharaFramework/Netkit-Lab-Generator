@@ -7,6 +7,7 @@
     <meta name="author" content="Lykon, Lollo, Neeja" />
     <title>Netkit Lab Generator</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/fontawesome-all.min.css" />
     <link rel="stylesheet" href="css/bootstrap.vertical-tabs.min.css">
     <link rel="stylesheet" href="css/vis.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -19,24 +20,43 @@
     if (isIE)
         document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
 </script>
-<h1>Netkit Lab Generator</h1>
-<h4><a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a></h4>
-<hr />
-<div id="description">
-    This tool allows to quickly generate most of the files and folders you need to run a working netkit lab.
-    The main purpose is to quickly generate the files and folders needed with low configuration options, so more
-    advanced funtionalities are omitted and some others are set by default (like zebra username and password). 
-    The tool also allows to visualize the topology in the 'Graph' tab.
-    <br />
-    Once the form is compiled just download the bash script or the .zip file with the whole lab.
-    It is also possible to export and import the form configuration for future changes.
-    DNS may not work with too many levels.
-    <br />
-    <br />
-    The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
-    of this application do not take any responsibility for any malfunction. Remember to check the final configuration for exams and production.
+
+<!-- Control Panel -->
+<nav class="navbar navbar-primary navbar-kathara navbar-kathara-primary">
+    <div class="container-fluid">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <ul class="nav navbar-nav">
+            <li><a href="#home" onclick="toggle_tab_and_submenu(event, this, 3)"><i class="fa fa-home" aria-hidden="true"></i> <strong>Home</strong></a></li>
+            <li><a href="#graph" onclick="toggle_tab_and_submenu(event, this, 3)" data-ng-click="makeGraphIfChanged(netkit)"><i class="fas fa-code-branch" aria-hidden="true"></i> <strong>Graph</strong></a></li>
+            <li id="executeDiv" class="ng-hide"><a onclick="toggle_submenu(event, 0, 3)"><i class="fa fa-play" aria-hidden="true"></i> <strong>Run on Host</strong></a></li>
+            <li><a onclick="toggle_submenu(event, 1, 3)"><i class="fa fa-download" aria-hidden="true"></i> <strong>Download Lab</strong></a></li>
+            <li><a onclick="toggle_submenu(event, 2, 3)"><i class="fa fa-save" aria-hidden="true"></i> <strong>Save &amp; Load</strong></a></li>
+        </ul>
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="bg-primary disclaimer" id="disclaimer">
+    <a onclick="collapseDisclaimer(event)" href="#" class="btn-default btn-close-disclaimer"><i class="fa fa-times" aria-hidden="true"></i></a>
+    <div id="title-link" class="ng-hide">
+        <h1>Netkit Lab Generator</h1>
+        <h4><a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a></h4>
+        <hr />
+    </div>
+    <div id="description">
+        This tool allows to quickly generate most of the files and folders you need to run a working netkit lab.
+        The main purpose is to quickly generate the files and folders needed with low configuration options, so more
+        advanced funtionalities are omitted and some others are set by default (like zebra username and password). 
+        The tool also allows to visualize the topology in the 'Graph' tab.
+        <br />
+        Once the form is compiled just download the bash script or the .zip file with the whole lab.
+        It is also possible to export and import the form configuration for future changes.
+        DNS may not work with too many levels.
+        <br />
+        <br />
+        The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
+        of this application do not take any responsibility for any malfunction. Remember to check the final configuration for exams and production.
+    </div>
 </div>
-<hr />
 
 <br />
 
@@ -77,9 +97,6 @@
 
                 <div class="clear"></div>
 
-                <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
-                <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div>
-
                 <br />
 
                 <table id="netkit">
@@ -104,8 +121,8 @@
                             <div>
                         </td>
                         <td class="interfaces">
-                            <div class="btn btn-success" data-ng-click="addInterface(x)">Add interface</div>
-                            <div class="btn btn-danger" data-ng-click="removeInterface(x)" data-ng-disabled="x.interfaces.counter<=1">Remove last interface</div><br />
+                            <div class="btn btn-success" data-ng-click="addInterface(x)"><i class="fa fa-plus" aria-hidden="true"></i> Add interface</div>
+                            <div class="btn btn-danger" data-ng-click="removeInterface(x)" data-ng-disabled="x.interfaces.counter<=1"><i class="fa fa-minus" aria-hidden="true"></i> Remove last interface</div><br />
                             <div class="hidelasthr" data-ng-repeat="i in x.interfaces.if">
                                 <div><label>Eth{{i.eth.number}}: </label>
                                     <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required /></div>
@@ -119,8 +136,8 @@
                             <textarea title="free" rows="3" class="form-control" data-ng-model="x.interfaces.free"></textarea>
                         </td>
                         <td class="gateways">
-                            <div class="btn btn-success" data-ng-click="addGateway(x)">Add gateway</div>
-                            <div class="btn btn-danger" data-ng-click="removeGateway(x)" data-ng-disabled="x.gateways.counter<=1">Remove last gw</div><br />
+                            <div class="btn btn-success" data-ng-click="addGateway(x)"><i class="fa fa-plus" aria-hidden="true"></i> Add gateway</div>
+                            <div class="btn btn-danger" data-ng-click="removeGateway(x)" data-ng-disabled="x.gateways.counter<=1"><i class="fa fa-minus" aria-hidden="true"></i> Remove last gw</div><br />
                             <div class="hidelasthr" data-ng-repeat="j in x.gateways.gw">
                                 <div><label>Route (empty for default gw):</label>
                                     <input type="text" data-ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" /></div>
@@ -156,8 +173,8 @@
                             </select>
                         </td>
                         <td data-ng-show="x.type=='other'">
-                            <div class="btn btn-success" data-ng-click="addFile(x)">Add file</div>
-                            <div class="btn btn-danger" data-ng-click="removeFile(x)" data-ng-disabled="x.other.files<=1">Remove last file</div><br />
+                            <div class="btn btn-success" data-ng-click="addFile(x)"><i class="fa fa-plus" aria-hidden="true"></i> Add file</div>
+                            <div class="btn btn-danger" data-ng-click="removeFile(x)" data-ng-disabled="x.other.files<=1"><i class="fa fa-minus" aria-hidden="true"></i> Remove last file</div><br />
                             <div>(files will be stored in /etc/scripts/)</div>
                             <div class="hidelasthr" data-ng-repeat="fl in x.other.files">
                                 <div><label>File name:</label>
@@ -250,34 +267,8 @@
                             <hr />
                         </td>
                     </tr>
-
                 </table>
 
-                <div class="btn btn-success" data-ng-click="addMachine()">Add machine</div>
-                <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</div><br />
-
-                <br />
-                <div id="executeDiv" class="ng-hide">
-                        <a class="btn btn-primary" id="copyLab"><strong>Copy lab on Host *</strong></a> <a class="btn btn-primary" id="lstart"><strong>Run LStart on Host **</strong></a> <a class="btn btn-primary" id="lclean"><strong>Run LClean on Host **</strong></a>
-                    <br />
-                    * On Windows it requires something to run .sh files (like Git bash), or you can unpack the .zip file (button below) to &lt;application data&gt;/KatharaUI/lab.
-                    <br />
-                    ** Requires Kathar&aacute; (or eventually Netkit) installed on Host and PATH configured correctly with NETKIT_HOME variable.
-                </div>
-                <a class="btn btn-primary" data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><strong>Download .sh file</strong></a>
-                <a class="btn btn-primary" data-ng-click="generateZip(netkit, labInfo)"><strong>Download .zip file</strong></a>
-                <br />
-                <a class="btn btn-primary" data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')"><strong>Export configuration</strong></a>
-                <br />
-                <a class="btn btn-primary" data-ng-click="import()"><strong>Import configuration</strong></a>
-                <span class="file">
-                    <input type="file" id="file" name="file" class="form-control hidden"
-                           onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
-                    <input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Browse..."><input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();" readonly />
-                </span>
-
-
-                <br />
                 <br />
                 <hr />
                 <br />
@@ -295,21 +286,64 @@
         </div>
     </div>
 
+    <!-- Side-menu -->
     <div id="col1" class="col-xs-2" align="right">
-        <!-- Nav tabs 
-        <ul class="nav nav-tabs tabs-right" style="border-left: 1px slid #ddd">
-            <li id="tab-home" class="tab-label active"><a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)">Home</a></li>
-            <li id="tab-graph" class="tab-label"><a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)">Graph</a></li>
-        </ul> -->
-        <div class="fixed right-margin">
+        <div class="fixed right-margin side-menu">
             <div align="right">
-                <a href="#home" data-toggle="tab" onclick="toggle_tab(event, this)" class="btn btn-primary"><i class="glyphicon glyphicon-home"></i> <strong>Home</strong></a>
+                <div class="btn btn-success" data-ng-click="addMachine()"><i class="fa fa-plus" aria-hidden="true"></i><strong>Add machine</strong></div>
             </div>
             <div align="right">
-                <a href="#graph" data-toggle="tab" onclick="toggle_tab(event, this)" data-ng-click="makeGraphIfChanged(netkit)" class="btn btn-primary"><i class="glyphicon glyphicon-picture"></i> <strong>Graph</strong></a>
+                <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1"><i class="fa fa-minus" aria-hidden="true"></i><strong>Remove last machine</strong></div>
             </div>
         </div>
     </div>
+
+    <!-- Sub-menu Run on Host -->
+    <nav id="submenu-0" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
+        <div class="container-fluid">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <ul class="nav navbar-nav">
+                <li><a id="copyLab"><i class="fas fa-copy"></i> <strong>Copy lab on Host *</strong></a></li>
+                <li><a id="lstart"><i class="fas fa-play-circle"></i> <strong>Run LStart on Host **</strong></a></li>
+                <li><a id="lclean"><i class="fas fa-stop-circle"></i> <strong>Run LClean on Host **</strong></a></li>
+            </ul>
+            <small>
+                <div align="right" class="margin-top">
+                    * Requires something to run .sh files (like Git bash), even on Windows.
+                    <br />
+                    ** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
+                </div>
+            </small>
+        </div><!-- /.container-fluid -->
+    </nav>
+    <!-- Sub-menu Download Lab -->
+    <nav id="submenu-1" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
+        <div class="container-fluid">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <ul class="nav navbar-nav">
+                <li><a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"><i class="fas fa-file-code"></i> <strong>Download .sh file</strong></a></li>
+                <li><a data-ng-click="generateZip(netkit, labInfo)"><i class="fas fa-file-archive"></i> <strong>Download .zip file</strong></a></li>
+            </ul>
+        </div><!-- /.container-fluid -->
+    </nav>
+    <!-- Sub-menu Save and Load -->
+    <nav id="submenu-2" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
+        <div class="container-fluid">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <ul class="nav navbar-nav">
+                <li class="margin-top">
+                    <span class="file">
+                        <input type="file" id="file" name="file" class="form-control hidden"
+                                onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));" />
+                        <input type="button" class="btn btn-default btn-short" onclick="document.getElementById('file').click();" value="Browse..."><input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();" readonly />
+                    </span>
+                </li>
+                <li><a data-ng-click="import()"><i class="fas fa-arrow-alt-circle-up"></i> <strong>Import configuration</strong></a></li>
+                <li><a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')"><i class="fas fa-arrow-alt-circle-down"></i> <strong>Export configuration</strong></a></li>
+            </ul>
+        </div><!-- /.container-fluid -->
+    </nav>
+
 </div>
 
 
@@ -381,6 +415,10 @@
 
             var logos = document.getElementById("logos");
             logos.classList.add("bg-logos-electron");
+        }
+        else {
+            var titleLink = document.getElementById("title-link");
+            titleLink.classList.remove("ng-hide");
         }
     }
 </script>
