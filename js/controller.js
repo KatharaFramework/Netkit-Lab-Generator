@@ -199,6 +199,8 @@ app.controller('nc', function($scope) {
                         $scope.counter = $scope.netkit.length;
                         $scope.labInfo = app[0].labInfo;
                         $scope.$apply();
+
+                        changed = true;
                     }
                     catch (err) {
                         alert("Error: " + err);
