@@ -64,7 +64,7 @@ ipcMain.on('script:execute', function(e){
     });
   }
   else {
-    exec('bash -c "$NETKIT_HOME%/lstart -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
+    exec('bash -c "$NETKIT_HOME/lstart -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
@@ -80,7 +80,7 @@ ipcMain.on('script:clean', function(e){
     });
   }
   else {
-    exec('bash -c "$NETKIT_HOME%/lclean -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
+    exec('bash -c "$NETKIT_HOME/lclean -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
