@@ -9,7 +9,31 @@ body {
     visibility: hidden;
     opacity: 0;
 }
-
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgb(102, 102, 102);
+    border-radius: 0;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    background: #337ab7;
+    border-radius: 0;
+    border: 2px solid #2e6da4;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 1);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: #5b8fbd;
+    border-color: #337ab7;
+}
+/* end scrollbar*/
 .form-control {
     border-radius: 0;
     padding: 2px 6px;
@@ -189,6 +213,13 @@ textarea {
     border-top: 3px solid #337ab7;
     margin-top: 3px;
 }
+.mock-machine span {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    padding: 1px 3px;
+    margin-right: 4px;
+}
 .mock-main-menu {
     display: block;
     position: absolute;
@@ -358,28 +389,3 @@ input[type=file] {
     width: 206px;
 }
 
-/* scrollbar */
-::-webkit-scrollbar {
-    width: 12px;
-}
- 
-/* Track */
-::-webkit-scrollbar-track {
-    background: rgb(102, 102, 102);
-    border-radius: 0;
-    border: 2px solid rgba(0, 0, 0, 0.15);
-}
-/* Handle */
-::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 0;
-    border-radius: 0;
-    background: #337ab7;
-    border-radius: 0;
-    border: 2px solid #2e6da4;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 1);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-    background: #5b8fbd;
-    border-color: #337ab7;
-}
-/* end scrollbar*/

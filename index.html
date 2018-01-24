@@ -303,7 +303,7 @@
             <span id="mock-main-menu" class="mock mock-main-menu"></span>
             <span class="mock mock-disclaimer" id="mock-disclaimer"></span>
             <div class="btn btn-default mock mock-labinfo" data-ng-click="scrollTo($event, 'labInfo')"></div>
-            <div data-ng-repeat="x in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine-first', false:''}[$index==0]" data-ng-click="scrollTo($event, x._uid)">{{x.name}}</div>
+            <div data-ng-repeat="x in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine-first', false:''}[$index==0]" data-ng-click="scrollTo($event, x._uid)"><span>{{$index+1}}</span>{{x.name}}</div>
             <div class="mock mock-preview-text">Bash file preview:</div>
             <span class="mock mock-preview"></span>
         </div>
