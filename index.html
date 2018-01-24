@@ -14,7 +14,8 @@
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
     <script src="js/page.js"></script>
 </head>
-<body id="logos" class="bg-logos">
+<body id="logos" class="bg-logos bodypadded">
+
 <script>
     var isIE = navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0;
     if (isIE)
@@ -40,7 +41,7 @@
         <br />
         <br />
         The <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
-        of this application do not take any responsibility for any malfunction. Remember to check the final configuration for exams and production.
+        of this application do not take any responsibility for any malfunction. Remember to manually check the final configuration for exams and production.
     </div>
 </div>
 
@@ -106,7 +107,7 @@
                         <th colspan="4">Additional functions</th>
                     </tr>
 
-                    <tr data-ng-repeat="x in netkit track by $index">
+                    <tr data-ng-repeat="x in netkit track by $index" id="{{x._uid}}">
                         <td>
                             <div><label>Machine {{x.row}}:</label>
                                 <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required /></div>
@@ -286,7 +287,7 @@
     </div>
 
     <!-- Side-menu -->
-    <div id="col1" class="col-xs-2" align="right">
+    <div id="col1" class="col-xs-1" align="right">
         <div class="fixed right-margin side-menu">
             <div align="right">
                 <div class="btn btn-success" data-ng-click="addMachine()"><i class="fa fa-plus" aria-hidden="true"></i><strong>Add machine</strong></div>
@@ -294,6 +295,17 @@
             <div align="right">
                 <div class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1"><i class="fa fa-minus" aria-hidden="true"></i><strong>Remove last machine</strong></div>
             </div>
+        </div>
+    </div>
+
+    <div id="minimap" class="col-xs-1">
+        <div id="minimap-body" ng-style="{ 'transform': 'scale(1, ' + minimap_transform + ')' }">
+            <span id="mock-main-menu" class="mock mock-main-menu"></span>
+            <span class="mock mock-disclaimer" id="mock-disclaimer"></span>
+            <div class="btn btn-default mock mock-labinfo" data-ng-click="scrollTo($event, 'labInfo')"></div>
+            <div data-ng-repeat="x in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine-first', false:''}[$index==0]" data-ng-click="scrollTo($event, x._uid)">{{x.name}}</div>
+            <div class="mock mock-preview-text">Bash file preview:</div>
+            <span class="mock mock-preview"></span>
         </div>
     </div>
 
@@ -390,8 +402,6 @@
 <script src="js/model.js"></script>
 <script src="js/controller.js"></script>
 
-
-
 <script>
     window.onload= function() {
         console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
@@ -442,6 +452,7 @@
             titleLink.classList.remove("ng-hide");
         }
     }
+
 </script>
 
 </body>

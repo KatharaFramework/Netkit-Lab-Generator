@@ -7,23 +7,45 @@ app.config(['$compileProvider',
     }
 ]);
 
-app.controller('nc', function($scope) {
+app.controller('nc', function($location, $anchorScroll, $scope) {
 
     $scope.app = "include/app.html";
 
+    $scope.scrollTo = function(e, hash) {
+        e.preventDefault();
+        $location.hash(hash);
+        $anchorScroll();
+    };
+
     $scope.labInfo = JSON.clone(labInfo);
-    $scope.netkit = [JSON.clone(backbone)];
-    $scope.counter = 1;
+    $scope.netkit = [];
+    $scope.counter = 0;
     $scope.labInfo.toggle = "enable";
+
+    $scope.minimap_transform = 1;
+
+    $scope.updateMimimapRatio = function(x) {
+        var ratio = window.innerHeight / (x + document.getElementById('minimap-body').offsetHeight);
+        if(ratio < 1) {
+            $scope.minimap_transform = ratio;
+        }
+        else {
+            $scope.minimap_transform = 1;
+        }
+    }
 
     $scope.addMachine = function() {
         $scope.counter++;
         var p = JSON.clone(backbone);
         p.row=$scope.counter;
+        p._uid=Math.floor((Math.random() * 1000000000000000) + 1);
         $scope.netkit.push(p);
 
         changed = true;
+        $scope.updateMimimapRatio(31);
     };
+
+    $scope.addMachine();
 
     $scope.removeMachine = function() {
         if($scope.netkit.length>1 && confirm("Are you sure you want to remove the machine?")) {
@@ -31,6 +53,7 @@ app.controller('nc', function($scope) {
             $scope.counter--;
 
             changed = true;
+            $scope.updateMimimapRatio(-31);
         }
     };
 

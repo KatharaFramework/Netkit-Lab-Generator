@@ -1,11 +1,15 @@
 body {
     padding: 50px 0 0 0;
 }
+.bodypadded {
+    padding: 50px 120px 0 0;
+}
 .ng-hide {
     display: none;
     visibility: hidden;
     opacity: 0;
 }
+
 .form-control {
     border-radius: 0;
     padding: 2px 6px;
@@ -162,8 +166,94 @@ textarea {
     position: fixed;
 }
 .right-margin {
-    right: 24px;
+    right: 140px;
 }
+.mock {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    color: rgba(0, 0, 0, 0.65);
+    margin: 3px;
+    font-size: 80%;
+}
+.mock-machine {
+    width: 100px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.01);
+    color: rgba(0, 0, 0, 0.45);
+    margin-bottom: 1px;
+    margin-top: 0px;
+}
+.mock-machine-first {
+    border-top: 3px solid #337ab7;
+    margin-top: 3px;
+}
+.mock-main-menu {
+    display: block;
+    position: absolute;
+    top: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 5px;
+    background-color: #337ab7;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.01);
+    margin: 0;
+}
+.mock-submenu {
+    -webkit-box-shadow: 0 5px 0px 0px #5b8fbd;
+    -moz-box-shadow: 0 5px 0px 0px #5b8fbd;
+    -ms-box-shadow: 0 5px 0px 0px #5b8fbd;
+    box-shadow: 0 5px 0px 0px #5b8fbd;
+}
+.mock-disclaimer {
+    display: block;
+    width: 100%;
+    height: 25px;
+    background-color: #000;
+    margin: 0;
+    margin-bottom: -5px;
+}
+.mock-labinfo {
+    width: 20px;
+    height: 30px;
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.01);
+    border-top: 3px solid #337ab7;
+}
+.mock-preview-text {
+    font-size: 40%;
+}
+.mock-preview {
+    display: block;
+    width: 108px;
+    height: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+#minimap-body {
+    transform-origin: center top;
+}
+#minimap {
+    position: fixed;
+    z-index: 9998;
+    text-align: left;
+    background-color: rgba(255, 255, 255, 1);
+    right: 0;
+    top: 0;
+    width: 120px;
+    height: 100%;
+    padding: 0;
+    border-left: 2px solid rgba(0, 0, 0, 0.2);
+    border-right: 2px solid rgba(0, 0, 0, 0.2);
+    font-size: 80%;
+}
+#minimap *::selection {
+    background: rgba(0, 0, 0, 0) !important;
+}
+#minimap *::-moz-selection {
+    background: rgba(0, 0, 0, 0) !important;
+}
+
 /*Modal*/
 .modal-kathara {
     display: inherit!important;
@@ -181,7 +271,7 @@ textarea {
 /*Navbar*/
 .navbar-kathara {
     position: fixed;
-    z-index: 9999;
+    z-index: 9997;
     background-color: #337ab7;
     color: #fff; 
     width: 100%;
@@ -191,7 +281,7 @@ textarea {
     box-shadow: 0 2px 2px 2px rgba(0, 0, 0, 0.35);
 }
 .navbar-kathara-primary {
-    z-index: 9998;
+    z-index: 9996;
     top: 0;
 }
 .navbar-kathara li a, .navbar-kathara li a:visited, .navbar-kathara li a:focus {
@@ -202,7 +292,7 @@ textarea {
     background-color: #5b8fbd;
 }
 .navbar-kathara-secondary {
-    z-index: 9999;
+    z-index: 9995;
     top: 51px;
     background-color: #5b8fbd;
 }
@@ -267,3 +357,29 @@ input[type=file] {
     /*float:left;*/
     width: 206px;
 }
+
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgb(102, 102, 102);
+    border-radius: 0;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    background: #337ab7;
+    border-radius: 0;
+    border: 2px solid #2e6da4;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 1);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: #5b8fbd;
+    border-color: #337ab7;
+}
+/* end scrollbar*/

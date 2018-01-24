@@ -11,7 +11,9 @@
   },
   "author": "Gaetano Bonofiglio",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "dom-minimap": "^1.7.2"
+  },
   "devDependencies": {
     "electron": "^1.7.10"
   }

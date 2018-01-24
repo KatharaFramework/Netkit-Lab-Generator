@@ -19,7 +19,7 @@ var tmp_folder = app.getPath('userData');
 // Listen for app to be ready
 app.on('ready', function(){
   // Create new window
-  mainWindow = new BrowserWindow({width: 1366, height: 768});
+  mainWindow = new BrowserWindow({width: 1366, height: 768, minWidth: 800, minHeight: 580});
   // Load html in window
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
