@@ -52,11 +52,11 @@ function toggle_tab_and_submenu(event, elem, total_submenus) {
 
 function close_modal(e){
     e.preventDefault();
-    var modal = document.getElementById("lstartModal");
+    var modal = document.getElementById("command-modal");
     modal.classList.add("ng-hide");
 }
 
 function show_modal(){
-    var modal = document.getElementById("lstartModal");
+    var modal = document.getElementById("command-modal");
     modal.classList.remove("ng-hide");
 }

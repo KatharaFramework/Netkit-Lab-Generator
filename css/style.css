@@ -171,11 +171,9 @@ textarea {
     background: rgb(189, 189, 189); /* Fall-back for browsers that don't support rgba */
     background: rgba(189, 189, 189, 0.5);  
 }
-
 .modal-kathara .modal-content{
     border-radius: 0!important;
 }
-
 .modal-kathara .modal-footer{
     border: 0!important;
     padding-top: 0px; 
