@@ -315,6 +315,26 @@
             </small>
         </div><!-- /.container-fluid -->
     </nav>
+
+    <!-- Lstart Modal -->
+    <div id="lstartModal" class="modal modal-kathara ng-hide">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="close_modal(event)">&times;</button>
+                    <h4 class="modal-title">Running Lstart</h4>
+                </div>
+                <div class="modal-body">
+                    <p>The command has been issued, please wait for its execution.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" onclick="close_modal(event)">Ok, I understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sub-menu Download Lab -->
     <nav id="submenu-1" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
         <div class="container-fluid">
@@ -392,6 +412,7 @@
         }
         function executeStart(e){
             e.preventDefault();
+            show_modal();
             const {ipcRenderer} = electron;
             //console.log(script);
             ipcRenderer.send('script:execute');

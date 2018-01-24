@@ -49,3 +49,14 @@ function toggle_tab_and_submenu(event, elem, total_submenus) {
     toggle_submenu(event, -1, total_submenus);
     toggle_tab(event, elem);
 }
+
+function close_modal(e){
+    e.preventDefault();
+    var modal = document.getElementById("lstartModal");
+    modal.classList.add("ng-hide");
+}
+
+function show_modal(){
+    var modal = document.getElementById("lstartModal");
+    modal.classList.remove("ng-hide");
+}

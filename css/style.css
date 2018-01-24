@@ -164,6 +164,22 @@ textarea {
 .right-margin {
     right: 24px;
 }
+/*Modal*/
+.modal-kathara {
+    display: inherit!important;
+    z-index: 9999;
+    background: rgb(189, 189, 189); /* Fall-back for browsers that don't support rgba */
+    background: rgba(189, 189, 189, 0.5);  
+}
+
+.modal-kathara .modal-content{
+    border-radius: 0!important;
+}
+
+.modal-kathara .modal-footer{
+    border: 0!important;
+    padding-top: 0px; 
+}
 /*Navbar*/
 .navbar-kathara {
     position: fixed;
@@ -177,7 +193,7 @@ textarea {
     box-shadow: 0 2px 2px 2px rgba(0, 0, 0, 0.35);
 }
 .navbar-kathara-primary {
-    z-index: 9999;
+    z-index: 9998;
     top: 0;
 }
 .navbar-kathara li a, .navbar-kathara li a:visited, .navbar-kathara li a:focus {
@@ -188,7 +204,7 @@ textarea {
     background-color: #5b8fbd;
 }
 .navbar-kathara-secondary {
-    z-index: 9998;
+    z-index: 9999;
     top: 51px;
     background-color: #5b8fbd;
 }
