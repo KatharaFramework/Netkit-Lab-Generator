@@ -474,7 +474,7 @@ function makeScript(lab){
             text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
         }
     }
-    text += "rm $0\n";
+    text += "rm \"$0\"\n";
 
     return text;
 }
