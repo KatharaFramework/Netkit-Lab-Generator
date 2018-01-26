@@ -23,6 +23,7 @@ app.controller('nc', function($location, $anchorScroll, $scope) {
     $scope.labInfo.toggle = "enable";
 
     $scope.minimap_transform = 1;
+    $scope.compensationScale = [];
 
     $scope.updateMimimapRatio = function(x) {
         var ratio = window.innerHeight / (x + document.getElementById('minimap-body').offsetHeight);
@@ -32,7 +33,11 @@ app.controller('nc', function($location, $anchorScroll, $scope) {
         else {
             $scope.minimap_transform = 1;
         }
-    }
+    };
+
+    $scope.changeScale = function(index, enter) {
+        $scope.compensationScale[index] = enter? { transform: "scale(1, "+ 1/$scope.minimap_transform +")"}:{ transform: "scale(1, 1)"};
+    };
 
     $scope.addMachine = function() {
         $scope.counter++;
