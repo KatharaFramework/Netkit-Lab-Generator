@@ -1,5 +1,5 @@
 # Netkit Lab Generator
-A **client-side JavaScript** tool to configure a Kathará or a Netkit lab and generate all the files you need and the topology graph. 
+A tool to configure a Kathará or a Netkit lab and generate all the files you need and the topology graph. 
 
 It works as stand-alone HTML file or using Electron for some advanced capabilities (like the ability to directly run a lab from inside the UI).
 
@@ -10,7 +10,7 @@ It is also possible to export and import the form configuration for future chang
 
 Now supports network topology preview (requires a modern browser or the Electrum release).
 
-* [Demo](http://bytearound.com/jobs/nlg/) **(may not always be up to date)**
+* [Demo](http://www.kathara.org/tools/nlg/) **(may not always be up to date)**
 * [Example configuration](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/examples/example_lab.config) (can be imported to generate the files or the graph)
 * [Screenshot (form)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801261.png)
 * [Screenshot (graph)](https://raw.githubusercontent.com/Kidel/Netkit-Lab-Generator/master/images/screencapture-201801143.png)
