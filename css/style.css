@@ -9,6 +9,10 @@ body {
     visibility: hidden;
     opacity: 0;
 }
+.anchor-id {
+    position: absolute;
+    margin-top: -130px;
+}
 /* scrollbar */
 ::-webkit-scrollbar {
     width: 12px;

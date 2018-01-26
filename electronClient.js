@@ -51,13 +51,13 @@ ipcMain.on('script:copy', function(e, script){
     console.log("The script file was saved to " + path.join(tmp_folder, "script.sh"));
     console.log("Running " + path.join(tmp_folder, "script.sh"));
     if(isWin) {
-      exec('' + path.join(tmp_folder, "script.sh"), function (err, stdout, stderr){
+      exec('"' + path.join(tmp_folder, 'script.sh"'), function (err, stdout, stderr){
         //console.log(err, stdout, stderr);
         return;
       });
     }
     else {
-      exec('bash \"' + path.join(tmp_folder, "script.sh\""), function (err, stdout, stderr) {
+      exec('bash "' + path.join(tmp_folder, 'script.sh"'), function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
       });
@@ -68,7 +68,8 @@ ipcMain.on('script:copy', function(e, script){
 ipcMain.on('script:execute', function(e){
   console.log("Running LStart on " + path.join(tmp_folder, "lab"));
   if(isWin) {
-    exec('start cmd /c "%NETKIT_HOME%\\lstart -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
+    console.log('start cmd /c \'%NETKIT_HOME%\\lstart -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\'');
+    exec('start cmd /c \"%NETKIT_HOME%\\lstart -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });
@@ -84,7 +85,7 @@ ipcMain.on('script:execute', function(e){
 ipcMain.on('script:clean', function(e){ 
   console.log("Running LClean on " + path.join(tmp_folder, "lab"));
   if(isWin) {
-    exec('start cmd /c "%NETKIT_HOME%\\lclean -d ' + path.join(tmp_folder, "lab") + '"', function (err, stdout, stderr) {
+    exec('start cmd /c \"%NETKIT_HOME%\\lclean -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\"', function (err, stdout, stderr) {
         //console.log(err, stdout, stderr);
         return;
     });

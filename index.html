@@ -68,6 +68,7 @@
                 <table id="labInfo">
                     <tr>
                         <th>Lab informations</th>
+                        <div id="labInfo_anchor" class="anchor-id"></div>
                     </tr>
                     <tr>
                         <td>
@@ -107,8 +108,9 @@
                         <th colspan="4">Additional functions</th>
                     </tr>
 
-                    <tr data-ng-repeat="x in netkit track by $index" id="{{x._uid}}">
+                    <tr data-ng-repeat="x in netkit track by $index">
                         <td>
+                            <div id="{{x._uid}}" class="anchor-id"></div>
                             <div><label>Machine {{x.row}}:</label>
                                 <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required /></div>
                             <input title="type" type="radio" value="terminale" data-ng-model="x.type" /> Terminal<br />
@@ -302,7 +304,7 @@
         <div id="minimap-body" ng-style="{ 'transform': 'scale(1, ' + minimap_transform + ')' }">
             <span id="mock-main-menu" class="mock mock-main-menu"></span>
             <span class="mock mock-disclaimer" id="mock-disclaimer"></span>
-            <div class="btn btn-default mock mock-labinfo" data-ng-click="scrollTo($event, 'labInfo')"></div>
+            <div class="btn btn-default mock mock-labinfo" data-ng-click="scrollTo($event, 'labInfo_anchor')"></div>
             <div data-ng-repeat="x in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine-first', false:''}[$index==0]" data-ng-click="scrollTo($event, x._uid)"><span>{{$index+1}}</span>{{x.name}}</div>
             <div class="mock mock-preview-text">Bash file preview:</div>
             <span class="mock mock-preview"></span>
@@ -310,7 +312,7 @@
     </div>
 
     <!-- Sub-menu Run on Host -->
-    <nav id="submenu-0" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
+    <nav id="submenu-0" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide" style="height: 105px">
         <div class="container-fluid">
             <!-- Collect the nav links, forms, and other content for toggling -->
             <ul class="nav navbar-nav">
@@ -318,13 +320,15 @@
                 <li><a id="lstart"><i class="fas fa-play-circle"></i> <strong>Run LStart on Host **</strong></a></li>
                 <li><a id="lclean"><i class="fas fa-stop-circle"></i> <strong>Run LClean on Host **</strong></a></li>
             </ul>
-            <small>
-                <div align="right" class="margin-top">
-                    * Requires something to run .sh files (like Git bash), even on Windows.
-                    <br />
+            <div style="clear:both">
+                <span class="label label-warning">
+                    * Requires something to run .sh files, even on Windows (like Git bash, associated with .sh files).
+                </span>
+                <br />
+                <span class="label label-warning">
                     ** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
-                </div>
-            </small>
+                </span>
+            </div>
         </div><!-- /.container-fluid -->
     </nav>
 
