@@ -13,6 +13,12 @@ body {
     position: absolute;
     margin-top: -130px;
 }
+.disabledLink {
+    color: currentColor;
+    cursor: not-allowed !important;
+    opacity: 0.5;
+    text-decoration: none;
+}
 /* scrollbar */
 ::-webkit-scrollbar {
     width: 12px;

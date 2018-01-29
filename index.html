@@ -317,8 +317,8 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <ul class="nav navbar-nav">
                 <li><a id="copyLab"><i class="fas fa-copy"></i> <strong>Copy lab on Host *</strong></a></li>
-                <li><a id="lstart"><i class="fas fa-play-circle"></i> <strong>Run LStart on Host **</strong></a></li>
-                <li><a id="lclean"><i class="fas fa-stop-circle"></i> <strong>Run LClean on Host **</strong></a></li>
+                <li><a id="lstart" class="disabledLink"><i class="fas fa-play-circle"></i> <strong>Run LStart on Host **</strong></a></li>
+                <li><a id="lclean" class="disabledLink"><i class="fas fa-stop-circle"></i> <strong>Run LClean on Host **</strong></a></li>
             </ul>
             <div style="clear:both">
                 <span class="label label-warning">
@@ -416,6 +416,7 @@
 
         var electron;
         var isWin;
+        var isCopied = false;
         
         function copyLab(e){
             e.preventDefault();
@@ -423,19 +424,28 @@
             const {ipcRenderer} = electron;
             //console.log(script);
             ipcRenderer.send('script:copy', script);
+            isCopied = true;
+            var lStartButton = document.getElementById('lstart');
+            lStartButton.classList.remove("disabledLink");
+            var lCleanButton = document.getElementById('lclean');
+            lCleanButton.classList.remove("disabledLink");
         }
         function executeStart(e){
             e.preventDefault();
-            show_modal();
-            const {ipcRenderer} = electron;
-            //console.log(script);
-            ipcRenderer.send('script:execute');
+            if(isCopied) {
+                show_modal();
+                const {ipcRenderer} = electron;
+                //console.log(script);
+                ipcRenderer.send('script:execute');
+            }
         }
         function executeClean(e){
             e.preventDefault();
-            show_modal();
-            const {ipcRenderer} = electron;
-            ipcRenderer.send('script:clean');
+            if(isCopied) {
+                show_modal();
+                const {ipcRenderer} = electron;
+                ipcRenderer.send('script:clean');
+            }
         }
 
         if(isElectron()) {
