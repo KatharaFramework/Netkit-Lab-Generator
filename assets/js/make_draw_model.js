@@ -13,6 +13,7 @@ function ip_to_bin(ip) {
     }
     return binary;
 }
+
 function network_from_binary_ip_mask(binary, netmask) {
     var network = "";
     for (var j = 0; j<32; j++) {
@@ -122,7 +123,6 @@ function contains_edge(obj, list) {
     }
     return false;
 }
-
 
 function generate_nodes_edges(lab){
     var edges = [];

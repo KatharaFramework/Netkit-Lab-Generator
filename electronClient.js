@@ -1,105 +1,77 @@
-const electron = require('electron');
-const path = require('path');
-const url = require('url');
-const exec = require('child_process').exec;
-const fs = require('fs');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+const path = require('path')
+const url = require('url')
+const exec = require('child_process').exec
+const fs = require('fs')
 
-var isWin = /^win/.test(process.platform);
+var isWin = /^win/.test(process.platform)
 
 // SET ENV
-process.env.NODE_ENV = 'production';
+process.env.NODE_ENV = 'production'
 
-const {app, BrowserWindow, Menu, ipcMain} = electron;
+let mainWindow
 
-let mainWindow;
+let tmp_folder = app.getPath('userData')
 
-var tmp_folder = app.getPath('userData');
-//console.log(tmp_folder);
+app.on('ready', function () {
 
-// Listen for app to be ready
-app.on('ready', function(){
-  // Create new window
-  mainWindow = new BrowserWindow({width: 1366, height: 768, minWidth: 800, minHeight: 580});
-  // Load html in window
+  mainWindow = new BrowserWindow({ width: 1060, height: 750, minWidth: 800, minHeight: 720 })
+
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
-    slashes:true
-  }));
-  mainWindow.isWin = isWin;
-  // Quit app when closed
-  mainWindow.on('closed', function(){
-    app.quit();
-  });
+    slashes: true
+  }))
 
-  if(process.env.NODE_ENV !== 'production'){
-    // Build menu from template
-    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
-    // Insert menu
-    Menu.setApplicationMenu(mainMenu);
+  mainWindow.isWin = isWin
+
+  mainWindow.on('closed', function () {
+    app.quit()
+  })
+
+  if (process.env.NODE_ENV !== 'production') {
+    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate)
+    Menu.setApplicationMenu(mainMenu)
   }
-});
+})
 
+ipcMain.on('script:copy', function (_, script) {
+  let pathTemp = path.join(tmp_folder, "script.sh")
+  console.log("Saving to " + pathTemp)
 
-ipcMain.on('script:copy', function(e, script){
-  //console.log(script);
-  console.log("Saving to " + path.join(tmp_folder, "script.sh"));
-  fs.writeFile(path.join(tmp_folder, "script.sh"), script, function(err) {
-    if(err) {
-        return console.log(err);
-    }
-    console.log("The script file was saved to " + path.join(tmp_folder, "script.sh"));
-    console.log("Running " + path.join(tmp_folder, "script.sh"));
-    if(isWin) {
-      exec('"' + path.join(tmp_folder, 'script.sh"'), function (err, stdout, stderr){
-        //console.log(err, stdout, stderr);
-        return;
-      });
-    }
+  fs.writeFile(pathTemp, script, function (err) {
+    if (err) console.log(err)
     else {
-      exec('bash "' + path.join(tmp_folder, 'script.sh"'), function (err, stdout, stderr) {
-        //console.log(err, stdout, stderr);
-        return;
-      });
-    }
-  }); 
+      console.log("Running " + pathTemp)
   
-});
-ipcMain.on('script:execute', function(e){
-  console.log("Running LStart on " + path.join(tmp_folder, "lab"));
-  if(isWin) {
-    console.log('start cmd /c \'%NETKIT_HOME%\\lstart -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\'');
-    exec('start cmd /c \"%NETKIT_HOME%\\lstart -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\"', function (err, stdout, stderr) {
-        //console.log(err, stdout, stderr);
-        return;
-    });
-  }
-  else {
-    exec('bash -c \'$NETKIT_HOME/lstart -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\'', function (err, stdout, stderr) {
-        //console.log(err, stdout, stderr);
-        return;
-    });
-  }
-});
+      if (isWin) exec('"' + pathTemp + '"')
+      else exec('bash "' + pathTemp + '"')
+    }
+  })
+})
 
-ipcMain.on('script:clean', function(e){ 
-  console.log("Running LClean on " + path.join(tmp_folder, "lab"));
-  if(isWin) {
-    exec('start cmd /c \"%NETKIT_HOME%\\lclean -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\"', function (err, stdout, stderr) {
-        //console.log(err, stdout, stderr);
-        return;
-    });
-  }
-  else {
-    exec('bash -c \'$NETKIT_HOME/lclean -d "\\\"' + path.join(tmp_folder, "lab") + '\\\""\'', function (err, stdout, stderr) {
-        //console.log(err, stdout, stderr);
-        return;
-    });
-  }
-});
+ipcMain.on('script:execute', function () {
+  let pathTemp = path.join(tmp_folder, "lab")
+  console.log("Running LStart on " + pathTemp)
+
+  if (isWin) 
+    exec('start cmd /c \"%NETKIT_HOME%\\lstart -d "\\\"' + pathTemp + '\\\""\"')
+  else 
+    exec('bash -c \'$NETKIT_HOME/lstart -d "\\\"' + pathTemp + '\\\""\'')
+})
+
+ipcMain.on('script:clean', function () {
+  let pathTemp = path.join(tmp_folder, "lab")
+  console.log("Running LClean on " + pathTemp)
+
+  if (isWin)
+    exec('start cmd /c \"%NETKIT_HOME%\\lclean -d "\\\"' + pathTemp + '\\\""\"')
+  else
+    exec('bash -c \'$NETKIT_HOME/lclean -d "\\\"' + pathTemp + '\\\""\'')
+})
 
 // Create menu template
-const mainMenuTemplate =  [
+const mainMenuTemplate = [
   // Each object is a dropdown
   /*{
     label: 'File',
@@ -108,33 +80,33 @@ const mainMenuTemplate =  [
         label: 'Quit',
         accelerator:process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
         click(){
-          app.quit();
+          app.quit()
         }
       }
     ]
   }*/
-];
+]
 
 // If OSX, add empty object to menu
-if(process.platform == 'darwin'){
-  mainMenuTemplate.unshift({});
+if (process.platform == 'darwin') {
+  mainMenuTemplate.unshift({})
 }
 
 // Add developer tools option if in dev
-if(process.env.NODE_ENV !== 'production'){
+if (process.env.NODE_ENV !== 'production') {
   mainMenuTemplate.push({
     label: 'Developer Tools',
-    submenu:[
+    submenu: [
       {
         role: 'reload'
       },
       {
         label: 'Toggle DevTools',
-        accelerator:process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
-        click(item, focusedWindow){
-          focusedWindow.toggleDevTools();
+        accelerator: process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
+        click(item, focusedWindow) {
+          focusedWindow.toggleDevTools()
         }
       }
     ]
-  });
+  })
 }
