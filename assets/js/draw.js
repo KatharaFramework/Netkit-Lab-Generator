@@ -1,4 +1,4 @@
-var LENGTH_MAIN = 350,
+const LENGTH_MAIN = 350,
     LENGTH_SERVER = 150,
     LENGTH_SUB = 50,
     LENGTH_CLOSE = 0.0001,
@@ -11,18 +11,19 @@ var LENGTH_MAIN = 350,
     LLGRAY = "#efefef",
     WHITE = "#fafafa",
     BLUE = "#2B7CE9",
-    BLACK = '#2B1B17';
-var DIR = "images/";
+    BLACK = '#2B1B17'
+
+const DIR = "assets/images/"
 
 // Called when the Visualization API is loaded.
 function draw(nodes, edges) {
     // create a network
-    var container = document.getElementById('mynetwork');
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {
+    let container = document.getElementById('mynetwork')
+    let data = {
+        nodes,
+        edges
+    }
+    let options = {
         nodes: {
             scaling: {
                 min: 16,
@@ -98,6 +99,6 @@ function draw(nodes, edges) {
                 shape: 'box'
             }
         }
-    };
-    network = new vis.Network(container, data, options);
+    }
+    network = new vis.Network(container, data, options)
 }

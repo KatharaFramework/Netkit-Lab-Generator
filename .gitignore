@@ -3,4 +3,3 @@
 release-builds/
 tmp/lab/
 node_modules/
-package-lock.json
