@@ -1,0 +1,83 @@
+#sdn {
+    margin: 1em;
+}
+
+#sdnDisclaimer {
+    text-align: center;
+    padding: 1em;
+    background-color: var(--disclaimer-color);
+    border-radius: 1em;
+}
+
+svg {
+    border: 1px solid lightgray;
+    padding: 10px;
+    box-sizing: content-box;
+}
+
+/* ----- NODES ----- */
+
+g.terminal circle {
+    fill: brown;
+    r: 20;
+}
+
+g.terminal circle:hover {
+    r: 25;
+}
+
+g.network circle {
+    fill: black;
+    r: 5;
+}
+
+g.terminal circle.switch,
+g.terminal circle.router {
+    fill: blue;
+}
+
+g.terminal circle.controller {
+    fill: orange;
+}
+
+g.terminal circle.ns,
+g.terminal circle.ws {
+    fill: red;
+}
+
+g.terminal circle.other {
+    stroke: black;
+    stroke-width: 2px;
+    fill: white;    
+}
+
+g.terminal circle.selected {
+    stroke: cyan;
+    stroke-width: 5px;
+}
+
+/* ----- LINKS ----- */
+
+g.link line {
+    stroke: darkgray;
+    stroke-width: 2px;
+}
+
+g.link line:hover {
+    stroke-width: 6px;
+}
+
+g.link line.controller {
+    stroke-dasharray: 10px 10px;
+}
+
+g.link line.selected {
+    stroke: cyan;
+}
+
+/* -------- SVG2 - Details -------- */
+
+line.axis {
+    stroke: darkgray;
+    stroke-width: 1px;
+}
