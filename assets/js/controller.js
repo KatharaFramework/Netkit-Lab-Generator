@@ -179,28 +179,28 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
         saveAs(blob, filename)
     }
 
-    $scope.generateScript = function (nk, li) {
-        return makeScript(makeFileStructure(nk, li))
+    $scope.generateScript = function (netkitData, labInfoData) {
+        return makeScript(makeFileStructure(netkitData, labInfoData))
     }
 
-    $scope.generateConfig = function (nk, li) {
-        var all = [{ "labInfo": li, "netkit": nk }]
+    $scope.generateConfig = function (netkitData, labInfoData) {
+        var all = [{ "labInfo": labInfoData, "netkit": netkitData }]
         return JSON.stringify(all, undefined, 4)
     }
 
-    $scope.generateZip = function (nk, li) {
-        return makeZip(makeFileStructure(nk, li))
+    $scope.generateZip = function (netkitData, labInfoData) {
+        return makeZip(makeFileStructure(netkitData, labInfoData))
     }
 
-    $scope.makeGraph = function (nk) {
-        return makeGraph(nk)
+    $scope.makeGraph = function (netkitData) {
+        return makeGraph(netkitData)
     }
 
-    $scope.makeGraphIfChanged = function (nk) {
+    $scope.makeGraphIfChanged = function (netkitData) {
         if (changed) {
             console.log("Reloading graph")
             changed = false
-            return makeGraph(nk)
+            return makeGraph(netkitData)
         }
     }
 
@@ -209,6 +209,10 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
             $scope.labInfo.toggle = "enable"
         }
         else $scope.labInfo.toggle = "disable"
+    }
+
+    $scope.loadSDN = function(netkitData, labInfoData){
+        getData($scope.generateConfig(netkitData, labInfoData))
     }
 
     $scope.import = function () {

@@ -1,3 +1,8 @@
+:root {
+    --main-color: #337ab7;
+    --disclaimer-color: rgba(255, 0, 0, .2)
+}
+
 .anchor-id {
     position: absolute;
     margin-top: -140px;
@@ -18,10 +23,6 @@
     height: 26px;
 }
 
-.gateways > div:last-child > hr{
-    display: none;
-}
-
 textarea {
     width: 100%;
     font-size: 14px;
@@ -30,7 +31,6 @@ textarea {
     background-color: white;
     background-image: none;
     border: 1px solid #ccc;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
     -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
@@ -64,29 +64,19 @@ textarea {
     }
 }
 
-#description {
-    text-align: justify;
-}
-
 .clear {
     clear: both;
 }
 
+/* Graph */
+
+#graph {
+    margin: 1em;
+}
+
 #mynetwork {
-    width: 100%;
     height: 80vh;
     border: 1px solid lightgray;
-    margin-bottom: 15px;
-}
-
-.tabs-left>li>a {
-    border-radius: 0;
-}
-
-.tabs-left {
-    position: fixed;
-    left: 8.33333333%;
-    margin-left: -63px;
 }
 
 /*Modal*/
@@ -112,7 +102,7 @@ textarea {
     position: fixed;
     border-radius: 0;
     width: 100%;
-    background-color: #337ab7;
+    background-color: var(--main-color);
     color: white;
 }
 
@@ -125,7 +115,7 @@ textarea {
 .navbar-kathara li a:visited,
 .navbar-kathara li a:focus {
     color: white;
-    background-color: #337ab7;
+    background-color: var(--main-color);
 }
 
 .navbar-kathara li a:active,
@@ -151,10 +141,6 @@ textarea {
     background-color: #7c9fbe;
 }
 
-.nav li a {
-    cursor: pointer;
-}
-
 /* ------------------------------------------------------ */
 /* ------------------------ NAVBAR ------------------------ */
 /* ------------------------------------------------------ */
@@ -167,231 +153,8 @@ textarea {
     margin-top: 10px;
 }
 
-/* ------------------------------------------------------- */
-/* --------------------- FLOAT RIGHT --------------------- */
-/* ------------------------------------------------------- */
-
-#right-controls {
-    position: fixed;
-    right: 5px;
-    top: 60px;
-}
-
-@media (max-width: 1055px) {
-    #right-controls {
-        position: relative;
-        right: 0;
-        top: 0;
-    }
-
-    .xs-floating-right {
-        z-index: 20;
-        opacity: 1;
-        position: fixed;
-        top: 5em;
-        right: 5px;
-        background-color: white;
-    }
-}
-
-#labInfo {
-    width: 206px;
-    margin: 1em 0;
-    background-color: white;
-}
-
-@media (max-width: 1055px) {
-    #labInfo tr:nth-child(4) {
-        display: none;
-    }
-}
-
-/* --------- MINIMAP --------- */
-
-#minimap {
-    text-align: left;
-    background-color: white;
-    max-width: 120px;
-    padding: 0;
-    font-size: 80%;
-
-    max-height: 15em;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    user-select: none;
-}
-
-@media (min-height: 820px) {
-    #minimap {
-        max-height: 28em;
-    }
-}
-
-#minimap-body {
-    border: 1px solid black;
-}
-
-.mock {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-    margin: 3px;
-    font-size: 80%;
-}
-
-.mock-main-menu {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 5px;
-    background-color: #337ab7;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.01);
-    margin: 0;
-}
-
-.mock-submenu {
-    box-shadow: 0 5px 0px 0px #5b8fbd;
-}
-
-.mock-preview-text {
-    margin-top: 7px;
-    font-size: 40%;
-}
-
-.mock-disclaimer {
-    width: 40%;
-    height: 2px;
-    background-color: rgba(255, 0, 0, .2);
-    margin: 3px;
-}
-
-.mock-machine:first-child {
-    border-top: 3px solid #337ab7;
-    margin-top: 3px;
-}
-
-.mock-machine {
-    width: 100px;
-    height: 30px;
-    background-color: rgba(0, 0, 0, 0.01);
-    color: rgba(0, 0, 0, 0.45);
-    margin-bottom: 1px;
-    margin-top: 0px;
-    transform: scale(1, 1);
-    transition: transform 0.2s ease-in-out;
-}
-
-.mock-machine span {
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.65);
-    color: white;
-    padding: 1px 3px;
-    margin-right: 4px;
-}
-
-.mock-preview-bash {
-    width: 108px;
-    height: 40px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-/* ------------------------------------------------------ */
-/* ------------------------ MAIN ------------------------ */
-/* ------------------------------------------------------ */
-
 body {
     padding-top: 50px;
-}
-
-#contents {
-    margin: 0 2em;
-    max-width: 1000px;
-}
-
-@media (max-width: 1255px) {
-    #contents {
-        max-width: 800px;
-    }
-}
-
-@media (max-width: 1055px) {
-    #contents {
-        width: inherit;
-        max-width: 1055px;
-    }
-}
-
-#disclaimer {
-    display: inline-block;
-    padding: 1em;
-    margin: 0;
-    background-color: rgba(255, 0, 0, .2);
-    border-radius: 1em;
-}
-
-#disclaimer a {
-    color: black;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-/* ------ TABLES ------ */
-
-#netkit tr {
-    text-align: left;
-    vertical-align: 0;
-}
-
-table {
-    border-collapse: collapse;
-}
-
-td {
-    border: 1px solid #aaa;
-    padding: 10px;
-}
-
-th {
-    color: white;
-    background-color: #337ab7;
-    border: 1px solid #2e6da4;
-    padding: 10px;
-}
-
-label {
-    margin-bottom: .3em;
-}
-
-p.btn,
-span.btn {
-    width: 100%;
-    padding: 2% 4%;
-}
-
-/* ------ BASH ------ */
-
-.bash {
-    margin: 3em 0;
-}
-
-/* ------------------------------------------------------ */
-/* ------------------------ GRAPH ------------------------ */
-/* ------------------------------------------------------ */
-
-#graph {
-    margin: 3em 0;
-}
-
-/* ------------------------------------------------------ */
-/* ------------------------ SDN ------------------------ */
-/* ------------------------------------------------------ */
-
-#graph-area {
-    margin: 3em 0;
-    background-color: green;
 }
 
 /* ------------------------------------------------------ */
@@ -400,6 +163,10 @@ span.btn {
 
 .hidden {
     display: none;
+}
+
+a {
+    cursor: pointer;
 }
 
 /* ---------- INPUTS ---------- */
@@ -434,6 +201,7 @@ input {
 .btn {
     margin: 2px 0;
     border-radius: 0;
+    font-weight: bold;
 }
 
 .btn-danger.disabled,

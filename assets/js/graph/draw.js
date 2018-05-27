@@ -46,7 +46,7 @@ function draw(nodes, edges) {
                 font: {strokeWidth: 2, strokeColor: 'white', size: 15},
                 value: 6
             },
-            'terminale': {
+            'terminal': {
                 color: BLUE,
                 image: DIR + 'terminal.png',
                 shape: 'image',

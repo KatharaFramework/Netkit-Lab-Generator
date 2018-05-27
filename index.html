@@ -8,7 +8,8 @@
     <meta name="author" content="Lykon, Lollo, Neeja" />
     <title>Netkit Lab Generator</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/home.css" />
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg=="
     />
     <script src="assets/js/helper.js"></script>
@@ -24,7 +25,7 @@
     <!-- MAIN-->
     <div data-ng-app="napp" data-ng-controller="nc">
 
-        <!-- Navbar-->
+        <!-- NAVBAR-->
         <nav id="main-nav" class="navbar navbar-primary container-fluid navbar-kathara navbar-kathara-primary">
             <ul class="nav navbar-nav">
                 <li>
@@ -33,9 +34,9 @@
                 <li>
                     <a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Graph</a>
                 </li>
-                <!-- <li class="hidden">
-                    <a href="#sdn" onclick="toggle_tab(this)">SDN</a>
-                </li> -->
+                <li class="hidden">
+                    <a href="#sdn" onclick="toggle_tab(event, this); loadSDNPage()">SDN MPLS</a>
+                </li>
                 <li class="hidden">
                     <a onclick="toggle_submenu(0)">Run on Host</a>
                 </li>
@@ -107,12 +108,12 @@
             </ul>
         </nav>
 
-        <!-- Contents -->
-        <div id="contents" class="tab-content">
+        <!-- CONTENTS -->
+        <div class="tab-content">
 
             <!-- MAIN WINDOW -->
             <div id="home" class="tab-pane active">
-                <div style="margin-bottom: 2em">
+                <div>
                     <h1>Netkit Lab Generator</h1>
                     <h4>
                         <a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a>
@@ -128,11 +129,11 @@
                         Once the form is compiled just download the bash script or the .zip file with the whole lab. It is also possible to export
                         and import the form configuration for future changes. DNS may not work with too many levels.
                     </p>
-                    <p id="disclaimer">The
+                    <p id="homeDisclaimer">The
                         <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
                         of this application do not take any responsibility for any malfunction. Remember to manually check the final configuration
                         for exams and production.
-                        <a class="link" onclick="document.getElementById('disclaimer').classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
+                        <a class="link" onclick="document.getElementById('homeDisclaimer').classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
                     </p>
                     </p>
                 </div>
@@ -222,7 +223,7 @@
                                     <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required />
                                 </div>
                                 <p>
-                                    <input title="type" type="radio" value="terminale" data-ng-model="x.type" /> Terminal</p>
+                                    <input title="type" type="radio" value="terminal" data-ng-model="x.type" /> Terminal</p>
                                 <p>
                                     <input title="type" type="radio" value="router" data-ng-model="x.type" /> Router</p>
                                 <p>
@@ -307,7 +308,7 @@
                                 <strong>userdir</strong> module?
                             </td>
 
-                            <td data-ng-show="x.type=='terminale'">
+                            <td data-ng-show="x.type=='terminal'">
                                 <label>Reference DNS (resolv.conf nameserver):</label>
                                 <select title="en" data-ng-model="x.pc.dns">
                                     <option value="-" selected>-</option>
@@ -449,19 +450,24 @@
             </div>
 
             <!-- GRAPH WINDOW -->
-            <div class="tab-pane" id="graph">
-                <div class="btn btn-primary" data-ng-click="makeGraph(netkit)">
-                    <strong>Preview</strong>(force)</div>
+            <div id="graph" class="tab-pane">
+                <button class="btn btn-primary" data-ng-click="makeGraph(netkit)">Reload</button>
                 <div id="mynetwork"></div>
             </div>
 
             <!-- SDN WINDOW-->
-            <!-- <div class="tab-pane" id="sdn">
-                    <div id="graph-area">
-                        <svg width="100%" height="100%"></svg>
+            <div id="sdn" class="tab-pane">
+                <link rel="stylesheet" href="assets/css/sdn.css" />
+                <p id="sdnDisclaimer">Si consiglia di allargare la finestra per visualizzare correttamente i contenuti 
+                    <a class="link" onclick="document.getElementById('sdnDisclaimer').classList.add('hidden')">click to close</a>
+                </p>
+                <button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
+                <div>
+                    <svg id="mainSVG" width="800" height="800"></svg>
+                    <svg id="secondarySVG" width="400" height="600"></svg>
+                </div>
+                <script src="assets/js/sdn/index.js"></script>
                     </div>
-                    <button>La</button>
-                </div> -->
         </div>
     </div>
 
@@ -492,9 +498,9 @@
             document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
     </script>
 
-    <script src="assets/js/make_draw_model.js"></script>
+    <script src="assets/js/graph/make_draw_model.js"></script>
     <script src="assets/js/vendor/vis.js"></script>
-    <script src="assets/js/draw.js"></script>
+    <script src="assets/js/graph/draw.js"></script>
     <script src="assets/js/make.js"></script>
     <script src="assets/js/model.js"></script>
     <script src="assets/js/controller.js"></script>

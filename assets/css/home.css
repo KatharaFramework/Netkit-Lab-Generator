@@ -1,0 +1,207 @@
+/* ------------------------------------------------------- */
+/* --------------------- FLOAT RIGHT --------------------- */
+/* ------------------------------------------------------- */
+
+#right-controls {
+    position: fixed;
+    right: 5px;
+    top: 60px;
+}
+
+@media (max-width: 1055px) {
+    #right-controls {
+        position: relative;
+        right: 0;
+        top: 0;
+    }
+
+    .xs-floating-right {
+        z-index: 20;
+        opacity: 1;
+        position: fixed;
+        top: 5em;
+        right: 5px;
+        background-color: white;
+    }
+}
+
+#labInfo {
+    width: 206px;
+    margin: 1em 0;
+    background-color: white;
+}
+
+@media (max-width: 1055px) {
+    #labInfo tr:nth-child(4) {
+        display: none;
+    }
+}
+
+/* --------- MINIMAP --------- */
+
+#minimap {
+    text-align: left;
+    background-color: white;
+    max-width: 120px;
+    padding: 0;
+    font-size: 80%;
+
+    max-height: 15em;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    user-select: none;
+}
+
+@media (min-height: 820px) {
+    #minimap {
+        max-height: 28em;
+    }
+}
+
+#minimap-body {
+    border: 1px solid black;
+}
+
+.mock {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    margin: 3px;
+    font-size: 80%;
+}
+
+.mock-main-menu {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 5px;
+    background-color: var(--main-color);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.01);
+    margin: 0;
+}
+
+.mock-submenu {
+    box-shadow: 0 5px 0px 0px #5b8fbd;
+}
+
+.mock-preview-text {
+    margin-top: 7px;
+    font-size: 40%;
+}
+
+.mock-disclaimer {
+    width: 40%;
+    height: 2px;
+    background-color: var(--disclaimer-color);
+    margin: 3px;
+}
+
+.mock-machine:first-child {
+    border-top: 3px solid var(--main-color);
+    margin-top: 3px;
+}
+
+.mock-machine {
+    width: 100px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.01);
+    color: rgba(0, 0, 0, 0.45);
+    margin-bottom: 1px;
+    margin-top: 0px;
+    transform: scale(1, 1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.mock-machine span {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: white;
+    padding: 1px 3px;
+    margin-right: 4px;
+}
+
+.mock-preview-bash {
+    width: 108px;
+    height: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* ------------------------------------------------------ */
+/* ---------------------- CONTENTS ---------------------- */
+/* ------------------------------------------------------ */
+
+#home {
+    margin: 0 2em;
+    max-width: 1000px;
+}
+
+@media (max-width: 1255px) {
+    #home {
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 1055px) {
+    #home {
+        width: inherit;
+        max-width: 1055px;
+    }
+}
+
+#home > div:first-child {
+    margin-bottom: 2em;
+}
+
+#homeDisclaimer {
+    display: inline-block;
+    padding: 1em;
+    margin: 0;
+    background-color: var(--disclaimer-color);
+    border-radius: 1em;
+}
+
+/* ------ TABLES ------ */
+
+#netkit tr {
+    text-align: left;
+    vertical-align: 0;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    border: 2px solid lightgray;
+    padding: 10px;
+}
+
+th {
+    color: white;
+    background-color: var(--main-color);
+    border: 2px solid #2e6da4;
+    padding: 10px;
+}
+
+label {
+    margin-bottom: .3em;
+}
+
+p.btn,
+span.btn {
+    width: 100%;
+    padding: 2% 4%;
+}
+
+.gateways > div:last-child > hr {
+    display: none;
+}
+
+/* ------ BASH ------ */
+
+.bash {
+    margin: 3em 0;
+}

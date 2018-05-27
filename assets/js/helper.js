@@ -18,8 +18,8 @@ function toggle_tab(e, selectedTab) {
     }
 
     let href = selectedTab.getAttribute("href").replace("#", '')
-    let tab = document.getElementById(href)
-    tab.classList.add("active")
+    let currentTab = document.getElementById(href)
+    currentTab.classList.add("active")
     
     let rightControls = document.getElementById("right-controls")
     if (href == "home") {
