@@ -17,12 +17,13 @@ const DIR = "assets/images/"
 
 // Called when the Visualization API is loaded.
 function draw(nodes, edges) {
-    // create a network
     let container = document.getElementById('mynetwork')
+
     let data = {
         nodes,
         edges
     }
+    
     let options = {
         nodes: {
             scaling: {
@@ -36,22 +37,21 @@ function draw(nodes, edges) {
         physics:{
             enabled: true,
             barnesHut:{gravitationalConstant:-1200}
-            //, stabilization: {iterations:200000}
         },
         groups: {
-            'router': {
-                color: ORANGE,
-                image: DIR + 'router.png',
-                shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white', size: 15},
-                value: 6
-            },
             'terminal': {
                 color: BLUE,
                 image: DIR + 'terminal.png',
                 shape: 'image',
                 font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8
+            },
+            'router': {
+                color: ORANGE,
+                image: DIR + 'router.png',
+                shape: 'image',
+                font: {strokeWidth: 2, strokeColor: 'white', size: 15},
+                value: 6
             },
             'ns': {
                 color: GREEN,
@@ -60,16 +60,22 @@ function draw(nodes, edges) {
                 font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8
             },
-            'other': {
-                color: GREEN,
-                image: DIR + 'other.png',
+            'ws': {
+                color: RED,
+                image: DIR + 'webserver.png',
                 shape: 'image',
                 font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8
             },
-            'ws': {
-                color: RED,
-                image: DIR + 'webserver.png',
+            'switch': {
+                
+            },
+            'controller': {
+                
+            },
+            'other': {
+                color: GREEN,
+                image: DIR + 'other.png',
                 shape: 'image',
                 font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8

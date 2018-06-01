@@ -9,70 +9,98 @@
     border-radius: 1em;
 }
 
-svg {
+#sdn button {
+    margin-bottom: 15px;
+}
+
+svg,
+#details {
     border: 1px solid lightgray;
     padding: 10px;
     box-sizing: content-box;
+    vertical-align: top;
+}
+
+#secondarySVG {
+    display: none;
+}
+
+#details {
+    display: inline-block;
+    width: 400px;
+    height: 600px;
+    overflow: auto;
+}
+
+.colorTag {
+    display: inline-block;
+    width: 30px;
+    height: 15px;
+}
+
+#details button {
+    float: right;
+    margin: 0;
+}
+
+#details hr:last-child {
+    display: none;
 }
 
 /* ----- NODES ----- */
 
-g.terminal circle {
+g.nodes circle:not(.network) {
     fill: brown;
     r: 20;
 }
 
-g.terminal circle:hover {
+g.nodes circle:not(.network):hover {
     r: 25;
 }
 
-g.network circle {
+g.nodes circle.network {
     fill: black;
-    r: 5;
+    r: 10;
 }
 
-g.terminal circle.switch,
-g.terminal circle.router {
+g.nodes circle.network:hover {
+    r: 20;
+}
+
+g.nodes circle.switch {
     fill: blue;
 }
 
-g.terminal circle.controller {
+g.nodes circle.controller {
     fill: orange;
 }
 
-g.terminal circle.ns,
-g.terminal circle.ws {
-    fill: red;
-}
-
-g.terminal circle.other {
-    stroke: black;
-    stroke-width: 2px;
-    fill: white;    
-}
-
-g.terminal circle.selected {
-    stroke: cyan;
+g.nodes circle.selected {
+    stroke: green;
     stroke-width: 5px;
 }
 
 /* ----- LINKS ----- */
 
-g.link line {
-    stroke: darkgray;
-    stroke-width: 2px;
+g.links line {
+    stroke: lightgray;
+    stroke-width: 3px;
 }
 
-g.link line:hover {
+g.links line:hover {
     stroke-width: 6px;
 }
 
-g.link line.controller {
-    stroke-dasharray: 10px 10px;
+g.links line.switch {
+    stroke: darkgray;
 }
 
-g.link line.selected {
-    stroke: cyan;
+g.links line.selected {
+    stroke: green;
+}
+
+g.links line.controller {
+    stroke-dasharray: 10px 10px;
 }
 
 /* -------- SVG2 - Details -------- */

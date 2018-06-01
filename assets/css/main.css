@@ -204,6 +204,11 @@ input {
     font-weight: bold;
 }
 
+#graph > button,
+#sdn > button {
+    margin-bottom: 15px;
+}
+
 .btn-danger.disabled,
 .btn-danger.disabled.active,
 .btn-danger.disabled.focus,

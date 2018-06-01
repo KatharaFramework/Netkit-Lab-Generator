@@ -163,6 +163,11 @@
     border-radius: 1em;
 }
 
+#homeDisclaimer a {
+    color: inherit;
+    text-decoration: underline;
+}
+
 /* ------ TABLES ------ */
 
 #netkit tr {

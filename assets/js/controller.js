@@ -11,12 +11,6 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
 
     $scope.app = "include/app.html"
 
-    $scope.scrollTo = function (e, hash) {
-        e.preventDefault()
-        $location.hash(hash)
-        $anchorScroll()
-    }
-
     $scope.labInfo = JSON.clone(labInfo)
     $scope.netkit = []
     $scope.counter = 0
@@ -24,6 +18,12 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
 
     $scope.minimap_transform = 1
     $scope.compensationScale = []
+
+    $scope.scrollTo = function (e, hash) {
+        e.preventDefault()
+        $location.hash(hash)
+        $anchorScroll()
+    }
 
     $scope.updateMimimapRatio = function (x) {
         var ratio = window.innerHeight / (x + document.getElementById('minimap-body').offsetHeight)
@@ -100,14 +100,12 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
 
     $scope.addRipNetwork = function (machine) {
         machine.routing.rip.network.push("")
-
         changed = true
     }
 
     $scope.removeRipNetwork = function (machine) {
         if (machine.routing.rip.network.length > 1 && confirm("Are you sure you want to remove the network?")) {
             machine.routing.rip.network.pop()
-
             changed = true
         }
     }
@@ -198,7 +196,6 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
 
     $scope.makeGraphIfChanged = function (netkitData) {
         if (changed) {
-            console.log("Reloading graph")
             changed = false
             return makeGraph(netkitData)
         }
@@ -212,17 +209,17 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
     }
 
     $scope.loadSDN = function(netkitData, labInfoData){
-        getData($scope.generateConfig(netkitData, labInfoData))
+        loadSDN($scope.generateConfig(netkitData, labInfoData))
     }
 
     $scope.import = function () {
         try {
-            var f = document.getElementById('file').files[0]
-            var r = new FileReader()
-            if (typeof (f) != "undefined") {
-                r.onloadend = function (e) {
+            let filePath = document.getElementById('file').files[0]
+            let fileReader = new FileReader()
+            if (filePath) {
+                fileReader.onloadend = function (e) {
                     try {
-                        var app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))) // rimozione caratteri di codifica prima di '['
+                        let app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))) // rimozione caratteri di codifica prima di '['
                         $scope.netkit = app[0].netkit
                         $scope.counter = $scope.netkit.length
                         $scope.labInfo = app[0].labInfo
@@ -234,7 +231,7 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
                         alert("Error: " + err)
                     }
                 }
-                r.readAsBinaryString(f)
+                fileReader.readAsBinaryString(filePath)
             }
             else alert("No file selected")
         }

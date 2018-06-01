@@ -47,11 +47,11 @@ function makeStaticRouting(netkit, lab) {
     // generazione networking e routing statico
     for (let machineIndex in netkit) {
         if (netkit[machineIndex].name && netkit[machineIndex].name != "") {
-            for (let i in netkit[machineIndex].interfaces.if) {
+            for (let interfaceIndex in netkit[machineIndex].interfaces.if) {
                 //ifconfig eth_ SELFADDRESS/MASK up
-                if ((netkit[machineIndex].interfaces.if[i].eth.domain)  && netkit[machineIndex].interfaces.if[i].eth.domain != "")
-                    lab.file[netkit[machineIndex].name + ".startup"] += "ifconfig eth" + netkit[machineIndex].interfaces.if[i].eth.number +
-                        (((netkit[machineIndex].interfaces.if[i].ip)  && netkit[machineIndex].interfaces.if[i].ip != "") ? " " + netkit[machineIndex].interfaces.if[i].ip : "") +
+                if ((netkit[machineIndex].interfaces.if[interfaceIndex].eth.domain)  && netkit[machineIndex].interfaces.if[interfaceIndex].eth.domain != "")
+                    lab.file[netkit[machineIndex].name + ".startup"] += "ifconfig eth" + netkit[machineIndex].interfaces.if[interfaceIndex].eth.number +
+                        (((netkit[machineIndex].interfaces.if[interfaceIndex].ip)  && netkit[machineIndex].interfaces.if[interfaceIndex].ip != "") ? " " + netkit[machineIndex].interfaces.if[interfaceIndex].ip : "") +
                         " up\n";
             }
 
