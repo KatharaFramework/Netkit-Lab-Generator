@@ -25,6 +25,10 @@ svg,
     display: none;
 }
 
+/* ------------------- */
+/* ----- DETAILS ----- */
+/* ------------------- */
+
 #details {
     display: inline-block;
     width: 400px;
@@ -32,22 +36,61 @@ svg,
     overflow: auto;
 }
 
+#details input {
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+
+    max-width: 30%;
+}
+
+#details input:valid {
+    background-image: none;
+}
+
 .colorTag {
     display: inline-block;
     width: 30px;
     height: 15px;
+    margin-right: 10px;
 }
 
 #details button {
     float: right;
     margin: 0;
+    margin-left: 5px;
 }
 
 #details hr:last-child {
     display: none;
 }
 
+.label-details {
+    border: 1px solid darkgray;
+    display: none;
+}
+
+/* --- Details table --- */
+
+.label-details table {
+    margin: 3px auto;
+    width: 95%;
+}
+
+.label-details th {
+    padding: 0 10px;
+}
+
+.label-details td {
+    padding: 5px;
+}
+
+.label-details td input {
+}
+
+/* ----------------- */
 /* ----- NODES ----- */
+/* ----------------- */
 
 g.nodes circle:not(.network) {
     fill: brown;
@@ -80,7 +123,9 @@ g.nodes circle.selected {
     stroke-width: 5px;
 }
 
+/* ----------------- */
 /* ----- LINKS ----- */
+/* ----------------- */
 
 g.links line {
     stroke: lightgray;
@@ -103,7 +148,9 @@ g.links line.controller {
     stroke-dasharray: 10px 10px;
 }
 
-/* -------- SVG2 - Details -------- */
+/* ---------------------- */
+/* -------- SVG2 -------- */
+/* ---------------------- */
 
 line.axis {
     stroke: darkgray;

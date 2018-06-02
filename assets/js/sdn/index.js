@@ -21,14 +21,128 @@ function openDetails() {
     document.getElementById('secondarySVG').style.display = 'inline-block'
 }
 
-function createNewLabel(name, color, path, whiteText = false){
+function resetButtons(){
+    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    bottoni.item(0).style.display = null    // Bottone per muovere i nodi
+    bottoni.item(2).style.display = 'none'  // Bottone per rilasciare i nodi
+    bottoni.item(1).style.display = 'none'  // Bottone per selezionare il path
+    bottoni.item(3).style.display = null    // Bottone per aggiungere etichette
+    togglePathButtons(false)
+}
+
+function togglePathButtons(display){
+    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    if(display){
+        bottoni.item(4).style.display = null  // Bottone per confermare un path
+        bottoni.item(5).style.display = null  // Bottone per annullare un path
+    } else {
+        bottoni.item(4).style.display = 'none'
+        bottoni.item(5).style.display = 'none'
+    }
+}
+
+/* -------------------- LABEL MANAGING -------------------- */
+
+function createNewLabel(){
+    document.getElementsByClassName('sdnBehaviour').item(3).style.display = 'none'
+    let row = d3.create('div')
+    row.append('input')
+        .attr('type', 'text')
+        .attr('placeholder', 'color')
+    row.append('input')
+        .attr('type', 'text')
+        .attr('placeholder', 'name')
+    row.append('button')
+        .text('Add')
+        .on('click', function(){
+            createNewDefinedLabel(row.nodes().pop())
+        })
+    row.append('button')
+        .text('Ignore')
+        .on('click', function(){
+            row.remove()
+            document.getElementsByClassName('sdnBehaviour').item(3).style.display = null
+        })
+    document.getElementById('details').appendChild(row.node())
+}
+
+function createNewDefinedLabel(rawElement){
     let details = document.getElementById('details')
-    let labelNode = document.createElement('p')
-    let colorTag = '<div class="colorTag" style="background-color:' + color + '"></div> '
-    labelNode.innerHTML = colorTag + name
-    labelNode.innerHTML += ' <button>Select</button>'
-    details.appendChild(labelNode)
-    details.appendChild(document.createElement('hr'))
+    let [colorInputEl, nameInputEl] = rawElement.getElementsByTagName('input')
+    if (colorInputEl.value && nameInputEl.value){
+        let labelNode = document.createElement('p')
+        let showDiv = document.createElement('div')
+        let colorTag = document.createElement('div')
+        let showButton = document.createElement('button')
+        let editButton = document.createElement('button')
+        
+        colorTag.className = 'colorTag'
+        colorTag.style.backgroundColor = colorInputEl.value
+
+        showButton.innerText = "Show/Hide"
+        showButton.addEventListener('click', function(){
+            let prevStatus = showDiv.style.display
+            showDiv.style.display = (prevStatus == 'block') ? 'none' : 'block'
+            // TODO: magari evidenzia anche sul grafo il path che segue
+        })
+
+        editButton.innerText = "Edit"
+        editButton.addEventListener('click', setActiveStatus)
+
+        function setActiveStatus(){
+            details.querySelectorAll('#details div p button.btn-success')
+                .forEach(el => setDisabledStatus.bind(el)())
+
+            this.classList.add('btn-success')
+            this.innerText = 'EDITING'
+            showDiv.style.display = 'block'
+
+            pathOutputDiv = this.parentElement.nextElementSibling
+
+            enablePathSelection()
+            let newThis = this.cloneNode(true)
+            newThis.addEventListener('click', setDisabledStatus)
+            this.parentNode.replaceChild(newThis, this)
+        }
+
+        function setDisabledStatus(){
+            this.classList.remove('btn-success')
+            this.innerText = 'Edit'
+            
+            pathOutputDiv = null
+
+            disableBehaviours()
+            let newThis = this.cloneNode(true)
+            newThis.addEventListener('click', setActiveStatus)
+            this.parentNode.replaceChild(newThis, this)
+        }
+
+        showDiv.className = 'label-details'
+        showDiv.appendChild(createTable('device', 'match', 'action', 'priority'))
+
+        labelNode.appendChild(colorTag)
+        labelNode.appendChild(document.createTextNode(nameInputEl.value.trim()))
+        labelNode.appendChild(editButton)
+        labelNode.appendChild(showButton)
+        
+        rawElement.innerHTML = ""
+        rawElement.append(labelNode)
+        rawElement.append(showDiv)
+        
+        details.appendChild(document.createElement('hr'))
+        document.getElementsByClassName('sdnBehaviour').item(3).style.display = null
+    }
+}
+
+function createTable(...headers){
+    let table = document.createElement('table')
+    let head = table.createTHead()
+    for(let header of headers){
+        head.appendChild(document.createElement('th')
+        ).innerText = header
+    }
+    table.createTBody()
+    return table
 }
 
 /* --------------------------------------------------------------------- */
@@ -63,26 +177,6 @@ function loadSDN(config) {
     resetButtons()
 }
 
-function resetButtons(){
-    let bottoni = document.getElementsByClassName('sdnBehaviour')
-    bottoni.item(0).style.display = null    // Bottone per muovere i nodi
-    bottoni.item(1).style.display = 'none'  // Bottone per rilasciare i nodi
-    bottoni.item(2).style.display = 'none'  // Bottone per selezionare il path
-    bottoni.item(3).style.display = null    // Bottone per aggiungere etichette
-    togglePathButtons(false)
-}
-
-function togglePathButtons(display){
-    let bottoni = document.getElementsByClassName('sdnBehaviour')
-    if(display){
-        bottoni.item(4).style.display = null  // Bottone per confermare un path
-        bottoni.item(5).style.display = null  // Bottone per annullare un path
-    } else {
-        bottoni.item(4).style.display = 'none'
-        bottoni.item(5).style.display = 'none'
-    }
-}
-
 let svg = d3.select("#mainSVG")
 let width = +svg.attr('width')
 let height = +svg.attr('height')
@@ -106,7 +200,7 @@ function startSimulation(data) {
         .enter()
         .append('line')
 
-    linksGroup.append('title').text(function (d) { return d.porta })
+    linksGroup.append('title').text(function (d) { return "eth" + d.porta })
 
     /* --------------------- PREPARE NODES --------------------- */
 
@@ -159,12 +253,10 @@ function startSimulation(data) {
     /* --------------------- DETAILS --------------------- */
     /* --------------------------------------------------- */
 
-    enablePathSelection()
-
     /* ---------------------- NODE ---------------------- */
 
     nodesGroup.on('click', function (d) {
-        if (d.type == "switch") {
+        if (d.type == "switch" && !pathOutputDiv) {
             let [middleX, middleY] = [width2 / 2, height2 / 2]
             let radius = Math.max(middleX, middleY) / 2
             let cx = middleX > middleY ? middleX / 2 : middleX
@@ -178,7 +270,7 @@ function startSimulation(data) {
     /* -------------------- LINKS -------------------- */
 
     linksGroup.on('click', function (d) {
-        if (d.source.type == "switch") {
+        if (d.source.type == "switch" && !pathOutputDiv) {
             openDetails()
             drawRadialAxis(10, 0, width2, (height2 / 2), 0)
         }
@@ -212,21 +304,27 @@ function drawRadialAxis(num, top, right, bottom, left) {
     }
 }
 
-/* -------------------------------------------------------- */
-/* -------------------- PATH SELECTION -------------------- */
-/* -------------------------------------------------------- */
+/* --------------------------------------------------------- */
+/* -------------------- GRAPH BEHAVIOUR -------------------- */
+/* --------------------------------------------------------- */
+
+function disableBehaviours(){
+    d3.selectAll('g.nodes circle').call(d3.drag())
+}
+
+/* -------------------- MOVING -------------------- */
 
 function enableMovingNodes() {
     document.getElementsByClassName('sdnBehaviour').item(0)
         .style.display = 'none'
+    document.getElementsByClassName('sdnBehaviour').item(1)
+        .style.display = null
     document.getElementsByClassName('sdnBehaviour').item(2)
         .style.display = null
 
     d3.selectAll('g.nodes circle').call(  // chiama la funzione passata per parametro esattamente una volta sola
         d3.drag().on('start', function (d) {
             if (!d3.event.active) simulation.alphaTarget(0.3).restart()
-            d.fx = d.x
-            d.fy = d.y
         }).on("drag", function (d) {
             d.fx = d3.event.x
             d.fy = d3.event.y
@@ -234,109 +332,150 @@ function enableMovingNodes() {
     )
 }
 
-let newPath = new Set() 
-
-function enablePathSelection() {
-    let machineLocked = true
-    let networksLocked = true
-
-    let linkLock = 0
-    let lastSelection = null
-
-    document.getElementsByClassName('sdnBehaviour').item(0)
-        .style.display = null
+function releaseNodes(){
     document.getElementsByClassName('sdnBehaviour').item(2)
         .style.display = 'none'
+    d3.selectAll('g.nodes circle').attr('', function(d){ d.fx = null; d.fy = null})
+}
 
-    d3.selectAll('g.nodes circle').call(d3.drag())     // Rimuovo il precedente comportamento al drag
+/* -------------------- SELECTING -------------------- */
 
-    d3.selectAll("circle.network").call(
-        d3.drag().on("start", function (d, i, data) {
-                data[i].classList.add('selected')
-                linkLock = 1
-                lastSelection = d.id
-                togglePathButtons(false)
+let newPath = new Set()
+
+function enablePathSelection() {
+    document.getElementsByClassName('sdnBehaviour').item(0)
+        .style.display = null
+    document.getElementsByClassName('sdnBehaviour').item(1)
+        .style.display = 'none'
+
+    disableBehaviours()
+
+    if(pathOutputDiv){
+        let machineLocked = true
+        let networksLocked = true
+
+        let linkLock = 0
+        let lastSelection = null
+
+        d3.selectAll("circle.network").call(
+            d3.drag().on("start", function (d, i, data) {
+                    data[i].classList.add('selected')
+                    linkLock = 1
+                    lastSelection = d.id
+                    togglePathButtons(false)
+                })
+                .on("end", function () {
+                    if(linkLock == 1 && newPath.size > 0) togglePathButtons(true)
+                    else discardPath()
+                    lockAll()
+                }))
+
+        d3.selectAll('circle.network')  // Link lock è 0
+            .on('mouseover', function(d, i, data){
+                if(!networksLocked && d.id == lastSelection){
+                    linkLock++
+                    networksLocked = true
+
+                    data[i].classList.add('selected')
+                }
             })
-            .on("end", function () {
-                if(linkLock == 1 && newPath.size > 1) togglePathButtons(true)
-                else discardPath()
-                lockAll()
-            }))
 
-    d3.selectAll('circle.network')  // Link lock è 0
-        .on('mouseover', function(d, i, data){
-            if(!networksLocked && d.id == lastSelection){
-                linkLock++
-                networksLocked = true
+        d3.selectAll('line.switch')
+            .on('mouseover', function (d, i, data) {
+                if(linkLock == 1 && d.target.id == lastSelection){
+                    linkLock++
+                    machineLocked = false
 
-                data[i].classList.add('selected')
-            }
-        })
+                    lastSelection = d.source.id
+                    data[i].classList.add('selected') // Seleziona una rete. La prossima sarà una macchina
+                    appendPathStep({device: d.source.id, ingressPort: d.porta})
+                } else if(linkLock == 3 && d.source.id == lastSelection){
+                    linkLock = 0
+                    networksLocked = false
 
-    d3.selectAll('line.switch')
-        .on('mouseover', function (d, i, data) {
-            if(linkLock == 1 && d.target.id == lastSelection){
-                linkLock++
-                machineLocked = false
+                    lastSelection = d.target.id
+                    data[i].classList.add('selected') // Seleziona una macchina. La prossima sarà una rete
+                    appendPathStep({device: d.source.id, egressPort: d.porta})
+                }
+            })
 
-                lastSelection = d.source.id
-                data[i].classList.add('selected') // Seleziona una rete. La prossima sarà una macchina
-                appendPathStep({device: d.source.id, ingressPort: d.porta})
-            } else if(linkLock == 3 && d.source.id == lastSelection){
-                linkLock = 0
-                networksLocked = false
+        d3.selectAll('circle.switch')   // linkLock è 2
+            .on('mouseover', function(d, i, data){
+                if(!machineLocked && d.id == lastSelection){
+                    linkLock++
+                    machineLocked = true
 
-                lastSelection = d.target.id
-                data[i].classList.add('selected') // Seleziona una macchina. La prossima sarà una rete
-                appendPathStep({device: d.source.id, egressPort: d.porta})
-            }
-        })
+                    data[i].classList.add('selected')
+                }
+            })
 
-    d3.selectAll('circle.switch')   // linkLock è 2
-        .on('mouseover', function(d, i, data){
-            if(!machineLocked && d.id == lastSelection){
-                linkLock++
-                machineLocked = true
-
-                data[i].classList.add('selected')
-            }
-        })
-
-    function lockAll(){
-        machineLocked = true
-        networksLocked = true
-        linkLock = 0
+        function lockAll(){
+            machineLocked = true
+            networksLocked = true
+            linkLock = 0
+        }
     }
+}
 
-    function appendPathStep(options){   // options è: {device, ingressPort || egressPort }. Ogni campo è string||number
-        let step = {device: options.device}
-        if(options.hasOwnProperty('ingressPort')) step.ingressPort = options.ingressPort
-        else step.egressPort = options.egressPort
+let pendingStep = null
+
+function appendPathStep(options){   // options è: {device, ingressPort || egressPort }. Ogni campo è string||number
+    if(!pendingStep){
+        pendingStep = options
+    } else {
+        if(pendingStep.device != options.device) throw new Error("Path non conforme. Forse uno step precedente è rimasto in memoria")
+        let step = {
+            device: options.device,
+            ingressPort: pendingStep.ingressPort,
+            egressPort: options.egressPort
+        }
+        pendingStep = null
         newPath.add(step)
     }
 }
 
+let pathOutputDiv = null
+
+function applyPath() {
+    let thisLabelData = {
+        devices: new Set(),
+        rules: []
+    }
+    let tableBody = pathOutputDiv.getElementsByTagName('tbody').item(0)
+    for(let step of newPath){
+        let rule = document.createElement('tr')
+        let device = rule.appendChild(document.createElement('td'))
+        let match = rule.appendChild(document.createElement('td'))
+        let action = rule.appendChild(document.createElement('td'))
+        let priority = rule.appendChild(document.createElement('td'))
+
+        device.innerText = step.device
+        match.innerText = "ingressPort eth" + step.ingressPort
+        action.innerText = "egressPort eth" + step.egressPort
+        // let pInput = priority.appendChild(document.createElement('input'))
+        // pInput.setAttribute('type', 'number')
+
+        tableBody.appendChild(rule)
+    }
+    togglePathButtons(false)
+    discardPath()
+}
+
 function discardPath(){
     newPath = new Set()
+    pendingStep = null
     for(let el of document.querySelectorAll('svg .selected')){
         el.classList.remove('selected')
     }
     togglePathButtons(false)
 }
 
-function applyPath() {
-    for(let step of newPath)
-        console.log(step)
-    togglePathButtons(false)
-    discardPath()
-}
-
 
 
 /* */
 
-// function assignImage(datum) {
-//     switch (datum.type){
+// function assignImage(d) {
+//     switch (d.type){
 //         case "terminal":
 //             return "assets/images/terminal.png"
 //         case "ns":
@@ -350,6 +489,6 @@ function applyPath() {
 //         case "switch":
 //             return "assets/images/other.png"     // TODO: sostituire
 //         default:
-//             console.error("tipo " + datum.type + " non riconosciuto")
+//             console.error("tipo " + d.type + " non riconosciuto")
 //     }
 // }

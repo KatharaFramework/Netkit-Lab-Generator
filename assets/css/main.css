@@ -1,5 +1,6 @@
 :root {
     --main-color: #337ab7;
+    --secondary-color: #5b8fbd;
     --disclaimer-color: rgba(255, 0, 0, .2)
 }
 
@@ -40,7 +41,7 @@ textarea {
 .browserupgrade {
     margin: 0.2em 0;
     background: #ffff00;
-    color: #000;
+    color: black;
     padding: 0.2em 0;
 }
 
@@ -120,20 +121,20 @@ textarea {
 
 .navbar-kathara li a:active,
 .navbar-kathara li a:hover {
-    background-color: #5b8fbd;
+    background-color: var(--secondary-color);
 }
 
 .navbar-kathara-secondary {
     z-index: 9995;
     top: 51px;
-    background-color: #5b8fbd;
+    background-color: var(--secondary-color);
 }
 
 .navbar-kathara-secondary li a,
 .navbar-kathara-secondary li a:visited,
 .navbar-kathara-secondary li a:focus {
     color: white;
-    background-color: #5b8fbd;
+    background-color: var(--secondary-color);
 }
 
 .navbar-kathara-secondary li a:active,
@@ -197,6 +198,10 @@ input {
 }
 
 /* ----------- BUTTONS ----------- */
+
+button {
+    color: initial;
+}
 
 .btn {
     margin: 2px 0;

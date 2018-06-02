@@ -94,7 +94,7 @@
                     <span class="file">
                         <input type="file" id="file" class="form-control hidden" onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));"
                         />
-                        <button style="color: black; background-color: white;" onclick="document.getElementById('file').click();">Browse...</button>
+                        <button onclick="document.getElementById('file').click();">Browse...</button>
                         <input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();"
                             readonly />
                     </span>
@@ -478,9 +478,9 @@
                 </p>
                 <button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
-                <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enablePathSelection()">Enable path selection</button>
-                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="createNewLabel('Uno', 'red')">Create new label</button>
+                <button class="btn sdnBehaviour" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
+                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="createNewLabel()">Create new label</button>
                 <button class="btn btn-success sdnBehaviour" style="display:none" onclick="applyPath()">Conferma path</button>
                 <button class="btn btn-danger sdnBehaviour" style="display:none" onclick="discardPath()">Annulla path</button>
                 <div style="margin: auto">
