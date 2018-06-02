@@ -1,7 +1,3 @@
-#sdn {
-    margin: 1em;
-}
-
 #sdnDisclaimer {
     text-align: center;
     padding: 1em;
@@ -21,13 +17,17 @@ svg,
     vertical-align: top;
 }
 
+/* --------------------- */
+/* -- MACHINE DETAILS -- */
+/* --------------------- */
+
 #secondarySVG {
     display: none;
 }
 
-/* ------------------- */
-/* ----- DETAILS ----- */
-/* ------------------- */
+/* ---------------------- */
+/* --- LABELS DETAILS --- */
+/* ---------------------- */
 
 #details {
     display: inline-block;

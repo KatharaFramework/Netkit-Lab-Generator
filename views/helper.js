@@ -1,9 +1,3 @@
-if (typeof JSON.clone !== "function") {
-    JSON.clone = function (obj) {
-        return JSON.parse(JSON.stringify(obj))
-    }
-}
-
 function lastElem(arr) {
     return arr[arr.length - 1]
 }
@@ -58,10 +52,6 @@ function close_modal(e) {
 function isElectron() {
     return window && window.process && window.process.type
 }
-
-var electron
-var isWin
-var isCopied = false
 
 function copyLab(e) {
     e.preventDefault()

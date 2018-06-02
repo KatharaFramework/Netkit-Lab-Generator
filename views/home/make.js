@@ -478,7 +478,7 @@ function makeScript(lab) {
     return text;
 }
 
-function makeZip(lab) {
+function makeZip(lab) {     // TODO: Si può spostare in controller.js? (per coerenza)
     var zip = new JSZip();
 
     for (let folderName in lab["folder"]) {
@@ -489,10 +489,4 @@ function makeZip(lab) {
     }
     var content = zip.generate({ type: "blob" });
     saveAs(content, "lab.zip");
-}
-
-function makeGraph(netkit) {
-    var graph = generate_nodes_edges(netkit);
-    //console.log(graph);
-    draw(graph.nodes, graph.edges);
 }

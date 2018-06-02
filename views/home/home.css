@@ -104,7 +104,6 @@
 }
 
 .mock-machine {
-    width: 100px;
     height: 30px;
     background-color: rgba(0, 0, 0, 0.01);
     color: rgba(0, 0, 0, 0.45);
@@ -123,7 +122,6 @@
 }
 
 .mock-preview-bash {
-    width: 108px;
     height: 40px;
     border: 1px solid rgba(0, 0, 0, 0.2);
 }

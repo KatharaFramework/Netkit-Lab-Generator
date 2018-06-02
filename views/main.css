@@ -9,13 +9,6 @@
     margin-top: -140px;
 }
 
-.disabledLink {
-    color: currentColor;
-    cursor: not-allowed !important;
-    opacity: 0.5;
-    text-decoration: none;
-}
-
 .form-control {
     border-radius: 0;
     padding: 2px 6px;
@@ -27,22 +20,9 @@
 textarea {
     width: 100%;
     font-size: 14px;
-    line-height: 1.4;
     color: #555;
-    background-color: white;
-    background-image: none;
-    border: 1px solid #ccc;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-}
-
-.browserupgrade {
-    margin: 0.2em 0;
-    background: #ffff00;
-    color: black;
-    padding: 0.2em 0;
+    padding: 1em;
+    border: 1px solid lightgray;
 }
 
 .file {
@@ -65,13 +45,7 @@ textarea {
     }
 }
 
-.clear {
-    clear: both;
-}
-
-/* Graph */
-
-#graph {
+.tab-pane {
     margin: 1em;
 }
 
@@ -80,7 +54,24 @@ textarea {
     border: 1px solid lightgray;
 }
 
-/*Modal*/
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ffff00;
+    color: black;
+    padding: 0.2em 0;
+}
+
+.hidden {
+    display: none;
+}
+
+a {
+    cursor: pointer;
+}
+
+/* ------------------------------------------------------ */
+/* ----------------------- MODAL ----------------------- */
+/* ------------------------------------------------------ */
 
 .modal-kathara {
     display: inherit !important;
@@ -97,14 +88,14 @@ textarea {
     padding-top: 0px;
 }
 
-/*Navbar*/
+/* ------------------------------------------------------ */
+/* ----------------------- NAVBAR ----------------------- */
+/* ------------------------------------------------------ */
 
 .navbar-kathara {
     position: fixed;
     border-radius: 0;
     width: 100%;
-    background-color: var(--main-color);
-    color: white;
 }
 
 .navbar-kathara-primary {
@@ -112,24 +103,23 @@ textarea {
     top: 0;
 }
 
-.navbar-kathara li a,
-.navbar-kathara li a:visited,
-.navbar-kathara li a:focus {
-    color: white;
-    background-color: var(--main-color);
-}
-
-.navbar-kathara li a:active,
-.navbar-kathara li a:hover {
-    background-color: var(--secondary-color);
-}
-
 .navbar-kathara-secondary {
     z-index: 9995;
     top: 51px;
-    background-color: var(--secondary-color);
 }
 
+.navbar-kathara,
+.navbar-kathara li a,
+.navbar-kathara li a:visited,
+.navbar-kathara li a:focus {
+    background-color: var(--main-color);
+    color: white;
+    font-weight: bolder;
+}
+
+.navbar-kathara li a:active,
+.navbar-kathara li a:hover,
+.navbar-kathara-secondary,
 .navbar-kathara-secondary li a,
 .navbar-kathara-secondary li a:visited,
 .navbar-kathara-secondary li a:focus {
@@ -142,12 +132,11 @@ textarea {
     background-color: #7c9fbe;
 }
 
-/* ------------------------------------------------------ */
-/* ------------------------ NAVBAR ------------------------ */
-/* ------------------------------------------------------ */
-
-.navbar-kathara a {
-    font-weight: bolder;
+.disabledLink {
+    color: currentColor;
+    cursor: not-allowed !important;
+    opacity: 0.5;
+    text-decoration: none;
 }
 
 .space-top {
@@ -159,18 +148,8 @@ body {
 }
 
 /* ------------------------------------------------------ */
-/* ----------------------- OTHERS ----------------------- */
+/* ----------------------- INPUTS ----------------------- */
 /* ------------------------------------------------------ */
-
-.hidden {
-    display: none;
-}
-
-a {
-    cursor: pointer;
-}
-
-/* ---------- INPUTS ---------- */
 
 input:required:invalid,
 input:focus:invalid,
@@ -192,26 +171,22 @@ input[type=file] {
 }
 
 input {
-    border-radius: 0;
     background-position: right center;
     background-repeat: no-repeat;
+    font-weight: normal;
 }
 
 /* ----------- BUTTONS ----------- */
 
 button {
     color: initial;
+    font-weight: normal;
 }
 
 .btn {
     margin: 2px 0;
     border-radius: 0;
     font-weight: bold;
-}
-
-#graph > button,
-#sdn > button {
-    margin-bottom: 15px;
 }
 
 .btn-danger.disabled,

@@ -1,6 +1,7 @@
 var changed = true
 
 var app = angular.module('napp', [])
+
 app.config(['$compileProvider',
     function ($compileProvider) {
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|local|data):/)
