@@ -214,10 +214,11 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
     }
 
     $scope.import = function () {
+        let fileElement = document.getElementById('file')
         try {
-            let filePath = document.getElementById('file').files[0]
-            let fileReader = new FileReader()
+            let filePath = fileElement.files[0]
             if (filePath) {
+                let fileReader = new FileReader()
                 fileReader.onloadend = function (e) {
                     try {
                         let app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))) // rimozione caratteri di codifica prima di '['
@@ -233,8 +234,9 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
                     }
                 }
                 fileReader.readAsBinaryString(filePath)
+            } else {
+                fileElement.click()
             }
-            else alert("No file selected")
         }
         catch (err) {
             alert("Error in File Reader: " + err)

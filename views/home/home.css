@@ -113,7 +113,7 @@
     transition: transform 0.2s ease-in-out;
 }
 
-.mock-machine span {
+.mock-id {    /*  */
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.65);
     color: white;
@@ -148,44 +148,25 @@
     }
 }
 
-#home > div:first-child {
-    margin-bottom: 2em;
-}
-
-#homeDisclaimer {
-    display: inline-block;
-    padding: 1em;
-    margin: 0;
-    background-color: var(--disclaimer-color);
-    border-radius: 1em;
-}
-
-#homeDisclaimer a {
-    color: inherit;
-    text-decoration: underline;
-}
-
 /* ------ TABLES ------ */
+
+#netkit {
+    margin-top: 2em;
+}
 
 #netkit tr {
     text-align: left;
     vertical-align: 0;
 }
 
-table {
-    border-collapse: collapse;
-}
-
-td {
-    border: 2px solid lightgray;
+td, th {
+    border: 1px solid lightgray;
     padding: 10px;
 }
 
 th {
     color: white;
     background-color: var(--main-color);
-    border: 2px solid #2e6da4;
-    padding: 10px;
 }
 
 label {

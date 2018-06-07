@@ -23,8 +23,6 @@ app.on('ready', function () {
     slashes: true
   }))
 
-  mainWindow.isWin = isWin
-
   mainWindow.on('closed', function () {
     app.quit()
   })
@@ -44,8 +42,10 @@ ipcMain.on('script:copy', function (_, script) {
     else {
       console.log("Running " + pathTemp)
   
-      if (isWin) exec('"' + pathTemp + '"')
-      else exec('bash "' + pathTemp + '"')
+      if (isWin)
+        exec('"' + pathTemp + '"')
+      else
+        exec('bash "' + pathTemp + '"')
     }
   })
 })

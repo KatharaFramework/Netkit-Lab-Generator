@@ -1,28 +1,93 @@
-#sdnDisclaimer {
-    text-align: center;
-    padding: 1em;
-    background-color: var(--disclaimer-color);
-    border-radius: 1em;
-}
-
 #sdn button {
     margin-bottom: 15px;
 }
 
-svg,
-#details {
+#sdnGraph,
+#details,
+#details2 {
     border: 1px solid lightgray;
     padding: 10px;
     box-sizing: content-box;
     vertical-align: top;
 }
 
-/* --------------------- */
-/* -- MACHINE DETAILS -- */
-/* --------------------- */
+/* ----------------- */
+/* ----- NODES ----- */
+/* ----------------- */
 
-#secondarySVG {
-    display: none;
+g.nodes circle {
+    fill: brown;
+    r: 20;
+}
+
+g.nodes circle.network {
+    fill: black;
+    r: 10;
+}
+
+g.nodes circle.switch {
+    fill: blue;
+}
+
+g.nodes circle.controller {
+    fill: orange;
+}
+
+g.nodes circle.control {
+    stroke: black;
+    stroke-width: 1px;
+    fill: white;
+}
+
+g.nodes circle.edge {
+}
+
+/* --- mouseover --- */
+
+g.nodes circle:hover {
+    r: 25;
+}
+
+g.nodes circle.network:hover {
+    r: 20;
+}
+
+/* --- selection --- */
+
+g.nodes circle.selected {
+    stroke: green;
+    stroke-width: 5px;
+}
+
+/* ----------------- */
+/* ----- LINKS ----- */
+/* ----------------- */
+
+g.links line {
+    stroke: lightgray;
+    stroke-width: 3px;
+}
+
+g.links line.switch {
+    stroke: darkgray;
+}
+
+g.links line.controller {
+    stroke-dasharray: 10px 10px;
+}
+
+/* --- mouseover --- */
+
+
+g.links line:hover {
+    stroke-width: 6px;
+}
+
+/* --- selection --- */
+
+
+g.links line.selected {
+    stroke: green;
 }
 
 /* ---------------------- */
@@ -32,7 +97,7 @@ svg,
 #details {
     display: inline-block;
     width: 400px;
-    height: 600px;
+    height: 800px;
     overflow: auto;
 }
 
@@ -85,74 +150,43 @@ svg,
     padding: 5px;
 }
 
-.label-details td input {
+/* -------------------- */
+/* --- NODE DETAILS --- */
+/* -------------------- */
+
+#details2 {
+    display: none;
+    width: 400px;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: auto;
 }
 
-/* ----------------- */
-/* ----- NODES ----- */
-/* ----------------- */
-
-g.nodes circle:not(.network) {
-    fill: brown;
-    r: 20;
+#details2 svg {
+    border: 1px solid lightgray;
+    box-sizing: content-box;
+    padding: 10px;
+    margin: 10px auto;
 }
 
-g.nodes circle:not(.network):hover {
-    r: 25;
+#details2 > a {
+    float: right;
+    color: red;
+    margin-bottom: 5px;
 }
 
-g.nodes circle.network {
-    fill: black;
-    r: 10;
+#details2 .disclaimer {
+    margin-top: 30px;
 }
 
-g.nodes circle.network:hover {
-    r: 20;
+#rules {
+    margin: auto;
+    width: fit-content;
+    text-align: center;
 }
 
-g.nodes circle.switch {
-    fill: blue;
-}
-
-g.nodes circle.controller {
-    fill: orange;
-}
-
-g.nodes circle.selected {
-    stroke: green;
-    stroke-width: 5px;
-}
-
-/* ----------------- */
-/* ----- LINKS ----- */
-/* ----------------- */
-
-g.links line {
-    stroke: lightgray;
-    stroke-width: 3px;
-}
-
-g.links line:hover {
-    stroke-width: 6px;
-}
-
-g.links line.switch {
-    stroke: darkgray;
-}
-
-g.links line.selected {
-    stroke: green;
-}
-
-g.links line.controller {
-    stroke-dasharray: 10px 10px;
-}
-
-/* ---------------------- */
-/* -------- SVG2 -------- */
-/* ---------------------- */
-
-line.axis {
-    stroke: darkgray;
-    stroke-width: 1px;
+#rules h2 {
+    text-align: center;
+    text-decoration: underline;
+    color: var(--main-color);
 }

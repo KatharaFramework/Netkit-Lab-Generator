@@ -1,7 +1,7 @@
 :root {
     --main-color: #337ab7;
     --secondary-color: #5b8fbd;
-    --disclaimer-color: rgba(255, 0, 0, .2)
+    --disclaimer-color: rgba(255, 0, 0, .2);
 }
 
 .anchor-id {
@@ -9,49 +9,11 @@
     margin-top: -140px;
 }
 
-.form-control {
-    border-radius: 0;
-    padding: 2px 6px;
-    margin-top: -2px;
-    margin-bottom: 2px;
-    height: 26px;
-}
-
-textarea {
-    width: 100%;
-    font-size: 14px;
-    color: #555;
-    padding: 1em;
-    border: 1px solid lightgray;
-}
-
-.file {
-    width: 300px;
-    margin-top: 3px;
-}
-
-.fakefile {
-    display: inline;
-    width: 200px;
-    background-color: white !important;
-    margin-top: 2px;
-}
-
-/*firefox only*/
-
 @-moz-document url-prefix() {
+    /* firefox only */
     .btn-short {
         margin-top: 0;
     }
-}
-
-.tab-pane {
-    margin: 1em;
-}
-
-#mynetwork {
-    height: 80vh;
-    border: 1px solid lightgray;
 }
 
 .browserupgrade {
@@ -65,8 +27,19 @@ textarea {
     display: none;
 }
 
-a {
-    cursor: pointer;
+.tab-pane {
+    margin: 1em;
+}
+
+.disclaimer {
+    text-align: center;
+    padding: 10px;
+    background-color: var(--disclaimer-color);
+    border-radius: 1em;
+}
+
+hr {
+    margin: 10px 0;
 }
 
 /* ------------------------------------------------------ */
@@ -139,10 +112,6 @@ a {
     text-decoration: none;
 }
 
-.space-top {
-    margin-top: 10px;
-}
-
 body {
     padding-top: 50px;
 }
@@ -150,6 +119,26 @@ body {
 /* ------------------------------------------------------ */
 /* ----------------------- INPUTS ----------------------- */
 /* ------------------------------------------------------ */
+
+.form-control {
+    border-radius: 0;
+    padding: 2px 6px;
+    margin-top: -2px;
+    margin-bottom: 2px;
+    height: 26px;
+}
+
+textarea {
+    width: 100%;
+    font-size: 14px;
+    color: #555;
+    padding: 1em;
+    border: 1px solid lightgray;
+}
+
+a {
+    cursor: pointer;
+}
 
 input:required:invalid,
 input:focus:invalid,
@@ -189,24 +178,12 @@ button {
     font-weight: bold;
 }
 
-.btn-danger.disabled,
-.btn-danger.disabled.active,
-.btn-danger.disabled.focus,
-.btn-danger.disabled:active,
-.btn-danger.disabled:focus,
-.btn-danger.disabled:hover,
 .btn-danger[disabled],
 .btn-danger[disabled].active,
 .btn-danger[disabled].focus,
 .btn-danger[disabled]:active,
 .btn-danger[disabled]:focus,
-.btn-danger[disabled]:hover,
-fieldset[disabled] .btn-danger,
-fieldset[disabled] .btn-danger.active,
-fieldset[disabled] .btn-danger.focus,
-fieldset[disabled] .btn-danger:active,
-fieldset[disabled] .btn-danger:focus,
-fieldset[disabled] .btn-danger:hover {
+.btn-danger[disabled]:hover {
     background-color: #9e9e9e;
     border-color: #808080;
     opacity: 0.2 !important;
