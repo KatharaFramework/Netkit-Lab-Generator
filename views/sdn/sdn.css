@@ -16,7 +16,7 @@
 /* ----------------- */
 
 g.nodes circle {
-    fill: brown;
+    fill: darkgray;
     r: 20;
 }
 
@@ -40,6 +40,10 @@ g.nodes circle.control {
 }
 
 g.nodes circle.edge {
+}
+
+g.nodes circle.external {
+    fill: darkgray;
 }
 
 /* --- mouseover --- */
@@ -101,7 +105,8 @@ g.links line.selected {
     overflow: auto;
 }
 
-#details input {
+#details input,
+#details2 input {
     margin-left: 10px;
     margin-bottom: 10px;
     padding-left: 10px;
@@ -109,7 +114,8 @@ g.links line.selected {
     max-width: 30%;
 }
 
-#details input:valid {
+#details input:valid,
+#details2 input:valid {
     background-image: none;
 }
 
@@ -150,6 +156,13 @@ g.links line.selected {
     padding: 5px;
 }
 
+#details .label-details td input[type=number],
+#details2 td input[type=number] {
+    max-width: 50px;
+    margin: 0;
+    border: none;
+}
+
 /* -------------------- */
 /* --- NODE DETAILS --- */
 /* -------------------- */
@@ -162,11 +175,8 @@ g.links line.selected {
     overflow-x: auto;
 }
 
-#details2 svg {
-    border: 1px solid lightgray;
-    box-sizing: content-box;
-    padding: 10px;
-    margin: 10px auto;
+#details2 > h3 {
+    margin-top: 10px;
 }
 
 #details2 > a {
@@ -179,14 +189,58 @@ g.links line.selected {
     margin-top: 30px;
 }
 
+/* --- SVG --- */
+
+#details2 svg {
+    border: 1px solid lightgray;
+    box-sizing: content-box;
+    padding: 10px;
+    margin: 10px auto;
+}
+
+.x-axis,
+.y-axis {
+    fill: black;
+}
+
+.domain {
+    fill: white;
+}
+
+rect.bar {
+    fill: var(--main-color);
+}
+
+/* --- Rules --- */
+
 #rules {
     margin: auto;
     width: fit-content;
     text-align: center;
 }
 
-#rules h2 {
+#rules > div > h2 {
     text-align: center;
     text-decoration: underline;
     color: var(--main-color);
+}
+
+#rules table {
+    margin: auto;
+}
+
+.half {
+    width: 50%;
+    float: left;
+    padding: 1em;
+}
+
+.modal-body input,
+.modal-body button {
+    margin: 10px;
+}
+
+.modal-body input {
+    border: 1px solid darkgray;
+    background-image: none;
 }

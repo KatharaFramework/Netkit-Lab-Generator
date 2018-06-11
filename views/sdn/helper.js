@@ -1,31 +1,11 @@
-function closeDetailsAndClean() {
-    document.getElementById('details').style.display = 'inline-block'
-    document.getElementById('details2').style.display = 'none'
-    let details = getDetailsElements()
-    for(let el in details)
-        details[el].style.display = 'none'
-    details.svg.innerHTML = ""
-    // TODO: clean packet labelling div
-    details.labelForwardingDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
+function removeNodesSelection(){
+    for (let el of document.querySelectorAll('svg .selected'))
+    el.classList.remove('selected')
 }
 
-function openDetails() {
-    closeDetailsAndClean()
-    document.getElementById('details').style.display = 'none'
-    document.getElementById('details2').style.display = 'inline-block'
-    return getDetailsElements()
-}
-
-function getDetailsElements() {
-    let details2 = document.getElementById('details2')
-    let rules = document.getElementById('rules')
-    return {
-        svg: details2.firstElementChild.nextElementSibling,
-        packetLabellingDiv: rules.firstElementChild,
-        labelForwardingDiv: rules.lastElementChild,
-        disclaimer: details2.lastElementChild
-    }
-}
+/* ----------------------------------------------------------- */
+/* ----------------------- TOP BUTTONS ----------------------- */
+/* ----------------------------------------------------------- */
 
 function resetButtons(){
     let bottoni = document.getElementsByClassName('sdnBehaviour')
@@ -48,6 +28,49 @@ function togglePathButtons(display){
     }
 }
 
+/* --------------------------------------------------------- */
+/* --------------------- DETAILS DIV ----------------------- */
+/* --------------------------------------------------------- */
+
+function openDetails() {
+    closeDetailsAndClean()
+    document.getElementById('details').style.display = 'none'
+    document.getElementById('details2').style.display = 'inline-block'
+    return getDetailsSections()
+}
+
+function closeDetailsAndClean() {
+    document.getElementById('details').style.display = 'inline-block'
+    document.getElementById('details2').style.display = 'none'
+    let details = getDetailsSections()
+    for(let el in details)
+        details[el].style.display = 'none'
+    details.svg.innerHTML = ""
+    details.packetRulesDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
+    details.labelForwardingDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
+}
+
+function getDetailsSections() {
+    let details2 = document.getElementById('details2')
+    let rules = document.getElementById('rules')
+    return {
+        title: details2.firstElementChild.nextElementSibling,
+        svg: details2.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling,
+        disclaimer: details2.lastElementChild,
+        packetRulesDiv: rules.firstElementChild,
+        labelForwardingDiv: rules.lastElementChild
+    }
+}
+
+function cleanSVGs(){
+    for (let svg of document.getElementsByTagName('svg'))
+        svg.innerHTML = ""
+}
+
+/* ---------------------------------------------------- */
+/* --------------------- GENERIC----------------------- */
+/* ---------------------------------------------------- */
+
 function createTable(...headers){
     let table = document.createElement('table')
     let head = table.createTHead()
@@ -59,7 +82,32 @@ function createTable(...headers){
     return table
 }
 
-function cleanSVGs(){
-    for (let svg of document.getElementsByTagName('svg'))
-        svg.innerHTML = ""
+function getLabelsInfo(){
+    let data = []
+    for (let el of document.getElementById('details').children) {
+        if(el.tagName == 'DIV' && el.firstChild.tagName != 'INPUT'){
+            let labelColor = el.firstChild.childNodes.item(0).style.backgroundColor
+            let labelName = el.firstChild.childNodes.item(1).textContent
+            for(let ruleRow of el.getElementsByTagName('tr')){
+                // Ogni child di ruleRow è una cella della riga: device, match, action, priority
+                let device = ruleRow.children.item(0).firstChild.textContent
+                let match = ruleRow.children.item(1).firstChild.textContent
+                let action = ruleRow.children.item(2).firstChild.textContent
+                let priority = ruleRow.children.item(3).firstChild.value
+
+                let rule = {
+                    label: {id: labelName, color: labelColor},
+                    match, action, priority
+                }
+
+                let el = data.find(el => el.id == device)
+                if(el) {
+                    el.rules.push(rule)
+                } else {
+                    data.push({id: device, rules: [rule]})
+                }
+            }
+        }
+    }
+    return data
 }

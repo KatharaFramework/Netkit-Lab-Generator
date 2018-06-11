@@ -11,9 +11,7 @@
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg==" />
     <script src="views/helper.js"></script>
     <script>
-        if (typeof JSON.clone !== "function") {
-            JSON.clone = function (obj) { return JSON.parse(JSON.stringify(obj)) }
-        }
+        if (typeof JSON.clone !== "function") JSON.clone = function (obj) { return JSON.parse(JSON.stringify(obj)) }
     </script>
 </head>
 
@@ -485,17 +483,84 @@
                 <button class="btn btn-danger sdnBehaviour" style="display:none" onclick="discardPath()">Annulla path</button>
                 <div style="margin: auto">
                     <svg id="sdnGraph" width="800" height="800"></svg>
+                    <!-- Details (labels details)-->
                     <div id="details"></div>
+                    <!-- Details2 (node details)-->
                     <div id="details2">
                         <a onclick="closeDetailsAndClean()">X</a>
+                        <h3>Title</h3>
+                        <hr>
                         <svg width="363" height="200"></svg>
                         <div id="rules">
                             <div>
-                                <h2>Packet labelling rules</h2>
-                                <button class="btn-success">Create new rule</button>
+                                <h2>Packet rules</h2>
+                                <button class="btn-success" onclick="document.getElementById('rule-modal').classList.remove('ng-hide')">Create new rule</button>
+                                <!-- Create label modal -->
+                                <div id="rule-modal" class="modal modal-kathara ng-hide">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" onclick="close_modal('rule-modal')">&times;</button>
+                                                <h4 class="modal-title">Create new rule</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="half">
+                                                    <h2>Match</h2>
+                                                    <select>
+                                                        <option value="swport">Sw. port</option>
+                                                        <option value="macsrc">MAC src</option>
+                                                        <option value="macdst">MAC dst</option>
+                                                        <option value="ethtype">ETH thype</option>
+                                                        <option value="mplslabel">MPLS label</option>
+                                                        <option value="mplstc">MPLS TC</option>
+                                                        <option value="vlanid">VLan ID</option>
+                                                        <option value="ipsrc">IP src</option>
+                                                        <option value="ipdst">IP dst</option>
+                                                        <option value="ipport">IP port</option>
+                                                        <option value="tcpsport">TCP sport</option>
+                                                        <option value="tcpdport">TCP dport</option>
+                                                        <option value="other">...</option> <!-- TODO -->
+                                                      </select>
+                                                      <input type="text">
+                                                </div>
+                                                <div class="half">
+                                                    <h2>Action</h2>
+                                                    <select>
+                                                        <option value="forwardtoport">Forward to port</option>
+                                                        <option value="sendtocontroller">Send to controller</option>
+                                                        <option value="drop">Drop</option>
+                                                        <option value="processl2">Process (L2)</option>
+                                                        <option value="processl3">Process (L3)</option>
+                                                        <option value="setfield">Set field</option>
+                                                        <option value="pushheader">Push header</option>
+                                                        <option value="popheader">Pop header</option>
+                                                        <option value="other">...</option> <!-- TODO -->
+                                                    </select>
+                                                    <input type="text">                                                    
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" onclick="close_modal('rule-modal')">Undo</button>
+                                                <button type="button" class="btn btn-success" onclick="createPacketRule()">Confirm</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table>
+                                    <thead>
+                                        <th>#</th>
+                                        <th>match</th>
+                                        <th>action</th>
+                                        <th>priority</th>
+                                        <th>stats</th>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
                             </div>
                             <div>
-                                <h2>Label forwarding rules</h2>
+                                <h2>Label rules</h2>
                                 <table>
                                     <thead>
                                         <th>#</th>
@@ -524,14 +589,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" onclick="close_modal(event)">&times;</button>
+                    <button type="button" class="close" onclick="close_modal('command-modal')">&times;</button>
                     <h4 class="modal-title">Running Commands</h4>
                 </div>
                 <div class="modal-body">
                     <p>The command has been issued, please wait for its execution.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" onclick="close_modal(event)">Ok, I understand</button>
+                    <button type="button" class="btn btn-warning" onclick="close_modal('command-modal')">Ok, I understand</button>
                 </div>
             </div>
         </div>
@@ -542,7 +607,7 @@
         var isCopied = false
 
         window.onload = function () {
-            console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+            console.log("  _______          __   __    __  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
 
             if (isElectron()) {
                 electron = require('electron')

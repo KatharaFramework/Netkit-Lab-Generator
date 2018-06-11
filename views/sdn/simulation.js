@@ -46,6 +46,7 @@ function findEdgeNetworks(data){
                 }
             }
             if(isInternal && isController) node.type += ' control'
+            if(!isInternal) node.type += ' external'
         }
     })
 }
@@ -110,7 +111,6 @@ function startSimulation(data) {
     linksGroup.attr('class', function (d) { return d.source.type }) // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
 
     d3.selectAll('g.nodes circle.switch').on('click', showSwitchDetails)
-    // d3.selectAll('g.links line.switch').on('click', showLinkDetails)
 }
 
 // function assignImage(d) {

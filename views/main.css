@@ -47,18 +47,21 @@ hr {
 /* ------------------------------------------------------ */
 
 .modal-kathara {
-    display: inherit !important;
+    display: block;
     z-index: 9999;
     background: rgba(189, 189, 189, 0.5);
 }
 
-.modal-kathara .modal-content {
-    border-radius: 0 !important;
+.modal-kathara .modal-title {
+    text-align: left;
 }
 
 .modal-kathara .modal-footer {
+    margin: 5px 0;
     border: 0 !important;
-    padding-top: 0px;
+    padding: 10px;
+    clear: both;
+    text-align: right;
 }
 
 /* ------------------------------------------------------ */

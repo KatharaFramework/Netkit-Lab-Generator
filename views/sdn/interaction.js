@@ -1,82 +1,34 @@
+/* ---------------------------------------------------- */
 /* --------------------- CLICKING --------------------- */
+/* ---------------------------------------------------- */
 
 function showSwitchDetails (d) {
-    if(pathOutputDiv) setAllEditButtonsDisabled()
+    if(pathOutputDiv) {
+        setAllEditButtonsDisabled()
+        discardPath()
+    }
     let nodeLabelsData = getLabelsInfo().find(el => el.id == d.id)
-    if(!nodeLabelsData){
-        let { disclaimer } = openDetails()
+    let { title, disclaimer, svg, packetRulesDiv, labelForwardingDiv } = openDetails()
+    title.innerHTML = d.id
+    title.style.display = null
+    let rulesAdded = showPacketsRules(d.id, packetRulesDiv)
+    if(!nodeLabelsData && rulesAdded == 0){
         disclaimer.style.display = null
         disclaimer.innerText = 'Nessuna regola installata sullo switch ' + d.id
     } else {
-        let { svg, packetLabellingDiv, labelForwardingDiv } = openDetails()
-        fillRulesSVG(undefined/* TODO */, svg)
-        showLabellingPacketsRules(packetLabellingDiv)
-        showMovingLabelRules(nodeLabelsData.rules, labelForwardingDiv)
+        if(nodeLabelsData)
+        showMovingLabelRules(nodeLabelsData.rules, labelForwardingDiv, rulesAdded + 1)
+        fillRulesSVG(nodeLabelsData, svg)
     }
 }
-
-function fillRulesSVG(data, svg){
-    svg.style.display = null
-    // if(svg.innerHTML == ""){
-    //     svg.style.display = 'none'
-    // } else svg.style.display = null
-}
-
-function showLabellingPacketsRules(reservedSpace){
-    reservedSpace.style.display = null
-    let addButton = reservedSpace.firstElementChild.nextElementSibling
-    addButton.removeEventListener('click', createLabellingRule)
-    addButton.addEventListener('click', createLabellingRule)
-}
-
-function createLabellingRule(){
-    console.log('Clicked on me! ', this)
-    // TODO
-}
-
-function showMovingLabelRules(data, reservedSpace){
-    reservedSpace.style.display = null
-    let counter = 1
-    let rulesTableBody = reservedSpace.getElementsByTagName('tbody').item(0)
-
-    for(let labelRule of data){
-        /* -------- CREATE A ROW -------- */
-        let ruleRow = rulesTableBody.appendChild(document.createElement('tr'))
-
-        ruleRow.appendChild(document.createElement('td')).appendChild(document.createTextNode(counter++))
-        let match = ruleRow.appendChild(document.createElement('td'))
-        let action = ruleRow.appendChild(document.createElement('td'))
-        let priority = ruleRow.appendChild(document.createElement('td'))
-        let stats = ruleRow.appendChild(document.createElement('td'))
-
-        /* ------- 'Match' column ------- */
-        let label = match.appendChild(document.createElement('p'))
-        let labelColor = label.appendChild(document.createElement('span'))
-        labelColor.className = 'colorTag'
-        labelColor.style.backgroundColor = labelRule.label.color
-        label.appendChild(document.createTextNode(labelRule.label.id))
-        match.appendChild(document.createElement('hr'))
-        match.appendChild(document.createTextNode(labelRule.match))
-
-        /* ------- Other columns------- */
-        action.appendChild(document.createTextNode(labelRule.action))
-        priority.appendChild(document.createTextNode(labelRule.priority))
-        stats.appendChild(document.createTextNode('1'))
-    }
-}
-
-// function showLinkDetails (d) {
-//     if (d.source.type == "switch" && !pathOutputDiv) {
-//         let {svg, textArea} = openDetails()
-//         // TODO ? Forse non c'è bisogno
-//     }
-// }
 
 function disableDragging(){
     d3.selectAll('g.nodes circle').call(d3.drag())
 }
 
+/* -------------------------------------------------- */
 /* --------------------- MOVING --------------------- */
+/* -------------------------------------------------- */
 
 // Oss. Questi due metodi sono dipendenti dall'oggetto simulation del modulo simulation.js
 function enableMovingNodes() {
@@ -113,7 +65,9 @@ function releaseNodes(){
     }
 }
 
+/* -------------------------------------------------- */
 /* ----------------- PATH SELECTION ----------------- */
+/* -------------------------------------------------- */
 
 let newPath = new Set()
 let pendingStep = null
@@ -211,10 +165,6 @@ function appendPathStep(options){   // options è: {device, ingressPort || egres
 }
 
 function applyPath() {
-    let thisLabelData = {
-        devices: new Set(),
-        rules: []
-    }
     let tableBody = pathOutputDiv.getElementsByTagName('tbody').item(0)
     for(let step of newPath){
         let rule = document.createElement('tr')
@@ -226,46 +176,42 @@ function applyPath() {
         device.innerText = step.device
         match.innerText = "ingressPort eth" + step.ingressPort
         action.innerText = "egressPort eth" + step.egressPort
-        priority.innerText = "1"
+
+        let priorityInput = priority.appendChild(document.createElement('input'))
+        priorityInput.value = +1
+        priorityInput.type = 'number'
+        priorityInput.min = 1
 
         tableBody.appendChild(rule)
+
+        rule.addEventListener('mouseenter', function() {
+            highlightSegmentOnGraph(step.device, step.ingressPort, step.egressPort)
+            console.log('perché questo event listenre sparisce?')
+        })
+        rule.addEventListener('mouseleave', discardPath)
     }
     togglePathButtons(false)
     discardPath()
 }
 
 function discardPath(){
-    newPath = new Set()
+    if(newPath.size) newPath = new Set()
     pendingStep = null
-    for(let el of document.querySelectorAll('svg .selected')){
-        el.classList.remove('selected')
-    }
+    removeNodesSelection()
     togglePathButtons(false)
 }
 
-// function drawLines(num, cx, cy, radius = 150) {
-//     let lines = d3.select("#details2 svg").append('g')
-//     let arcDegree = 2 * Math.PI / num
-//     for (let i = 0; i < num; i++) {
-//         // v-- Qui se sostituisco radius con cx, cy viene una stella che riempie lo spazio (male però)
-//         let x2 = cx + radius * Math.cos(arcDegree * i)
-//         let y2 = cy + radius * Math.sin(arcDegree * i)
+/* -------------------------------------------------- */
+/* ----------------- RULE HIGHLIGHT ----------------- */
+/* -------------------------------------------------- */
 
-//         lines.append('line')
-//             .attr('x1', cx).attr('y1', cy)
-//             .attr('x2', x2).attr('y2', y2)
-//             .attr('class', 'axis')
-//     }
-// }
+function highlightSegmentOnGraph(device, from, to){
+    d3.selectAll('circle.switch')
+        .attr('class', function(d){ return (d.id == device) ? 'switch selected' : 'switch' })
 
-// function drawRadialAxis(num, top, right, bottom, left) {
-//     let plot = d3.select("#details2 svg").append('g')
-//     let horizontalSpaceBetween = (top + bottom) / (num + 2)
-//     for (let i = 0; i < num; i++) {
-//         let height = horizontalSpaceBetween * (i + 1)
-//         plot.append('line')
-//             .attr('x1', left).attr('y1', height)
-//             .attr('x2', right).attr('y2', height)
-//             .attr('class', 'axis')
-//     }
-// }
+    d3.selectAll('line.switch')
+        .attr('class', function(d){
+            return (d.source.id == device && (d.porta == from || d.porta == to)) ?
+                'switch selected' : 'switch'
+        })
+}

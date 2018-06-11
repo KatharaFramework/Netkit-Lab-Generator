@@ -43,10 +43,8 @@ function toggle_submenu(number, total = 3) {
     }
 }
 
-function close_modal(e) {
-    e.preventDefault()
-    let modal = document.getElementById("command-modal")
-    modal.classList.add("ng-hide")
+function close_modal(id) {
+    document.getElementById(id).classList.add("ng-hide")
 }
 
 function isElectron() {
