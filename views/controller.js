@@ -233,6 +233,7 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
                         alert("Error: " + err)
                     }
                 }
+                fileElement.value = ''
                 fileReader.readAsBinaryString(filePath)
             } else {
                 fileElement.click()

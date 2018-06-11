@@ -132,7 +132,7 @@
                         <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
                         of this application do not take any responsibility for any malfunction. Remember to manually check the final configuration
                         for exams and production.
-                        <a class="link" onclick="document.querySelector('#home div .disclaimer').classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
+                        <a class="link" onclick="this.parentElement.classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
                     </p>
                     </p>
                 </div>
@@ -247,21 +247,21 @@
                                     <span class="btn btn-danger" data-ng-click="removeInterface(machine)" data-ng-disabled="machine.interfaces.counter<=1">Remove last interface</span>
                                 </p>
                                 <div data-ng-repeat="i in machine.interfaces.if">
-                                    <!-- <div data-ng-hide="((machine.type == 'switch' || machine.type == 'controller') && i.eth.number == 0)"> -->
-                                    <div>
-                                        <label>Eth{{i.eth.number}}: </label>
-                                        <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
+                                    <div data-ng-hide="((machine.type == 'switch' || machine.type == 'controller') && i.eth.number == 0)">
+                                        <div>
+                                            <label>Eth{{i.eth.number}}: </label>
+                                            <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
+                                        </div>
+                                        <div>
+                                            <label> IP/Net: </label>
+                                            <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
+                                        </div>
+                                        <div>
+                                            <label> Complete DNS Name: </label>
+                                            <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
+                                        </div>
+                                        <hr>
                                     </div>
-                                    <div>
-                                        <label> IP/Net: </label>
-                                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
-                                    </div>
-                                    <div>
-                                        <label> Complete DNS Name: </label>
-                                        <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
-                                    </div>
-                                    <hr>
-                                    <!-- </div> -->
                                 </div>
                                 <label>Directly in {{machine.name}}.startup:</label>
                                 <textarea title="free" rows="3" class="form-control" data-ng-model="machine.interfaces.free"></textarea>
@@ -320,12 +320,10 @@
                                     <strong>userdir</strong> module?
                                 </div>
 
-                                <div data-ng-show="machine.type=='switch'">
-                                    TODO
+                                <div data-ng-show="machine.type =='switch'">
                                 </div>
 
                                 <div data-ng-show="machine.type=='controller'">
-                                    TODO
                                 </div>
 
                                 <div data-ng-show="machine.type=='other'">
@@ -469,16 +467,25 @@
             <!-- SDN-->
             <div id="sdn" class="tab-pane">
                 <link rel="stylesheet" href="views/sdn/sdn.css" />
+                <script src="views/sdn/dataclass.js"></script>
                 <script src="views/sdn/helper.js"></script>
                 <script src="views/sdn/labelmanaging.js"></script>
+                <script src="views/sdn/rulesmanaging.js"></script>
+                <script src="views/sdn/simulation.js"></script>
+                <script src="views/sdn/interaction.js"></script>
                 <p class="disclaimer">Please update the size of the window to fit contents!
-                    <a class="link" onclick="document.querySelector('#sdn .disclaimer').classList.add('hidden')">click to close</a>
+                    <a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
                 </p>
+                <div style="margin-bottom: 20px">
+                    <h3>HOW TO:</h3>
+                    ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                    <a onclick="this.parentElement.style.display='none'">close</a>
+                </div>
                 <button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enablePathSelection()">Enable path selection</button>
                 <button class="btn sdnBehaviour" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="createNewLabel()">Create new label</button>
+                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="closeDetailsAndClean();createNewLabel()">Create new label</button>
                 <button class="btn btn-success sdnBehaviour" style="display:none" onclick="applyPath()">Conferma path</button>
                 <button class="btn btn-danger sdnBehaviour" style="display:none" onclick="discardPath()">Annulla path</button>
                 <div style="margin: auto">
@@ -486,8 +493,9 @@
                     <!-- Details (labels details)-->
                     <div id="details"></div>
                     <!-- Details2 (node details)-->
-                    <div id="details2">
+                    <div id="details2" style="display: none">
                         <a onclick="closeDetailsAndClean()">X</a>
+                        <button style="display: none" class="btn-success">Apply</button>
                         <h3>Title</h3>
                         <hr>
                         <svg width="363" height="200"></svg>
@@ -538,10 +546,22 @@
                                                     </select>
                                                     <input type="text">                                                    
                                                 </div>
+                                                <div class="half">
+                                                    <h2>Priority</h2>
+                                                    <input type="number" min="0" value="0" onchange="sdnData.changePriority(this.value)">                                                    
+                                                </div>
+                                                <div class="half">
+                                                    <h2>Idle timeout</h2>
+                                                    <input type="number" min="0" value="10000">                                                    
+                                                </div>
+                                                <div class="half">
+                                                    <h2>Hard timeout</h2>
+                                                    <input type="number" min="0" value="90000">                                                    
+                                                </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-danger" onclick="close_modal('rule-modal')">Undo</button>
-                                                <button type="button" class="btn btn-success" onclick="createPacketRule()">Confirm</button>
+                                                <button type="button" class="btn btn-success" onclick="createPacketRule(appendPacketRule)">Confirm</button>
                                             </div>
                                         </div>
                                     </div>
@@ -552,6 +572,8 @@
                                         <th>match</th>
                                         <th>action</th>
                                         <th>priority</th>
+                                        <th>idle timeout</th>
+                                        <th>hard timeout</th>
                                         <th>stats</th>
                                     </thead>
                                     <tbody>
@@ -567,6 +589,8 @@
                                         <th>match</th>
                                         <th>action</th>
                                         <th>priority</th>
+                                        <th>idle timeout</th>
+                                        <th>hard timeout</th>
                                         <th>stats</th>
                                     </thead>
                                     <tbody>
@@ -578,8 +602,6 @@
                         <p class="disclaimer"></p>
                     </div>
                 </div>
-                <script src="views/sdn/simulation.js"></script>
-                <script src="views/sdn/interaction.js"></script>
             </div>
         </div>
     </div>
@@ -603,7 +625,7 @@
     </div>
 
     <script>
-        var electron, d3
+        var electron, d3, sdnData
         var isCopied = false
 
         window.onload = function () {
@@ -616,7 +638,7 @@
                 let thisWin = electron.remote.getCurrentWindow()
                 let sdnDisclaimer = document.querySelector("#sdn .disclaimer")
                 thisWin.on('resize', function () {
-                    if (thisWin.getBounds().height < 1000 || thisWin.getBounds().width < 1300) {
+                    if (thisWin.getBounds().height < 1000 || thisWin.getBounds().width < 1500) {
                         sdnDisclaimer.classList.remove('hidden')
                     } else sdnDisclaimer.classList.add('hidden')
                 }).emit('resize')
