@@ -42,10 +42,25 @@ class SDNData {
 
     /* RULES */
 
-    addRule(device, match, action, priority, idleTimeout, hardTimeout, isLabelForwarding) {
+    addRule() {
+        let device, matches, action, priority, idleTimeout, hardTimeout, stats, isLabelForwarding
+        if(arguments.length == 8){
+            [device, matches, action, priority, idleTimeout, hardTimeout, stats, isLabelForwarding] = arguments
+        } else if (arguments.length > 10 && (arguments.length % 2 == 0)){
+            console.error('TODO in addRule')
+        } else {
+            throw new Error('Utilizzo incorretto di addRule')
+        }
+
         let deviceRules = this.getDeviceRules(device)
-        let newRule = this._makeRule(match, action, priority, idleTimeout, hardTimeout, 0)
-        newRule.isLabelForwarding = isLabelForwarding
+        let newRule = {
+            matches, action,
+            idleTimeout, hardTimeout,
+            // TODO: Rimuovi Math
+            priority, stats: (stats || Math.floor(Math.random()*100)),
+            isLabelForwarding
+        }
+
         if (deviceRules) {
             deviceRules.push(newRule)
         } else {
@@ -55,11 +70,6 @@ class SDNData {
             })
         }
         return newRule
-    }
-
-    _makeRule(match, action, priority, idleTimeout, hardTimeout, stats) {
-        // TODO: gestire le statistiche
-        return { match, action, priority, idleTimeout, hardTimeout, stats: Math.floor(Math.random()*100) }
     }
 
     getDeviceRules(deviceName) {

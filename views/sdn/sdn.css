@@ -2,13 +2,35 @@
     margin-bottom: 15px;
 }
 
+#comandiSDN,
 #sdnGraph,
 #details,
-#details2 {
+#details2,
+#details3 {
+    display: inline-block;
     border: 1px solid lightgray;
     padding: 10px;
     box-sizing: content-box;
     vertical-align: top;
+}
+
+/* ----------------- */
+/* ---- COMANDI ---- */
+/* ----------------- */
+
+#comandiSDN {
+    width: 70px;
+    height: 820px;
+
+    overflow: hidden;
+    padding: 0;
+}
+
+#comandiSDN button {
+    padding: 5px 0;
+    margin: 0;
+    width: 100%;
+    height: 50px;
 }
 
 /* ----------------- */
@@ -25,6 +47,10 @@ g.nodes circle.network {
     r: 10;
 }
 
+g.nodes circle.network.external {
+    fill: darkgray;
+}
+
 g.nodes circle.switch {
     fill: blue;
 }
@@ -37,13 +63,6 @@ g.nodes circle.control {
     stroke: black;
     stroke-width: 1px;
     fill: white;
-}
-
-g.nodes circle.edge {
-}
-
-g.nodes circle.external {
-    fill: darkgray;
 }
 
 /* --- mouseover --- */
@@ -76,8 +95,13 @@ g.links line.switch {
     stroke: darkgray;
 }
 
-g.links line.controller {
+g.links line.controller,
+line.network.edge:not(.switch) {
     stroke-dasharray: 10px 10px;
+}
+
+g.links line.network.control.switch {
+    display: none;
 }
 
 /* --- mouseover --- */
@@ -99,7 +123,6 @@ g.links line.selected {
 /* ---------------------- */
 
 #details {
-    display: inline-block;
     width: 400px;
     height: 800px;
     overflow: auto;
@@ -168,7 +191,6 @@ g.links line.selected {
 /* -------------------- */
 
 #details2 {
-    display: inline-block;
     width: 600px;
     height: 800px;
     overflow-y: scroll;
@@ -185,7 +207,8 @@ g.links line.selected {
     margin: 10px 20px;
 }
 
-#details2 > a {
+#details2 > a,
+#details3 > a {
     float: right;
     color: red;
     margin-bottom: 5px;
@@ -235,18 +258,67 @@ rect.bar {
     margin: auto;
 }
 
+/* ----------------- */
+/* ----- MODAL ----- */
+/* ----------------- */
+
 .half {
     width: 50%;
     float: left;
     padding: 1em;
 }
 
-.modal-body input,
-.modal-body button {
+.modal-body input {
     margin: 10px;
 }
 
 .modal-body input {
     border: 1px solid darkgray;
     background-image: none;
+    margin: auto;
+}
+
+/* ----------------- */
+/* ----- MODAL ----- */
+/* ----------------- */
+
+.half {
+    width: 50%;
+    float: left;
+    padding: 1em;
+}
+
+.modal-body input {
+    margin: 10px;
+}
+
+.modal-body input {
+    border: 1px solid darkgray;
+    background-image: none;
+}
+
+#rule-modal .half button {
+    min-width: 80px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+    padding: 0;
+}
+
+#rule-modal .half button.btn-danger {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+#rule-modal .half button.btn-success {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ----------------- */
+/* --- DETAILS 3 --- */
+/* ----------------- */
+
+#details3 {
+    width: 400px;
+    height: 800px;
 }

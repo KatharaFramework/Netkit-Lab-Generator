@@ -3,7 +3,8 @@
 /* ---------------------------------------------------- */
 
 function createNewLabel() {
-    document.getElementsByClassName('sdnBehaviour').item(3).style.display = 'none'
+    let createLabelButton = document.getElementsByClassName('sdnBehaviour').item(4)
+    hide(createLabelButton)
     let row = d3.create('div')
     row.append('input').attr('placeholder', 'color')
         .attr('type', 'text').attr('pattern', '(#[0-9]{3,6})|([A-z]+)|(rgba?.*)')
@@ -12,11 +13,7 @@ function createNewLabel() {
     row.append('button').text('Add')
         .on('click', function () { createNewDefinedLabel(row.nodes().pop()) })
     row.append('button').text('Ignore')
-        .on('click', function () {
-            row.remove()
-            document.getElementsByClassName('sdnBehaviour').item(3)
-                .style.display = null
-        })
+        .on('click', function () { row.remove(); unhide(createLabelButton)})
     document.getElementById('details').appendChild(row.node())
 }
 
@@ -42,7 +39,7 @@ function createNewDefinedLabel(rawElement) {
         })
 
         editButton.innerText = "Edit"
-        editButton.addEventListener('click', setActiveStatus)
+        editButton.addEventListener('click', function(){ editButtonBehaviour(this, false) })
 
         deleteButton.style.display = "none"
         deleteButton.innerText = "Remove..."
@@ -62,7 +59,7 @@ function createNewDefinedLabel(rawElement) {
         rawElement.append(showDiv)
 
         details.appendChild(document.createElement('hr'))
-        document.getElementsByClassName('sdnBehaviour').item(3).style.display = null
+        unhide(document.getElementsByClassName('sdnBehaviour').item(4))
     }
 }
 
@@ -70,48 +67,39 @@ function createNewDefinedLabel(rawElement) {
 
 /* ----- edit button ----- */
 
-function setActiveStatus() {
-    setAllEditButtonsDisabled()
+function editButtonBehaviour(buttonEl, forceStop) {
+    if(buttonEl.innerText == 'Edit' && !forceStop){
+        setAllEditButtonsDisabled()
+        buttonEl.classList.add('btn-success')
+        buttonEl.innerText = 'EDITING'
+        buttonEl.parentElement.nextElementSibling.style.display = 'block'
 
-    this.classList.add('btn-success')
-    this.innerText = 'EDITING'
-    this.parentElement.nextElementSibling.style.display = 'block'
-
-    this.previousElementSibling.style.display = null
-
-    sdnData.setPathOutputDiv(this.parentElement.nextElementSibling)
-
-    enablePathSelection()
-
-    let newThis = this.cloneNode(true)
-    newThis.addEventListener('click', setDisabledStatus)
-    this.parentNode.replaceChild(newThis, this)
-}
-
-function setDisabledStatus() {
-    this.classList.remove('btn-success')
-    this.innerText = 'Edit'
-
-    this.previousElementSibling.style.display = 'none'
-    disableRemove.bind(this.previousElementSibling)()
-
-    sdnData.setPathOutputDiv(null)
-
-    disableDragging()
-
-    let newThis = this.cloneNode(true)
-    newThis.addEventListener('click', setActiveStatus)
-    this.parentNode.replaceChild(newThis, this)
+        buttonEl.previousElementSibling.style.display = null
+        
+        sdnData.setPathOutputDiv(buttonEl.parentElement.nextElementSibling)
+    
+        enablePathSelection()
+    } else {
+        buttonEl.classList.remove('btn-success')
+        buttonEl.innerText = 'Edit'
+        
+        buttonEl.previousElementSibling.style.display = 'none'
+        disableRemove.bind(buttonEl.previousElementSibling)()
+        
+        sdnData.setPathOutputDiv(null)
+        
+        disableDragging()
+    }
 }
 
 function setAllEditButtonsDisabled() {
     details.querySelectorAll('#details > div > p button.btn-success')
-        .forEach(el => setDisabledStatus.bind(el)())
+        .forEach(el => editButtonBehaviour(el, true))
 }
 
 /* ----- remove button ----- */
 
-function enableRemove() {
+function enableRemove() {   // TODO: Pensa a come sostiturie questi due metodi con 1 solo (simlmente ad editButton)
     this.className = "btn-danger"
     this.innerText = "Click to remove"
 

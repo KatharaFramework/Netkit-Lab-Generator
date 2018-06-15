@@ -22,7 +22,7 @@ function loadSDN(config) {
     cleanSVGs()
     resetButtons()
     document.getElementById('details').innerHTML = ""
-    closeDetailsAndClean()
+    closeDetailsAndClean(3)
 
     sdnData = new SDNData() // TODO: Aprire un alert per chiedere conferma?
     startSimulation(data)
@@ -79,7 +79,7 @@ function startSimulation(data) {
 
     /* ------------------- CREATE SIMULATION ------------------- */
 
-    let simulation = d3.forceSimulation(data.nodes)     // <-- Da ora ogni nodo ha in più: index, x, y, vx, vy
+    let simulation = d3.forceSimulation(data.nodes) // <-- Da ora ogni nodo ha in più: index, x, y, vx, vy
         .force("link", d3.forceLink(data.links)
             .id(function (d) { return d.id }))      // <-- specificando id posso riferirmi ai nodi attraverso il loro campo 'id' piuttosto che al loro indice nell'array dei nodi
         .force("charge", d3.forceManyBody())
@@ -111,7 +111,24 @@ function startSimulation(data) {
 
     sdnData.setSimulation(simulation)
 
-    linksGroup.attr('class', function (d) { return d.source.type }) // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
+    linksGroup.attr('class', function (d) { return d.target.type + " " + d.source.type }) // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
 
     d3.selectAll('g.nodes circle.switch').on('click', showSwitchDetails)
+}
+
+function toggleExternalVisibility(thisButton){
+    let externalNodes = d3.selectAll('g.nodes circle.external, g.nodes circle:not(.switch):not(.network):not(.controller)')
+    let externalLinks = d3.selectAll('g.links line.external')
+    if(thisButton.stato){
+        externalNodes.attr('hidden', null)
+        externalLinks.attr('hidden', null)
+        thisButton.innerText = 'Hide external network'
+        thisButton.stato = false
+    } else {
+        externalNodes.attr('hidden', '')
+        externalLinks.attr('hidden', '')
+        thisButton.innerText = 'Show external network'
+        thisButton.stato = true
+    }
+
 }

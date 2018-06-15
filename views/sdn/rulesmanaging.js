@@ -1,3 +1,30 @@
+function createMatchRepresentation(matches, hasLabel = false){
+    if(hasLabel){
+        let match = matches[0]
+        let cellContents = [
+            document.createElement('p'),
+            document.createElement('hr'),
+            document.createTextNode(match.match + " " + match.value)
+        ]
+        
+        let labelColor = cellContents[0].appendChild(document.createElement('span'))
+        cellContents[0].appendChild(document.createTextNode(match.label.name))
+
+        labelColor.className = 'colorTag'
+        labelColor.style.backgroundColor = match.label.color
+
+        return cellContents
+    } else {
+        let len = matches.length
+        let cellContents = []
+        matches.forEach(function(match, index){
+            cellContents.push(document.createTextNode(match.match + " " + match.value))
+            if(len > index +1) cellContents.push(document.createElement('hr'))
+        })
+        return cellContents
+    }
+}
+
 /* -------------------------------------------------------- */
 /* --------------------- NODE DETAILS --------------------- */
 /* -------------------------------------------------------- */
@@ -5,36 +32,43 @@
 /* -------------- PACKET RULES -------------- */
 
 function createPacketRule(callback) {
-    let modal = document.getElementById('rule-modal')
+    let device = document.querySelector('#details2 h3').innerText
 
-    let device = document.getElementById('details2').querySelector('h3').innerHTML
-    let match = modal.getElementsByTagName('select').item(0).value
-    let action = modal.getElementsByTagName('select').item(1).value
+    let inputDivs = document.querySelectorAll('#rule-modal .modal-body .half')
+    let matchDiv = inputDivs.item(0)
+    let actionDiv = inputDivs.item(1)
+    let priorityDiv = inputDivs.item(2)
+    let idleTimeoutDiv = inputDivs.item(3)
+    let hardTimeoutDiv = inputDivs.item(4)
 
-    let vals = modal.getElementsByTagName('input')
-    let matchVal = vals.item(0).value
-    let actionVal = vals.item(1).value
-    let priorityVal = vals.item(2).value
-    let idleTimeoutVal = vals.item(3).value
-    let hardTimeoutVal = vals.item(4).value
+    let matches = []
+    for(let i = 3; i < matchDiv.children.length; i += 2){
+        matches.push({
+            match: matchDiv.children[i].value,
+            value: matchDiv.children[i+1].value
+        })
+    }
 
     let rule = sdnData.addRule(
         device,
-        { match, value: matchVal },
-        { action, value: actionVal },
-        priorityVal,
-        idleTimeoutVal,
-        hardTimeoutVal,
+        matches,
+        {
+            action: actionDiv.lastElementChild.previousElementSibling.value,
+            value: actionDiv.lastElementChild.value
+        },
+        priorityDiv.lastElementChild.value,
+        idleTimeoutDiv.lastElementChild.value,
+        hardTimeoutDiv.lastElementChild.value,
+        0,
         false
     )
 
     let table = document.getElementById('rules').firstElementChild.lastElementChild
     let tbody = table.lastElementChild
-    unhide(table)
     callback(tbody, rule, 'NEW')
     
     hide(document.querySelector('#details2 .disclaimer'))
-    close_modal('rule-modal')
+    unhide(table)
 }
 
 function showPacketsRules(rules, div, counter) {
@@ -44,15 +78,17 @@ function showPacketsRules(rules, div, counter) {
 }
 
 function appendPacketRule(div, rule, counter) {
-    let row = div.appendChild(document.createElement('tr'))
-
-    row.appendChild(document.createElement('td')).textContent = counter
-    row.appendChild(document.createElement('td')).textContent = rule.match.match + ' ' + rule.match.matchVal
-    row.appendChild(document.createElement('td')).textContent = rule.action.action + ' ' + rule.action.actionVal
-    row.appendChild(document.createElement('td')).textContent = rule.priority
-    row.appendChild(document.createElement('td')).textContent = rule.idleTimeout
-    row.appendChild(document.createElement('td')).textContent = rule.hardTimeout
-    row.appendChild(document.createElement('td')).textContent = rule.stats
+    div.appendChild(
+        createRow(
+            counter,
+            createMatchRepresentation(rule.matches),
+            rule.action.action + ' ' + rule.action.value,
+            rule.priority, 
+            rule.idleTimeout,
+            rule.hardTimeout,
+            rule.stats
+        ).row
+    )
 }
 
 /* ------------ LABELS ONLY RULES ------------ */
@@ -61,25 +97,17 @@ function showMovingLabelRules(data, reservedSpace, counter) {
     let rulesTableBody = reservedSpace.getElementsByTagName('tbody').item(0)
 
     for (let labelRule of data) {
-        /* -------- CREATE A ROW -------- */
-        let ruleRow = rulesTableBody.appendChild(document.createElement('tr'))
-
-        ruleRow.appendChild(document.createElement('td')).appendChild(document.createTextNode(counter++))
-        let match = ruleRow.appendChild(document.createElement('td'))
-        ruleRow.appendChild(document.createElement('td')).textContent = labelRule.action.action + " " + labelRule.action.value
-        ruleRow.appendChild(document.createElement('td')).textContent = labelRule.priority
-        ruleRow.appendChild(document.createElement('td')).textContent = labelRule.idleTimeout
-        ruleRow.appendChild(document.createElement('td')).textContent = labelRule.hardTimeout
-        ruleRow.appendChild(document.createElement('td')).textContent = labelRule.stats
-
-        /* ------- 'Match' column ------- */
-        let label = match.appendChild(document.createElement('p'))
-        let labelColor = label.appendChild(document.createElement('span'))
-        labelColor.className = 'colorTag'
-        labelColor.style.backgroundColor = labelRule.match.label.color
-        label.appendChild(document.createTextNode(labelRule.match.label.name))
-        match.appendChild(document.createElement('hr'))
-        match.appendChild(document.createTextNode(labelRule.match.match + " " + labelRule.match.value))
+        rulesTableBody.appendChild(
+            createRow(
+                counter++,
+                createMatchRepresentation(labelRule.matches, true),
+                labelRule.action.action + " " + labelRule.action.value,
+                labelRule.priority,
+                labelRule.idleTimeout,
+                labelRule.hardTimeout,
+                labelRule.stats
+            ).row
+        )
     }
 }
 

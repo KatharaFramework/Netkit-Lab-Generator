@@ -9,7 +9,7 @@ function showSwitchDetails(d) {
     }
 
     let nodeRules = sdnData.getDeviceRules(d.id)
-    let { title, svg, disclaimer, packetRulesDiv, labelForwardingDiv } = openDetails()
+    let { title, svg, disclaimer, packetRulesDiv, labelForwardingDiv } = openDetails(2)
     title.innerHTML = d.id
     disclaimer.innerText = 'Nessuna regola installata sullo switch ' + d.id
     
@@ -39,8 +39,9 @@ function showSwitchDetails(d) {
 
 // Oss. Questi due metodi sono dipendenti dall'oggetto simulation del modulo simulation.js
 function enableMovingNodes() {
-    document.getElementsByClassName('sdnBehaviour').item(0).style.display = 'none'
-    document.getElementsByClassName('sdnBehaviour').item(1).style.display = null
+    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    hide(bottoni.item(1))
+    unhide(bottoni.item(2))
     let simulation = sdnData.getSimulation()
 
     d3.selectAll('g.nodes circle').call(  // call chiama la funzione passata per parametro esattamente una volta sola
@@ -49,8 +50,7 @@ function enableMovingNodes() {
         }).on("drag", function (d) {
             d.fx = d3.event.x
             d.fy = d3.event.y
-            document.getElementsByClassName('sdnBehaviour').item(2)
-                .style.display = null
+            unhide(bottoni.item(3))
         }).on('end', function () {
             if (!d3.event.active) simulation.alphaTarget(0)
         })
@@ -67,8 +67,7 @@ function releaseNodes() {
 
     if (released) {
         let simulation = sdnData.getSimulation()
-        document.getElementsByClassName('sdnBehaviour').item(2)
-            .style.display = 'none'
+        hide(document.getElementsByClassName('sdnBehaviour').item(3))
         simulation.alphaTarget(0.1).restart()
         setTimeout(() => simulation.alphaTarget(0), 3000)
     }
@@ -83,11 +82,9 @@ function disableDragging() {
 }
 
 function enablePathSelection() {
-    document.getElementsByClassName('sdnBehaviour').item(0)
-        .style.display = null
-    document.getElementsByClassName('sdnBehaviour').item(1)
-        .style.display = 'none'
-
+    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    unhide(bottoni.item(1))
+    hide(bottoni.item(2))
     disableDragging()
 
     if (sdnData.isEditingLabels()) {
@@ -96,7 +93,7 @@ function enablePathSelection() {
         let linkLock = 0
         let lastSelection = null
 
-        d3.selectAll("circle.network").call(
+        d3.selectAll("circle.network:not(.control):not(.external)").call(
             d3.drag().on("start", function (d, i, data) {
                 data[i].classList.add('selected')
                 linkLock = 1
@@ -112,7 +109,7 @@ function enablePathSelection() {
                     linkLock = 0
                 }))
 
-        d3.selectAll('circle.network')  // Link lock è 0
+        d3.selectAll('circle.network:not(.control):not(.external)')  // Link lock è 0
             .on('mouseover', function (d, i, data) {
                 if (!networksLocked && d.id == lastSelection && !data[i].classList.contains('selected')) {
                     linkLock++
@@ -122,7 +119,7 @@ function enablePathSelection() {
                 }
             })
 
-        d3.selectAll('line.switch')
+        d3.selectAll('line.switch:not(.control)')
             .on('mouseover', function (d, i, data) {
                 if (linkLock == 1 && d.target.id == lastSelection && !data[i].classList.contains('selected')) {
                     linkLock++
@@ -173,13 +170,9 @@ function applyPath() {
         tableBody.appendChild(rule)
         sdnData.addRule(
             step.device,
-            { match: 'ingressPort', value: step.ingressPort, label },
+            [{ match: 'ingressPort', value: step.ingressPort, label }],
             { action: 'egressPort', value: step.egressPort },
-            0,      // TODO
-            10000,  // TODO
-            10000,  // TODO
-            true
-        )
+            0, 10000, 10000, 0, true)
 
         rule.addEventListener('mouseenter', function () {
             highlightSegmentOnGraph(step.device, step.ingressPort, step.egressPort)
@@ -203,9 +196,11 @@ function discardPath() {
 
 function highlightSegmentOnGraph(device, from, to) {
     d3.selectAll('circle.switch')
-        .attr('class', function (d) { return (d.id == device) ? 'switch selected' : 'switch' })
+        .attr('class', function (d) {
+            return (d.id == device) ? 'switch selected' : 'switch'
+        })
 
-    d3.selectAll('line.switch')
+    d3.selectAll('line.switch:not(.control)')
         .attr('class', function (d) {
             return (d.source.id == device && (d.porta == from || d.porta == to)) ?
                 'switch selected' : 'switch'

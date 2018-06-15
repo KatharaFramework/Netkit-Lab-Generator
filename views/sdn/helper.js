@@ -10,14 +10,15 @@ function removeNodesSelection() {
 function resetButtons() {
     let bottoni = document.getElementsByClassName('sdnBehaviour')
     unhide(
-        bottoni.item(0),    // Bottone per muovere i nodi
-        bottoni.item(3)     // Bottone per aggiungere etichette
+        bottoni.item(1),    // Bottone per muovere i nodi
+        bottoni.item(4)     // Bottone per aggiungere etichette
     )
     hide(
-        bottoni.item(1),    // Bottone per selezionare il path
-        bottoni.item(2),    // Bottone per rilasciare i nodi
-        bottoni.item(4),    // Bottone per confermare un path
-        bottoni.item(5)     // Bottone per annullare un path
+        bottoni.item(0),    // Bottone per caricare la configurazione
+        bottoni.item(2),    // Bottone per selezionare il path
+        bottoni.item(3),    // Bottone per rilasciare i nodi
+        bottoni.item(5),    // Bottone per confermare un path
+        bottoni.item(6)     // Bottone per annullare un path
     )
 }
 
@@ -25,12 +26,12 @@ function togglePathButtons(displayBool) {
     let bottoni = document.getElementsByClassName('sdnBehaviour')
     if (displayBool) 
         unhide(
-            bottoni.item(4),
-            bottoni.item(5))
+            bottoni.item(5),
+            bottoni.item(6))
     else 
         hide(
-            bottoni.item(4),
-            bottoni.item(5)
+            bottoni.item(5),
+            bottoni.item(6)
     )
 }
 
@@ -38,27 +39,32 @@ function togglePathButtons(displayBool) {
 /* --------------------- DETAILS DIV ----------------------- */
 /* --------------------------------------------------------- */
 
-function openDetails() {
-    closeDetailsAndClean()
+function openDetails(num) {
+    closeDetailsAndClean(3)
     hide(document.getElementById('details'))
-    unhide(document.getElementById('details2'))
-    
-    let details = getDetailsSections()
-    for(let el in details) unhide(details[el])
-    return details
+    switch(num){
+        case 2:
+            unhide(document.getElementById('details2'))
+            let details = getDetails2Sections()
+            for(let el in details) unhide(details[el])
+            return details
+        case 3:
+            unhide(document.getElementById('details3')) // TODO: details3 è gestito a sezioni
+            return document.getElementById('details3')
+    }
 }
 
-function closeDetailsAndClean() {
-    hide(document.getElementById('details2'))
+function closeDetailsAndClean(num) {    // TODO: eventualmente togli 'num'
+    hide(document.getElementById('details2'), document.getElementById('details3'))
     unhide(document.getElementById('details'))
 
-    let details = getDetailsSections()
+    let details = getDetails2Sections()
     details.svg.innerHTML = ""
     details.packetRulesDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
     details.labelForwardingDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
 }
 
-function getDetailsSections() {
+function getDetails2Sections() {
     let details2 = document.getElementById('details2')
     let rules = document.getElementById('rules')
     return {
@@ -76,6 +82,28 @@ function cleanSVGs() {
 }
 
 /* ---------------------------------------------------- */
+/* ------------------- RULES MODAL--------------------- */
+/* ---------------------------------------------------- */
+
+function cleanRulesModal(){
+    let matchDiv = document.querySelector('#rule-modal .modal-body .half')
+    while(matchDiv.children.length != 5)
+        modalRemoveLine(matchDiv)
+}
+
+function modalMakeNewLine(parent){
+    parent.appendChild(parent.lastElementChild.previousElementSibling.cloneNode(true))
+    parent.appendChild(parent.lastElementChild.previousElementSibling.cloneNode(true))
+}
+
+function modalRemoveLine(parent){
+    if(parent.children.length > 5){
+        parent.lastElementChild.remove()
+        parent.lastElementChild.remove()
+    }
+}
+
+/* ---------------------------------------------------- */
 /* --------------------- GENERIC----------------------- */
 /* ---------------------------------------------------- */
 
@@ -90,18 +118,24 @@ function createTable(...headers) {
     return table
 }
 
-function createRow(...tdVals){
+function createRow(...tdContents){
     let row = document.createElement('tr')
-    for (let val of tdVals){
-        if (typeof val == 'object'){
-            let cell = document.createElement('td')
-            cell.appendChild(val)
-            row.appendChild(cell)
-        } else {
-            row.appendChild(document.createElement('td')).textContent = val
-        }
+    let cells = []
+    for (let content of tdContents){
+        let cell = row.appendChild(document.createElement('td'))
+        
+        if (typeof content == 'object'){
+            if(Array.isArray(content)){
+                // content è un array
+                for(let child of content) cell.appendChild(child)
+                // content è un nodo
+            } else cell.appendChild(content)
+            // content è testo semplice
+        } else cell.textContent = content
+
+        cells.push(cell)
     }
-    return row
+    return {row, cells}
 }
 
 function hide(...elements){

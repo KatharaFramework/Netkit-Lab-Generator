@@ -473,60 +473,65 @@
                 <script src="views/sdn/rulesmanaging.js"></script>
                 <script src="views/sdn/simulation.js"></script>
                 <script src="views/sdn/interaction.js"></script>
+
                 <p class="disclaimer">Please update the size of the window to fit contents!
                     <a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
                 </p>
-                <div style="margin-bottom: 20px">
-                    <h3>HOW TO:</h3>
-                    ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
-                    <a onclick="this.parentElement.style.display='none'">close</a>
-                </div>
-                <button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
+                <button class="btn btn-primary sdnBehaviour" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
                 <button class="btn btn-warning sdnBehaviour" style="display:none" onclick="enablePathSelection()">Enable path selection</button>
                 <button class="btn sdnBehaviour" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="closeDetailsAndClean();createNewLabel()">Create new label</button>
+                <button class="btn btn-success sdnBehaviour" style="display:none" onclick="closeDetailsAndClean(2);createNewLabel()">Create new label</button>
                 <button class="btn btn-success sdnBehaviour" style="display:none" onclick="applyPath()">Conferma path</button>
                 <button class="btn btn-danger sdnBehaviour" style="display:none" onclick="discardPath()">Annulla path</button>
-                <div style="margin: auto">
+                <div>
+                    <div id="comandiSDN">
+                        <button class="btn btn-success">Submit</button>
+                        <button class="btn btn-success">Update</button>
+                        <button class="btn btn-warning" onclick="toggleExternalVisibility(this)">Hide external network</button>
+                        <!-- <button class="btn btn-warning">Scheduler</button> -->
+                        <button style="position: relative; top:570px" onclick="openDetails(3)" class="btn btn-primary">HOW TO</button>
+                        <button style="position: relative; top:570px"  data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+                    </div>
                     <svg id="sdnGraph" width="800" height="800"></svg>
                     <!-- Details (labels details)-->
                     <div id="details"></div>
                     <!-- Details2 (node details)-->
                     <div id="details2" style="display: none">
-                        <a onclick="closeDetailsAndClean()">X</a>
+                        <a onclick="closeDetailsAndClean(2)">X</a>
                         <button style="display: none" class="btn-success">Apply</button>
                         <h3>Title</h3>
                         <hr>
-                        <svg width="363" height="200"></svg>
+                        <svg width="563" height="200"></svg>
                         <div id="rules">
                             <div>
                                 <h2>Packet rules</h2>
-                                <button class="btn-success" onclick="document.getElementById('rule-modal').classList.remove('ng-hide')">Create new rule</button>
+                                <button class="btn btn-success" onclick="document.getElementById('rule-modal').classList.remove('ng-hide')">Create new rule</button>
                                 <!-- Create label modal -->
                                 <div id="rule-modal" class="modal modal-kathara ng-hide">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <button type="button" class="close" onclick="close_modal('rule-modal')">&times;</button>
+                                                <button type="button" class="close" onclick="close_modal('rule-modal');cleanRulesModal()">&times;</button>
                                                 <h4 class="modal-title">Create new rule</h4>
                                             </div>
                                             <div class="modal-body">
                                                 <div class="half">
                                                     <h2>Match</h2>
+                                                    <button class="btn btn-success" onclick="modalMakeNewLine(this.parentElement)">Add</button>
+                                                    <button class="btn btn-danger" onclick="modalRemoveLine(this.parentElement)">Remove</button>
                                                     <select>
-                                                        <option value="swport">Sw. port</option>
-                                                        <option value="macsrc">MAC src</option>
-                                                        <option value="macdst">MAC dst</option>
-                                                        <option value="ethtype">ETH thype</option>
-                                                        <option value="mplslabel">MPLS label</option>
-                                                        <option value="mplstc">MPLS TC</option>
-                                                        <option value="vlanid">VLan ID</option>
-                                                        <option value="ipsrc">IP src</option>
-                                                        <option value="ipdst">IP dst</option>
-                                                        <option value="ipport">IP port</option>
-                                                        <option value="tcpsport">TCP sport</option>
-                                                        <option value="tcpdport">TCP dport</option>
+                                                        <option value="MAC source">MAC src</option>
+                                                        <option value="MAC destination">MAC dst</option>
+                                                        <option value="eth type">ETH thype</option>
+                                                        <option value="MPLS label">MPLS label</option>
+                                                        <option value="MPLS tc">MPLS TC</option>
+                                                        <option value="vlan id">VLan ID</option>
+                                                        <option value="IP source">IP src</option>
+                                                        <option value="IP destination">IP dst</option>
+                                                        <option value="IP port">IP port</option>
+                                                        <option value="TCP source port">TCP sport</option>
+                                                        <option value="TCP destination port">TCP dport</option>
                                                         <option value="other">...</option> <!-- TODO -->
                                                       </select>
                                                       <input type="text">
@@ -534,21 +539,21 @@
                                                 <div class="half">
                                                     <h2>Action</h2>
                                                     <select>
-                                                        <option value="forwardtoport">Forward to port</option>
-                                                        <option value="sendtocontroller">Send to controller</option>
+                                                        <option value="forward to port">Forward to port</option>
+                                                        <option value="send to controller">Send to controller</option>
                                                         <option value="drop">Drop</option>
-                                                        <option value="processl2">Process (L2)</option>
-                                                        <option value="processl3">Process (L3)</option>
-                                                        <option value="setfield">Set field</option>
-                                                        <option value="pushheader">Push header</option>
-                                                        <option value="popheader">Pop header</option>
+                                                        <option value="process l2">Process (L2)</option>
+                                                        <option value="process l3">Process (L3)</option>
+                                                        <option value="set field">Set field</option>
+                                                        <option value="push header">Push header</option>
+                                                        <option value="pop header">Pop header</option>
                                                         <option value="other">...</option> <!-- TODO -->
                                                     </select>
                                                     <input type="text">                                                    
                                                 </div>
                                                 <div class="half">
                                                     <h2>Priority</h2>
-                                                    <input type="number" min="0" value="0" onchange="sdnData.changePriority(this.value)">                                                    
+                                                    <input type="number" min="0" value="0">                                                    
                                                 </div>
                                                 <div class="half">
                                                     <h2>Idle timeout</h2>
@@ -560,8 +565,8 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-danger" onclick="close_modal('rule-modal')">Undo</button>
-                                                <button type="button" class="btn btn-success" onclick="createPacketRule(appendPacketRule)">Confirm</button>
+                                                <button type="button" class="btn btn-danger" onclick="close_modal('rule-modal');cleanRulesModal()">Undo</button>
+                                                <button type="button" class="btn btn-success" onclick="createPacketRule(appendPacketRule);close_modal('rule-modal');cleanRulesModal()">Confirm</button>
                                             </div>
                                         </div>
                                     </div>
@@ -601,6 +606,25 @@
                         </div>
                         <p class="disclaimer"></p>
                     </div>
+                    <div id="details3" style="display: none">
+                        <a onclick="closeDetailsAndClean(3)">X</a>
+                        <div>
+                            <h3>HOW TO:</h3>
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                            ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
+                        </div>
+                        <div>
+                            TODO
+                        </div>
+                        <div>
+                            TODO
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -638,7 +662,7 @@
                 let thisWin = electron.remote.getCurrentWindow()
                 let sdnDisclaimer = document.querySelector("#sdn .disclaimer")
                 thisWin.on('resize', function () {
-                    if (thisWin.getBounds().height < 1000 || thisWin.getBounds().width < 1500) {
+                    if (thisWin.getBounds().height < 950 || thisWin.getBounds().width < 1560) {
                         sdnDisclaimer.classList.remove('hidden')
                     } else sdnDisclaimer.classList.add('hidden')
                 }).emit('resize')
