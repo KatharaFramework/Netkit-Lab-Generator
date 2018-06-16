@@ -59,7 +59,8 @@ g.nodes circle.controller {
     fill: orange;
 }
 
-g.nodes circle.control {
+g.nodes circle.control,
+g.nodes circle.edge {
     stroke: black;
     stroke-width: 1px;
     fill: white;
@@ -72,12 +73,13 @@ g.nodes circle:hover {
 }
 
 g.nodes circle.network:hover {
-    r: 20;
+    r: 15;
 }
 
 /* --- selection --- */
 
-g.nodes circle.selected {
+g.nodes circle.selected,
+g.nodes circle.edge.selected {
     stroke: green;
     stroke-width: 5px;
 }

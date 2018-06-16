@@ -155,5 +155,5 @@ function fillRulesSVG(rulesData) {
         .attr("width", x.bandwidth())
         .attr("height", function (d) { return height - y(d.stats) })
 
-    svg.node().style.display = null
+    unhide(svg.node())
 }

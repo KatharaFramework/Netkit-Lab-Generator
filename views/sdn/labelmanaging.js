@@ -39,20 +39,29 @@ function createNewDefinedLabel(rawElement) {
         })
 
         editButton.innerText = "Edit"
-        editButton.addEventListener('click', function(){ editButtonBehaviour(this, false) })
+        editButton.addEventListener('click', changeEditButtonBehaviour)
 
         deleteButton.style.display = "none"
         deleteButton.innerText = "Remove..."
-        deleteButton.addEventListener('click', enableRemove)
+        deleteButton.addEventListener('click', changeRemoveButtonBehaviour)
 
         showDiv.className = 'label-details'
         showDiv.appendChild(createTable('device', 'match', 'action'))
 
         labelNode.appendChild(colorTag)
-        labelNode.appendChild(document.createTextNode(nameInputEl.value.trim()))
+        labelNode.appendChild(document.createTextNode(nameInputEl.value))
         labelNode.appendChild(deleteButton)
         labelNode.appendChild(editButton)
         labelNode.appendChild(showButton)
+
+        labelNode.addEventListener('mouseenter', function(){
+            let rows = this.parentElement.querySelectorAll('tr')
+            for(let row of rows) row.dispatchEvent(new Event('mouseenter'))
+        })
+        labelNode.addEventListener('mouseleave', function(){
+            let rows = this.parentElement.querySelectorAll('tr')
+            for(let row of rows) row.dispatchEvent(new Event('mouseleave'))
+        })
 
         rawElement.innerHTML = ""
         rawElement.append(labelNode)
@@ -67,24 +76,23 @@ function createNewDefinedLabel(rawElement) {
 
 /* ----- edit button ----- */
 
-function editButtonBehaviour(buttonEl, forceStop) {
-    if(buttonEl.innerText == 'Edit' && !forceStop){
+function changeEditButtonBehaviour() {
+    if(this.innerText == 'Edit'){
         setAllEditButtonsDisabled()
-        buttonEl.classList.add('btn-success')
-        buttonEl.innerText = 'EDITING'
-        buttonEl.parentElement.nextElementSibling.style.display = 'block'
+        this.classList.add('btn-success')
+        this.innerText = 'EDITING'
+        this.parentElement.nextElementSibling.style.display = 'block'
 
-        buttonEl.previousElementSibling.style.display = null
+        unhide(this.previousElementSibling)
         
-        sdnData.setPathOutputDiv(buttonEl.parentElement.nextElementSibling)
+        sdnData.setPathOutputDiv(this.parentElement.nextElementSibling)
     
         enablePathSelection()
     } else {
-        buttonEl.classList.remove('btn-success')
-        buttonEl.innerText = 'Edit'
+        this.classList.remove('btn-success')
+        this.innerText = 'Edit'
         
-        buttonEl.previousElementSibling.style.display = 'none'
-        disableRemove.bind(buttonEl.previousElementSibling)()
+        hide(this.previousElementSibling)
         
         sdnData.setPathOutputDiv(null)
         
@@ -94,34 +102,34 @@ function editButtonBehaviour(buttonEl, forceStop) {
 
 function setAllEditButtonsDisabled() {
     details.querySelectorAll('#details > div > p button.btn-success')
-        .forEach(el => editButtonBehaviour(el, true))
+        .forEach(el => changeEditButtonBehaviour.call(el))
+    setAllRemoveButtonsDisabled()
 }
 
 /* ----- remove button ----- */
 
-function enableRemove() {   // TODO: Pensa a come sostiturie questi due metodi con 1 solo (simlmente ad editButton)
-    this.className = "btn-danger"
-    this.innerText = "Click to remove"
-
-    if (this.style.display != 'none') {
-        for (let child of this.parentElement.nextElementSibling.children[0].children[1].children) {
-            child.addEventListener('click', function () { this.remove() })
-        }
+function changeRemoveButtonBehaviour() {
+    if(this.innerText == 'Remove...'){
+        this.className = "btn-danger"
+        this.innerText = "Click to remove"
+    
+        for (let child of this.parentElement.parentElement.querySelectorAll('tr'))
+            child.addEventListener('click', removeMe)
+    } else {
+        this.classList.remove('btn-danger')
+        this.innerText = 'Remove...'
+    
+        for (let child of this.parentElement.parentElement.querySelectorAll('tr'))
+            child.removeEventListener('click', removeMe)
     }
-
-    this.removeEventListener('click', enableRemove)
-    this.addEventListener('click', disableRemove)
 }
 
-function disableRemove() {
-    this.classList.remove('btn-danger')
-    this.innerText = 'Remove...'
+function setAllRemoveButtonsDisabled(){
+    details.querySelectorAll('#details > div > p button.btn-danger')
+        .forEach(el => changeRemoveButtonBehaviour.call(el))
+}
 
-    for (let child of this.parentElement.nextElementSibling.children[0].children[1].children) {
-        let newThis = child.cloneNode(true)
-        child.parentNode.replaceChild(newThis, child)
-    }
-
-    this.removeEventListener('click', disableRemove)
-    this.addEventListener('click', enableRemove)
+function removeMe(){
+    this.remove()
+    removeNodesSelection()
 }

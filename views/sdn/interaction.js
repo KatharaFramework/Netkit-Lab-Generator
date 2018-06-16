@@ -157,6 +157,7 @@ function applyPath() {
         color: labelInfo.firstElementChild.style.backgroundColor,
         name: labelInfo.firstElementChild.nextSibling.nodeValue
     }
+
     for (let step of sdnData.getPathSteps()) {
         let rule = document.createElement('tr')
         let device = rule.appendChild(document.createElement('td'))
@@ -175,10 +176,13 @@ function applyPath() {
             0, 10000, 10000, 0, true)
 
         rule.addEventListener('mouseenter', function () {
+            if(!sdnData.pathHasAtLeastOneStep())
             highlightSegmentOnGraph(step.device, step.ingressPort, step.egressPort)
-            console.log('perché questo event listenre sparisce?')   // TODO
         })
-        rule.addEventListener('mouseleave', discardPath)
+        rule.addEventListener('mouseleave', function (){
+            if(!sdnData.pathHasAtLeastOneStep())
+                removeNodesSelection()
+        })
     }
     togglePathButtons(false)
     discardPath()
@@ -196,13 +200,13 @@ function discardPath() {
 
 function highlightSegmentOnGraph(device, from, to) {
     d3.selectAll('circle.switch')
-        .attr('class', function (d) {
-            return (d.id == device) ? 'switch selected' : 'switch'
+        .each(function(d, i, nodes){
+            if (d.id == device) nodes[i].classList.add('selected')
         })
 
     d3.selectAll('line.switch:not(.control)')
-        .attr('class', function (d) {
-            return (d.source.id == device && (d.porta == from || d.porta == to)) ?
-                'switch selected' : 'switch'
+        .each(function(d, i, nodes){
+            if (d.source.id == device && (d.porta == from || d.porta == to))
+                nodes[i].classList.add('selected')
         })
 }
