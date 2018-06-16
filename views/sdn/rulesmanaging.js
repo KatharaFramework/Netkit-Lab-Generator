@@ -59,7 +59,6 @@ function createPacketRule(callback) {
         priorityDiv.lastElementChild.value,
         idleTimeoutDiv.lastElementChild.value,
         hardTimeoutDiv.lastElementChild.value,
-        0,
         false
     )
 

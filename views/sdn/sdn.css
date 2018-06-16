@@ -277,26 +277,6 @@ rect.bar {
 .modal-body input {
     border: 1px solid darkgray;
     background-image: none;
-    margin: auto;
-}
-
-/* ----------------- */
-/* ----- MODAL ----- */
-/* ----------------- */
-
-.half {
-    width: 50%;
-    float: left;
-    padding: 1em;
-}
-
-.modal-body input {
-    margin: 10px;
-}
-
-.modal-body input {
-    border: 1px solid darkgray;
-    background-image: none;
 }
 
 #rule-modal .half button {
@@ -323,4 +303,8 @@ rect.bar {
 #details3 {
     width: 400px;
     height: 800px;
+}
+
+#details3 h3 {
+    margin-top: 10px;
 }

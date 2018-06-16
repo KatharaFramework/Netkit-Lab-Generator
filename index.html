@@ -472,7 +472,8 @@
                 <script src="views/sdn/labelmanaging.js"></script>
                 <script src="views/sdn/rulesmanaging.js"></script>
                 <script src="views/sdn/simulation.js"></script>
-                <script src="views/sdn/interaction.js"></script>
+                <script src="views/sdn/graphinteraction.js"></script>
+                <script src="views/sdn/controllerinteraction.js"></script>
 
                 <p class="disclaimer">Please update the size of the window to fit contents!
                     <a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
@@ -486,12 +487,13 @@
                 <button class="btn btn-danger sdnBehaviour" style="display:none" onclick="discardPath()">Annulla path</button>
                 <div>
                     <div id="comandiSDN">
-                        <button class="btn btn-success">Submit</button>
-                        <button class="btn btn-success">Update</button>
+                        <button class="btn btn-success" onclick="submitToController()" disabled>Submit</button>
+                        <button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
                         <button class="btn btn-warning" onclick="toggleExternalVisibility(this)">Hide external network</button>
                         <!-- <button class="btn btn-warning">Scheduler</button> -->
-                        <button style="position: relative; top:570px" onclick="openDetails(3)" class="btn btn-primary">HOW TO</button>
-                        <button style="position: relative; top:570px"  data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+                        <button style="position: relative; top:520px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
+                        <button style="position: relative; top:520px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
+                        <button style="position: relative; top:520px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
                     </div>
                     <svg id="sdnGraph" width="800" height="800"></svg>
                     <!-- Details (labels details)-->
@@ -520,7 +522,8 @@
                                                     <h2>Match</h2>
                                                     <button class="btn btn-success" onclick="modalMakeNewLine(this.parentElement)">Add</button>
                                                     <button class="btn btn-danger" onclick="modalRemoveLine(this.parentElement)">Remove</button>
-                                                    <select>
+                                                    <select onchange="setInputPattern(this.value, this.nextElementSibling)">
+                                                        <option value="noselection">Select...</option>
                                                         <option value="MAC source">MAC src</option>
                                                         <option value="MAC destination">MAC dst</option>
                                                         <option value="eth type">ETH thype</option>
@@ -532,13 +535,15 @@
                                                         <option value="IP port">IP port</option>
                                                         <option value="TCP source port">TCP sport</option>
                                                         <option value="TCP destination port">TCP dport</option>
-                                                        <option value="other">...</option> <!-- TODO -->
+                                                        <!-- TODO: eventualmente aggiungerne altri -->
                                                       </select>
-                                                      <input type="text">
+                                                      <input type="text" disabled>
                                                 </div>
                                                 <div class="half">
                                                     <h2>Action</h2>
-                                                    <select>
+                                                    <select onchange="setInputPattern(this.value, this.nextElementSibling)">
+                                                        <option value="noselection">Select...</option>
+                                                        <option value="set MPLS label">Set MPLS label</option>
                                                         <option value="forward to port">Forward to port</option>
                                                         <option value="send to controller">Send to controller</option>
                                                         <option value="drop">Drop</option>
@@ -547,9 +552,9 @@
                                                         <option value="set field">Set field</option>
                                                         <option value="push header">Push header</option>
                                                         <option value="pop header">Pop header</option>
-                                                        <option value="other">...</option> <!-- TODO -->
+                                                        <!-- TODO: eventualmente aggiungerne altri -->
                                                     </select>
-                                                    <input type="text">                                                    
+                                                    <input type="text" disabled>                                                    
                                                 </div>
                                                 <div class="half">
                                                     <h2>Priority</h2>
@@ -610,6 +615,7 @@
                         <a onclick="closeDetailsAndClean(3)">X</a>
                         <div>
                             <h3>HOW TO:</h3>
+                            <hr>
                             ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
                             ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
                             ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
@@ -619,10 +625,11 @@
                             ..... ..... ..... ..... ..... and ..... ..... ..... ..... .....  and ..... ..... ..... .....  so ..... ..... ..... .....  because ..... ..... .....  of course ..... ..... ..... .....
                         </div>
                         <div>
-                            TODO
-                        </div>
-                        <div>
-                            TODO
+                            <h3>Controller</h3>
+                            <hr>
+                            <p>Connect <button onclick=enableControllerButtons()>Connetti</button></p>
+                            <p>Test connection</p>
+                            <p>Reset connection</p>
                         </div>
                     </div>
                 </div>

@@ -39,8 +39,8 @@ function togglePathButtons(displayBool) {
 /* --------------------- DETAILS DIV ----------------------- */
 /* --------------------------------------------------------- */
 
-function openDetails(num) {
-    closeDetailsAndClean(3)
+function openDetails(num, subsection) {
+    closeDetailsAndClean()
     hide(document.getElementById('details'))
     switch(num){
         case 2:
@@ -49,19 +49,28 @@ function openDetails(num) {
             for(let el in details) unhide(details[el])
             return details
         case 3:
-            unhide(document.getElementById('details3')) // TODO: details3 è gestito a sezioni
-            return document.getElementById('details3')
+            let details3 = document.getElementById('details3')
+            let subsections = details3.querySelectorAll('div')
+            unhide(subsections.item(subsection - 1), details3)
+            return "TODO?"
     }
 }
 
-function closeDetailsAndClean(num) {    // TODO: eventualmente togli 'num'
-    hide(document.getElementById('details2'), document.getElementById('details3'))
-    unhide(document.getElementById('details'))
-
+function closeDetailsAndClean() {
+    /* details2 sections */
+    hide(document.getElementById('details2'))
     let details = getDetails2Sections()
     details.svg.innerHTML = ""
     details.packetRulesDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
     details.labelForwardingDiv.getElementsByTagName('tbody').item(0).innerHTML = ""
+    
+    /* details3 sections */
+    let details3 = document.getElementById('details3')
+    for(let section of details3.querySelectorAll('div')) hide(section)
+    hide(details3)
+
+    /* unhide main (details) */
+    unhide(document.getElementById('details'))
 }
 
 function getDetails2Sections() {
@@ -101,6 +110,35 @@ function modalRemoveLine(parent){
         parent.lastElementChild.remove()
         parent.lastElementChild.remove()
     }
+}
+
+function setInputPattern(value, inputEl) {
+    // TODO: Ho già provato a fare 'switch(value){case ...: ...}' ma non va. Eventualmente riprova
+    // TODO: Ammettere anche valori "192.*"
+    let newPattern
+    if (value == "noselection") { inputEl.disabled = true; return }
+    else if (value == "MAC source") { newPattern = "([0-9A-F]{4}:){4}" }           // TODO: non sono sicuro che sia così
+    else if (value == "MAC destination") { newPattern = "([0-9A-F]{4}:){4}" }      // TODO: non sono sicuro che sia così
+    else if (value == "eth type") { newPattern = "ciao" }
+    else if (value == "MPLS label") { newPattern = "ciao" }
+    else if (value == "MPLS tc") { newPattern = "ciao" }
+    else if (value == "vlan id") { newPattern = "ciao" }
+    else if (value == "IP source") { newPattern = "([0-2]?[0-9]{,2}\.){4}" }       // TODO: quello che ho messo ora è (0-299.){4}
+    else if (value == "IP destination") { newPattern = "([0-2]?[0-9]{,2}\.){4}" }  // TODO: quello che ho messo ora è (0-299.){4}
+    else if (value == "IP port") { newPattern = "[0-6]?[0-9]{,4}" } // 0 - 65535   // TODO: quello che ho messo ora è 0-69999
+    else if (value == "TCP source port") { newPattern = "[0-6]?[0-9]{,4}" }
+    else if (value == "TCP destination port") { newPattern = "[0-6]?[0-9]{,4}" }
+    else if (value == "set MPLS label") { newPattern = "ciao" }
+    else if (value == "forward to port") { newPattern = "[0-6]?[0-9]{,4}" }    // 0 - 65535    // TODO: quello che ho messo ora è 0-69999
+    else if (value == "send to controller") { newPattern = "ciao" }
+    else if (value == "drop") { inputEl.disabled = true; return }
+    else if (value == "process l2") { newPattern = "ciao" }
+    else if (value == "process l3") { newPattern = "ciao" }
+    else if (value == "set field") { newPattern = "ciao" }
+    else if (value == "push header") { newPattern = "ciao" }
+    else if (value == "pop header") { newPattern = "ciao" }
+    inputEl.pattern = newPattern
+    inputEl.disabled = false
 }
 
 /* ---------------------------------------------------- */

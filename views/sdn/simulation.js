@@ -130,5 +130,4 @@ function toggleExternalVisibility(thisButton){
         thisButton.innerText = 'Show external network'
         thisButton.stato = true
     }
-
 }

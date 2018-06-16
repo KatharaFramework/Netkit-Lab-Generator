@@ -43,8 +43,12 @@ class SDNData {
     /* RULES */
 
     addRule() {
-        let device, matches, action, priority, idleTimeout, hardTimeout, stats, isLabelForwarding
-        if(arguments.length == 8){
+        let device, matches, action, priority, idleTimeout = 5000, hardTimeout = 10000, stats = 0, isLabelForwarding
+        if(arguments.length == 5){
+            [device, matches, action, priority, isLabelForwarding] = arguments
+        } else if(arguments.length == 7){
+            [device, matches, action, priority, idleTimeout, hardTimeout, isLabelForwarding] = arguments
+        } else if (arguments.length == 8){
             [device, matches, action, priority, idleTimeout, hardTimeout, stats, isLabelForwarding] = arguments
         } else if (arguments.length > 10 && (arguments.length % 2 == 0)){
             console.error('TODO in addRule')
@@ -56,8 +60,7 @@ class SDNData {
         let newRule = {
             matches, action,
             idleTimeout, hardTimeout,
-            // TODO: Rimuovi Math
-            priority, stats: (stats || Math.floor(Math.random()*100)),
+            priority, stats: stats,
             isLabelForwarding
         }
 
@@ -110,5 +113,9 @@ class SDNData {
     getPathSteps() {
         if (this.pathHasAtLeastOneStep())
             return this.newPath
+    }
+
+    getRules(){
+        return this.rules
     }
 }

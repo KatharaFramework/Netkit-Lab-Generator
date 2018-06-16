@@ -93,21 +93,27 @@ function enablePathSelection() {
         let linkLock = 0
         let lastSelection = null
 
-        d3.selectAll("circle.network:not(.control):not(.external)").call(
-            d3.drag().on("start", function (d, i, data) {
+        d3.selectAll("circle.network:not(.control):not(.external)").call(d3.drag()
+            .on("start", function (d, i, data) {
+                if(data[i].classList.contains('edge')) {
+                    console.log("TODO")
+                }
                 data[i].classList.add('selected')
                 linkLock = 1
                 lastSelection = d.id
                 togglePathButtons(false)
             })
-                .on("end", function () {
-                    if (linkLock == 1 && sdnData.pathHasAtLeastOneStep())
-                        togglePathButtons(true)
-                    else discardPath()
-                    machineLocked = true
-                    networksLocked = true
-                    linkLock = 0
-                }))
+            .on("end", function (_, i, data) {
+                if(data[i].classList.contains('edge')) {
+                    console.log("TODO")
+                }
+                if (linkLock == 1 && sdnData.pathHasAtLeastOneStep())
+                    togglePathButtons(true)
+                else discardPath()
+                machineLocked = true
+                networksLocked = true
+                linkLock = 0
+            }))
 
         d3.selectAll('circle.network:not(.control):not(.external)')  // Link lock è 0
             .on('mouseover', function (d, i, data) {
@@ -173,7 +179,7 @@ function applyPath() {
             step.device,
             [{ match: 'ingressPort', value: step.ingressPort, label }],
             { action: 'egressPort', value: step.egressPort },
-            0, 10000, 10000, 0, true)
+            0, true)
 
         rule.addEventListener('mouseenter', function () {
             if(!sdnData.pathHasAtLeastOneStep())
