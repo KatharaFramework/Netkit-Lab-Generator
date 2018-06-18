@@ -187,8 +187,7 @@
 
                                             <span id="mock-main-menu" class="mock mock-main-menu"></span>
                                             <div data-ng-repeat="machine in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
-                                                data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]"
-                                                ng-mouseenter="changeScale($index, true)" ng-mouseleave="changeScale($index, false)">
+                                                data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]">
                                                 <span class="mock-id">{{$index+1}}</span>{{machine.name}}</div>
 
                                             <div class="mock mock-preview-text">Bash file preview:</div>
@@ -229,9 +228,9 @@
                                     <input title="type" type="radio" value="ns" data-ng-model="machine.type" /> Name Server</p>
                                 <p>
                                     <input title="type" type="radio" value="ws" data-ng-model="machine.type" /> Web Server</p>
-                                <p>
-                                    <input title="type" type="radio" value="switch" data-ng-model="machine.type" data-ng-dblclick="hasAController()"/> Open vSwitch</p>
-                                <p>
+                                <p data-ng-show="toggleOVSwitchSelection(netkit, this.machine.type)">
+                                    <input title="type" type="radio" value="switch" data-ng-model="machine.type"/> Open vSwitch</p>
+                                <p data-ng-show="toggleControllerSelection(netkit, this.machine.type)">
                                     <input title="type" type="radio" value="controller" data-ng-model="machine.type" /> OpenFlow Ryu controller</p>
                                 <p>
                                     <input title="type" type="radio" value="other" data-ng-model="machine.type" /> Other</p>
@@ -242,25 +241,30 @@
                             </td>
 
                             <td class="interfaces">
-                                <p>
-                                    <span class="btn btn-success" data-ng-click="addInterface(machine)">Add interface</span>
-                                    <span class="btn btn-danger" data-ng-click="removeInterface(machine)" data-ng-disabled="machine.interfaces.counter<=1">Remove last interface</span>
+                                <p style="color:darkgray" data-ng-hide="(machine.type != 'switch' && machine.type != 'controller')">
+                                    Connection between switches and controller is automatically configured
                                 </p>
-                                <div data-ng-repeat="i in machine.interfaces.if">
-                                    <div data-ng-hide="((machine.type == 'switch' || machine.type == 'controller') && i.eth.number == 0)">
-                                        <div>
-                                            <label>Eth{{i.eth.number}}: </label>
-                                            <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
+                                <div data-ng-hide="machine.type == 'controller'">
+                                    <p>
+                                        <span class="btn btn-success" data-ng-click="addInterface(machine)">Add interface</span>
+                                        <span class="btn btn-danger" data-ng-click="removeInterface(machine)" data-ng-disabled="machine.interfaces.counter<=1">Remove last interface</span>
+                                    </p>
+                                    <div data-ng-repeat="i in machine.interfaces.if">
+                                        <div data-ng-hide="(machine.type == 'switch' && i.eth.number == 0)">
+                                            <div>
+                                                <label>Eth{{i.eth.number}}: </label>
+                                                <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
+                                            </div>
+                                            <div>
+                                                <label> IP/Net: </label>
+                                                <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
+                                            </div>
+                                            <div>
+                                                <label> Complete DNS Name: </label>
+                                                <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
+                                            </div>
+                                            <hr>
                                         </div>
-                                        <div>
-                                            <label> IP/Net: </label>
-                                            <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
-                                        </div>
-                                        <div>
-                                            <label> Complete DNS Name: </label>
-                                            <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
-                                        </div>
-                                        <hr>
                                     </div>
                                 </div>
                                 <label>Directly in {{machine.name}}.startup:</label>

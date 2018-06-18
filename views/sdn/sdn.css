@@ -44,7 +44,7 @@ g.nodes circle {
 
 g.nodes circle.network {
     fill: black;
-    r: 10;
+    r: 15;
 }
 
 g.nodes circle.network.external {
@@ -55,11 +55,6 @@ g.nodes circle.switch {
     fill: blue;
 }
 
-g.nodes circle.controller {
-    fill: orange;
-}
-
-g.nodes circle.control,
 g.nodes circle.edge {
     stroke: black;
     stroke-width: 1px;
@@ -73,14 +68,14 @@ g.nodes circle:hover {
 }
 
 g.nodes circle.network:hover {
-    r: 15;
+    r: 20;
 }
 
 /* --- selection --- */
 
 g.nodes circle.selected,
 g.nodes circle.edge.selected {
-    stroke: green;
+    stroke: darkorange;
     stroke-width: 5px;
 }
 
@@ -90,20 +85,15 @@ g.nodes circle.edge.selected {
 
 g.links line {
     stroke: lightgray;
-    stroke-width: 3px;
+    stroke-width: 4px;
 }
 
 g.links line.switch {
     stroke: darkgray;
 }
 
-g.links line.controller,
 line.network.edge:not(.switch) {
     stroke-dasharray: 10px 10px;
-}
-
-g.links line.network.control.switch {
-    display: none;
 }
 
 /* --- mouseover --- */
@@ -117,7 +107,7 @@ g.links line:hover {
 
 
 g.links line.selected {
-    stroke: green;
+    stroke: darkorange;
 }
 
 /* ---------------------- */

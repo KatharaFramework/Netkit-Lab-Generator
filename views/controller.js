@@ -179,7 +179,7 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
     }
 
     $scope.generateScript = function (netkitData, labInfoData) {
-        return makeScript(makeFileStructure(netkitData, labInfoData))
+        return makeScript(makeFilesStructure(netkitData, labInfoData))
     }
 
     $scope.generateConfig = function (netkitData, labInfoData) {
@@ -188,7 +188,7 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
     }
 
     $scope.generateZip = function (netkitData, labInfoData) {
-        return makeZip(makeFileStructure(netkitData, labInfoData))
+        return makeZip(makeFilesStructure(netkitData, labInfoData))
     }
 
     $scope.makeGraph = function (netkitData) {
@@ -200,6 +200,14 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
             changed = false
             return makeGraph(netkitData)
         }
+    }
+
+    $scope.toggleOVSwitchSelection = function (netkitData, thisType){
+        return netkitData.some(machine => machine.type == 'controller') && thisType != 'controller'
+    }
+
+    $scope.toggleControllerSelection = function (netkitData, thisType){
+        return !netkitData.some(machine => machine.type == 'controller') || thisType == 'controller'
     }
 
     $scope.toggleGraphUpdate = function () {

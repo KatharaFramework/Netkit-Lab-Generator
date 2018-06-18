@@ -54,6 +54,8 @@ function createNewDefinedLabel(rawElement) {
         labelNode.appendChild(editButton)
         labelNode.appendChild(showButton)
 
+        sdnData.addLabel(nameInputEl.value, colorInputEl.value)
+
         labelNode.addEventListener('mouseenter', function(){
             let rows = this.parentElement.querySelectorAll('tr')
             for(let row of rows) row.dispatchEvent(new Event('mouseenter'))

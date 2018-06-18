@@ -7,6 +7,7 @@ class SDNData {
         this.pathOutputDiv = null
 
         this.rules = []
+        this.labels = []
     }
 
     /* PATHS */
@@ -75,6 +76,10 @@ class SDNData {
         return newRule
     }
 
+    addLabel(name, color){
+        this.labels.push({name, color})
+    }
+
     getDeviceRules(deviceName) {
         let deviceRules = this.rules.find(el => el.deviceName == deviceName)
         if (deviceRules) return deviceRules.rules
@@ -117,5 +122,10 @@ class SDNData {
 
     getRules(){
         return this.rules
+    }
+
+    getLabels(){
+        console.log(this.labels)
+        return this.labels
     }
 }

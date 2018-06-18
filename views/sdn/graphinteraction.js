@@ -92,11 +92,12 @@ function enablePathSelection() {
         let networksLocked = true
         let linkLock = 0
         let lastSelection = null
+        let includesEdgeNetwork = false
 
-        d3.selectAll("circle.network:not(.control):not(.external)").call(d3.drag()
+        d3.selectAll("circle.network:not(.external)").call(d3.drag()
             .on("start", function (d, i, data) {
                 if(data[i].classList.contains('edge')) {
-                    console.log("TODO")
+                    includesEdgeNetwork = true
                 }
                 data[i].classList.add('selected')
                 linkLock = 1
@@ -105,17 +106,18 @@ function enablePathSelection() {
             })
             .on("end", function (_, i, data) {
                 if(data[i].classList.contains('edge')) {
-                    console.log("TODO")
+                    if(includesEdgeNetwork) {
+                        // TODO: Caso in cui ho sia l'inizio che il rilascio in un nodo edge
+                    } else {
+                        // TODO: Caso in cui ho solo il rilascio in un nodo edge
+                    }
                 }
-                if (linkLock == 1 && sdnData.pathHasAtLeastOneStep())
+                if (linkLock == 1 && sdnData.pathHasAtLeastOneStep()){
                     togglePathButtons(true)
-                else discardPath()
-                machineLocked = true
-                networksLocked = true
-                linkLock = 0
+                } else discardPath()
             }))
 
-        d3.selectAll('circle.network:not(.control):not(.external)')  // Link lock è 0
+        d3.selectAll('circle.network:not(.external)')  // Link lock è 0
             .on('mouseover', function (d, i, data) {
                 if (!networksLocked && d.id == lastSelection && !data[i].classList.contains('selected')) {
                     linkLock++
@@ -125,7 +127,7 @@ function enablePathSelection() {
                 }
             })
 
-        d3.selectAll('line.switch:not(.control)')
+        d3.selectAll('line.switch')
             .on('mouseover', function (d, i, data) {
                 if (linkLock == 1 && d.target.id == lastSelection && !data[i].classList.contains('selected')) {
                     linkLock++

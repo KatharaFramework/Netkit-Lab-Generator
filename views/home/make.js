@@ -1,492 +1,474 @@
-function makeMachineFolder(netkit, lab) {
-    for (let machineIndex in netkit) {
-        lab["folder"][netkit[machineIndex].name] = "";
-    }
-    return lab;
+function makeMachineFolders(netkit, lab) {
+    for (let machine of netkit)
+        lab.folder[machine.name] = ""
 }
 
-function addLabInfo(info, lab) {
+function makeStartupFiles(netkit, lab) {
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "")
+            lab.file[machine.name + ".startup"] = ""
+    }
+}
+
+/* -------------------------------------------------- */
+/* -------------------- LAB CONF -------------------- */
+/* -------------------------------------------------- */
+
+function makeLabInfo(info, lab) {
     if (info) {
-        lab.file["lab.conf"] = "";
+        lab.file["lab.conf"] = ""
         if (info.description && info.description != "")
-            lab.file["lab.conf"] += 'LAB_DESCRIPTION="' + info.description + '"\n';
+            lab.file["lab.conf"] += 'LAB_DESCRIPTION="' + info.description + '"\n'
         if (info.version && info.version != "")
-            lab.file["lab.conf"] += 'LAB_VERSION="' + info.version + '"\n';
+            lab.file["lab.conf"] += 'LAB_VERSION="' + info.version + '"\n'
         if (info.author && info.author != "")
-            lab.file["lab.conf"] += 'LAB_AUTHOR="' + info.author + '"\n';
+            lab.file["lab.conf"] += 'LAB_AUTHOR="' + info.author + '"\n'
         if (info.email && info.email != "")
-            lab.file["lab.conf"] += 'LAB_EMAIL="' + info.email + '"\n';
+            lab.file["lab.conf"] += 'LAB_EMAIL="' + info.email + '"\n'
         if (info.web && info.web != "")
-            lab.file["lab.conf"] += 'LAB_WEB="' + info.web + '"\n';
+            lab.file["lab.conf"] += 'LAB_WEB="' + info.web + '"\n'
     }
 }
 
-function makeLabConf(netkit, lab) {
-    if (!lab.file["lab.conf"] || lab.file["lab.conf"] == "")
-        lab.file["lab.conf"] = "";
-    for (let machineIndex in netkit) {
-        for (let i in netkit[machineIndex].interfaces.if) {
-            if (netkit[machineIndex].interfaces.if[i].eth.domain && netkit[machineIndex].interfaces.if[i].eth.domain != "")
-                lab.file["lab.conf"] += netkit[machineIndex].name + "[" + netkit[machineIndex].interfaces.if[i].eth.number + "]=" + netkit[machineIndex].interfaces.if[i].eth.domain + "\n";
+function makeLabConfFile(netkit, lab) {
+    if (!lab.file["lab.conf"])
+        lab.file["lab.conf"] = ""
+    for (let machine of netkit) {
+        for (let interface of machine.interfaces.if) {
+            if (interface.eth.number == 0 && (machine.type == 'controller' || machine.type == 'switch')){
+                interface.eth.domain = 'SDNRESERVED'
+                lab.file["lab.conf"] += machine.name + "[0]=" +"SDNRESERVED\n"
+            } else if (interface.eth.domain && interface.eth.domain != ""){
+                lab.file["lab.conf"] += machine.name + "[" + interface.eth.number + "]=" + interface.eth.domain + "\n"
+            }
         }
         if (lab.file["lab.conf"] != "")
-            lab.file["lab.conf"] += "\n";
+            lab.file["lab.conf"] += "\n"
     }
-    return lab;
 }
 
-function makeStartup(netkit, lab) {
-    for (let machineIndex in netkit) {
-        if (netkit[machineIndex].name && netkit[machineIndex].name != "")
-            lab.file[netkit[machineIndex].name + ".startup"] = "";
-    }
-    return lab;
-}
-
-function makeStaticRouting(netkit, lab) {
-    // generazione networking e routing statico
-    for (let machineIndex in netkit) {
-        if (netkit[machineIndex].name && netkit[machineIndex].name != "") {
-            for (let interfaceIndex in netkit[machineIndex].interfaces.if) {
-                //ifconfig eth_ SELFADDRESS/MASK up
-                if ((netkit[machineIndex].interfaces.if[interfaceIndex].eth.domain)  && netkit[machineIndex].interfaces.if[interfaceIndex].eth.domain != "")
-                    lab.file[netkit[machineIndex].name + ".startup"] += "ifconfig eth" + netkit[machineIndex].interfaces.if[interfaceIndex].eth.number +
-                        (((netkit[machineIndex].interfaces.if[interfaceIndex].ip)  && netkit[machineIndex].interfaces.if[interfaceIndex].ip != "") ? " " + netkit[machineIndex].interfaces.if[interfaceIndex].ip : "") +
-                        " up\n";
-            }
-
-            for (let g in netkit[machineIndex].gateways.gw) {
-                if ((netkit[machineIndex].gateways.gw[g].gw)  && netkit[machineIndex].gateways.gw[g].gw != "") {
-                    //route add default gw GATEWAY dev eth_
-                    if (netkit[machineIndex].gateways.gw[g].route == "") {
-                        lab.file[netkit[machineIndex].name + ".startup"] += "route add default gw " +
-                            netkit[machineIndex].gateways.gw[g].gw + " dev eth" +
-                            netkit[machineIndex].gateways.gw[g].if + "\n";
-                    }
-                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
-                    else {
-                        lab.file[netkit[machineIndex].name + ".startup"] += "route add -net " + netkit[machineIndex].gateways.gw[g].route + " gw " +
-                            netkit[machineIndex].gateways.gw[g].gw + " dev eth" +
-                            netkit[machineIndex].gateways.gw[g].if + "\n";
-                    }
-                }
-            }
-
-            if ((netkit[machineIndex].interfaces.free)  && netkit[machineIndex].interfaces.free != "")
-                lab.file[netkit[machineIndex].name + ".startup"] += "\n" + netkit[machineIndex].interfaces.free + "\n";
-        }
-    }
-
-    return lab;
-}
+/* --------------------------------------------------- */
+/* ------------------ STARTUP FILES ------------------ */
+/* --------------------------------------------------- */
 
 function makeTerminal(netkit, lab) {
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "") {
-            if (netkit[machineIndex].type == 'terminal') {
-                if ((netkit[machineIndex].pc.dns)  && netkit[machineIndex].pc.dns != "-") {
-                    lab["folder"][netkit[machineIndex].name + "/etc"] = "";
-                    lab.file[netkit[machineIndex].name + "/etc/resolv.conf"] = "nameserver " + netkit[machineIndex].pc.dns + "\n";
-                }
-            }
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'terminal' && machine.pc.dns && machine.pc.dns != "-") {
+            lab.folder[machine.name + "/etc"] = ""
+            lab.file[machine.name + "/etc/resolv.conf"] = "nameserver " + machine.pc.dns + "\n"
         }
     }
-    return lab;
 }
 
 function makeWebserver(netkit, lab) {
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-            if (netkit[machineIndex].type == 'ws') {
-                if (netkit[machineIndex].ws.userdir == true) {
-                    lab["folder"][netkit[machineIndex].name + "/home/guest/public_html"] = "";
-                    lab.file[netkit[machineIndex].name + "/home/guest/public_html/index.html"] = '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>';
-                    lab.file[netkit[machineIndex].name + ".startup"] += "a2enmod userdir\n";
-                }
-                lab.file[netkit[machineIndex].name + ".startup"] += "/etc/init.d/apache2 start\n";
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'ws') {
+            if (machine.ws.userdir == true) {
+                lab.folder[machine.name + "/home/guest/public_html"] = ""
+                lab.file[machine.name + "/home/guest/public_html/index.html"] = '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>'
+                lab.file[machine.name + ".startup"] += "a2enmod userdir\n"
             }
+            lab.file[machine.name + ".startup"] += "/etc/init.d/apache2 start\n"
+        }
     }
-    return lab;
 }
 
 function makeOther(netkit, lab) {
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "") {
-            if (netkit[machineIndex].type == 'other') {
-                if ((netkit[machineIndex].other.image) ) {
-                    // TODO
-                    lab.file["lab.conf"] += netkit[machineIndex].name + "[image]=" + netkit[machineIndex].other.image + "\n";
-                    for (let findex in netkit[machineIndex].other.files) {
-                        lab.file["/etc/scripts/" + netkit[machineIndex].other.files[findex].name] = netkit[machineIndex].other.files[findex].contents;
-                    }
-                }
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'other' && machine.other.image) {
+            lab.file["lab.conf"] += machine.name + "[image]=" + machine.other.image + "\n"
+            for (let file of machine.other.files) {
+                lab.file["/etc/scripts/" + file.name] = file.contents
             }
         }
     }
-    return lab;
 }
 
 function makeNameserver(netkit, lab) {
-    // generazione file e cartelle comuni
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-            if (netkit[machineIndex].type == 'ns') {
-                lab.file[netkit[machineIndex].name + ".startup"] += "/etc/init.d/bind start\n";
-                lab["folder"][netkit[machineIndex].name + "/etc/bind"] = "";
-                lab.file[netkit[machineIndex].name + "/etc/bind/named.conf"] = "";
-            }
-    }
-
     //Gestione Nameserver
     //variabili d'appoggio comuni ai vari cicli
-    var authority = [];
-    var nsroot;
-    //Trovo il root-ns e lo salvo
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-            if (netkit[machineIndex].type == "ns" && netkit[machineIndex].ns.authority && netkit[machineIndex].ns.zone == ".") {
-                nsroot = netkit[machineIndex];
-            }
+    let authority = []
+    let nsroot
+
+    // generazione file e cartelle comuni
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'ns') {
+            lab.file[machine.name + ".startup"] += "/etc/init.d/bind start\n"
+            lab.folder[machine.name + "/etc/bind"] = ""
+            lab.file[machine.name + "/etc/bind/named.conf"] = ""
+        }
+        //Trovo il root-ns e lo salvo
+        if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority && machine.ns.zone == ".") {
+            nsroot = machine
+        }
     }
+
     //Se non ho root-ns evito di generare una configurazione incoerente
     //db.root in ogni macchina dns
-    if ((nsroot) ) {
-
-        for (let machineIndex in netkit) {
-            if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "") {
-                if (netkit[machineIndex].type == 'ns') {
-                    lab.file[netkit[machineIndex].name + "/etc/bind/db.root"] = "";
-                    if (netkit[machineIndex].ns.authority && netkit[machineIndex].ns.zone == ".") {
-                        lab.file[netkit[machineIndex].name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA " + nsroot.interfaces.if[0].name +
-                            " root." + nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
-                    }
-                    if (netkit[machineIndex].ns.recursion) {
-                        lab.file[netkit[machineIndex].name + "/etc/bind/named.conf"] += 'options {\n allow-recursion {0/0; };\n};\n\n';
-                    }
-                    lab.file[netkit[machineIndex].name + "/etc/bind/db.root"] += ".    IN NS " + nsroot.interfaces.if[0].name + "\n";
-                    lab.file[netkit[machineIndex].name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name + "    IN A " + nsroot.interfaces.if[0].ip.split("/")[0] + "\n";
-                    if (netkit[machineIndex].ns.authority && netkit[machineIndex].ns.zone == ".") {
-                        lab.file[netkit[machineIndex].name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n';
-                    } else {
-                        lab.file[netkit[machineIndex].name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n';
-                    }
+    if (nsroot) {
+        for (let machine of netkit) {
+            if (machine.name && machine.name != "" && machine.type == 'ns') {
+                lab.file[machine.name + "/etc/bind/db.root"] = ""
+                if (machine.ns.authority && machine.ns.zone == ".") {
+                    lab.file[machine.name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA " + nsroot.interfaces.if[0].name +
+                        " root." + nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"
+                }
+                if (machine.ns.recursion) {
+                    lab.file[machine.name + "/etc/bind/named.conf"] += 'options {\n allow-recursion {0/0; };\n};\n\n'
+                }
+                lab.file[machine.name + "/etc/bind/db.root"] += ".    IN NS " + nsroot.interfaces.if[0].name + "\n"
+                lab.file[machine.name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name + "    IN A " + nsroot.interfaces.if[0].ip.split("/")[0] + "\n"
+                if (machine.ns.authority && machine.ns.zone == ".") {
+                    lab.file[machine.name + "/etc/bind/named.conf"] += 'zone "." {\n type master;\n file "/etc/bind/db.root";\n};\n\n'
+                } else {
+                    lab.file[machine.name + "/etc/bind/named.conf"] += 'zone "." {\n type hint;\n file "/etc/bind/db.root";\n};\n\n'
                 }
             }
 
         }
         //entry in db.zona e named.conf per le altre macchine
-        for (let machineIndex in netkit) {
-            if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-                if (netkit[machineIndex].type == "ns" && netkit[machineIndex].ns.authority) {
-                    authority[netkit[machineIndex].ns.zone] = netkit[machineIndex];
-                    if (netkit[machineIndex].ns.zone != ".") {
-                        lab.file[netkit[machineIndex].name + "/etc/bind/db" + netkit[machineIndex].ns.zone.slice(0, -1)] = "$TTL   60000\n@    IN SOA " + netkit[machineIndex].interfaces.if[0].name + " root." + netkit[machineIndex].interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
-                        lab.file[netkit[machineIndex].name + "/etc/bind/named.conf"] += 'zone "' + netkit[machineIndex].ns.zone.slice(1, -1) + '" {\n type master;\n file "/etc/bind/db' + netkit[machineIndex].ns.zone.slice(0, -1) + '";\n};\n\n';
-                    }
+        for (let machine of netkit) {
+            if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority) {
+                authority[machine.ns.zone] = machine
+                if (machine.ns.zone != ".") {
+                    lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] = "$TTL   60000\n@    IN SOA " + machine.interfaces.if[0].name + " root." + machine.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n" //ho preso il nome dell'interfaccia eth0
+                    lab.file[machine.name + "/etc/bind/named.conf"] += 'zone "' + machine.ns.zone.slice(1, -1) + '" {\n type master;\n file "/etc/bind/db' + machine.ns.zone.slice(0, -1) + '";\n};\n\n'
                 }
+            }
         }
-        //console.log(authority);
+        //console.log(authority)
         //entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
-        for (let machineIndex in netkit) {
-            if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-                for (let f in netkit[machineIndex].interfaces.if) {
-                    var ip;
-                    if ((netkit[machineIndex].interfaces.if[f].ip) ) {
-                        ip = netkit[machineIndex].interfaces.if[f].ip.split("/")[0];
-                    }
-                    if ((netkit[machineIndex].interfaces.if[f].name) ) { //Entrano tutte le interfacce di tutte le macchine con un nome ns
-
+        for (let machine of netkit) {
+            if (machine.name && machine.name != "") {
+                for (let f in machine.interfaces.if) {
+                    let ip
+                    if (machine.interfaces.if[f].ip)
+                        ip = machine.interfaces.if[f].ip.split("/")[0]
+                    if (machine.interfaces.if[f].name) { //Entrano tutte le interfacce di tutte le macchine con un nome ns
                         //Caso particolare per ns di primo livello
-                        if (((netkit[machineIndex].ns.zone) ) && netkit[machineIndex].type == "ns" && netkit[machineIndex].ns.authority && netkit[machineIndex].ns.zone.split(".").length == 3) {
-                            lab.file[authority["."].name + "/etc/bind/db.root"] += netkit[machineIndex].ns.zone.substring(1) + "    IN NS " + netkit[machineIndex].interfaces.if[f].name + "\n";
-                            lab.file[authority["."].name + "/etc/bind/db.root"] += netkit[machineIndex].interfaces.if[f].name + "    IN A " + ip + "\n";
-                            lab.file[netkit[machineIndex].name + "/etc/bind/db" + netkit[machineIndex].ns.zone.slice(0, -1)] += netkit[machineIndex].ns.zone.substring(1) + "    IN NS " + netkit[machineIndex].interfaces.if[f].name + "\n";
-                            lab.file[netkit[machineIndex].name + "/etc/bind/db" + netkit[machineIndex].ns.zone.slice(0, -1)] += netkit[machineIndex].interfaces.if[f].name + "     IN A " + netkit[machineIndex].interfaces.if[f].ip.split("/")[0] + "\n";
+                        if (machine.ns.zone && machine.type == "ns" && machine.ns.authority && machine.ns.zone.split(".").length == 3) {
+                            lab.file[authority["."].name + "/etc/bind/db.root"] +=
+                                machine.ns.zone.substring(1) + "    IN NS "
+                                + machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
+                                + "    IN A " + ip + "\n"
+                            lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] +=
+                                machine.ns.zone.substring(1) + "    IN NS "
+                                + machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
+                                + "     IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n"
                         }
                         else {
-
-                            var nome = netkit[machineIndex].interfaces.if[f].name; //www.pluto.net.
-                            var nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
-                            var a = ".";
+                            let nome = machine.interfaces.if[f].name //www.pluto.net.
+                            let nomediviso = nome.split(".") //[0]www [1]pluto [2]net [3].
+                            let a = "."
 
                             //Questo for toglie il primo pezzo www.pluto.net. => pluto.net.
                             for (let i = 1; i < nomediviso.length; i++) {
                                 if (nomediviso[i] != "") {
-                                    a += nomediviso[i] + ".";
+                                    a += nomediviso[i] + "."
                                 }
                             }
 
-                            if ((authority[a]) != "undefined" && typeof (authority[a].ns.zone) ) {
-
-                                var fileExt = authority[a].ns.zone.slice(0, -1);
-
+                            if (authority[a] && authority[a].ns.zone) {
+                                let fileExt = authority[a].ns.zone.slice(0, -1)
                                 //Evito che entri in caso di root-ns
                                 if (fileExt != "") {
-
                                     //se è un NS inserisco il glue record
-                                    if (netkit[machineIndex].type == "ns" && netkit[machineIndex].ns.authority) {
+                                    if (machine.type == "ns" && machine.ns.authority) {
                                         //Creo le linee relative a me stesso nel mio file db
-                                        var aSup = ".";
-                                        var nomediviso2 = authority[a].ns.zone.split(".");
-
+                                        let aSup = "."
+                                        let nomediviso2 = authority[a].ns.zone.split(".")
                                         //Questo for toglie il primo pezzo .www.pluto.net. => pluto.net.
                                         for (let i = 2; i < nomediviso2.length; i++) {
                                             if (nomediviso2[i] != "") {
-                                                aSup += nomediviso2[i] + ".";
+                                                aSup += nomediviso2[i] + "."
                                             }
                                         }
-
-                                        lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] += netkit[machineIndex].ns.zone.substring(1) + "    IN NS " + netkit[machineIndex].interfaces.if[f].name + "\n";
-                                        lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] += netkit[machineIndex].interfaces.if[f].name + "    IN A " + netkit[machineIndex].interfaces.if[f].ip.split("/")[0] + "\n";
-                                        lab.file[authority[a].name + "/etc/bind/db" + fileExt] += netkit[machineIndex].ns.zone.substring(1) + "    IN NS " + netkit[machineIndex].interfaces.if[f].name + "\n";
+                                        lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] +=
+                                            machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n"
+                                            + machine.interfaces.if[f].name + "    IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n"
+                                            + machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n"
                                     }
-
                                     //e poi inserisco anche il record A, altirmenti solo A
-                                    lab.file[authority[a].name + "/etc/bind/db" + fileExt] += netkit[machineIndex].interfaces.if[f].name + "    IN A " + ip + "\n";
+                                    lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.interfaces.if[f].name + "    IN A " + ip + "\n"
                                 }
                             }
                         }
 
                     }
                 }
+            }
         }
     }
+}
 
-    return lab;
+function makeRouter(netkit, lab) {
+    // routing dinamico RIP e OSPF
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'router') {
+            if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
+                lab.file[machine.name + ".startup"] += "/etc/init.d/zebra start\n"
+                lab.folder[machine.name + "/etc/zebra"] = ""
+                lab.file[machine.name + "/etc/zebra/daemons"] = "zebra=yes\n"
+
+                lab.file[machine.name + "/etc/zebra/zebra.conf"] = "hostname zebra\n"
+                    + "password zebra\n"
+                    + "enable password zebra\n"
+                    + "\nlog file /var/log/zebra/zebra.log\n"
+            }
+
+            if (machine.routing.rip.en) {
+                lab.file[machine.name + "/etc/zebra/daemons"] += "ripd=yes\n"
+
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] = "hostname ripd\n"
+                    + "password zebra\n"
+                    + "enable password zebra\n"
+                    + "\n"
+                    + "router rip\n"
+
+                for (let network of machine.routing.rip.network)
+                    lab.file[machine.name + "/etc/zebra/ripd.conf"] += "network " + network + "\n"
+
+                for (let route of machine.routing.rip.route) {
+                    if (route && route != "")
+                        lab.file[machine.name + "/etc/zebra/ripd.conf"] += "route " + route + "\n"
+                }
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] += "\n"
+            }
+
+            if (machine.routing.ospf.en) {
+                lab.file[machine.name + "/etc/zebra/daemons"] += "ospfd=yes\n"
+
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] = "hostname ospfd\n"
+                    + "password zebra\n"
+                    + "enable password zebra\n"
+                    + "\n"
+                    + "router ospf\n"
+
+                for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
+                    lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n"
+                    if (machine.routing.ospf.stub[m])
+                        lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n"
+                }
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\n"
+            }
+
+            if (machine.routing.bgp.en) makeBgpConf(machine, lab)
+
+            //nb: mantenere l'ordine
+            if (machine.routing.rip.en && machine.routing.rip.connected) {
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] += "redistribute connected\n"
+            }
+            if (machine.routing.ospf.en && machine.routing.ospf.connected) {
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "redistribute connected\n"
+            }
+            if (machine.routing.rip.en && machine.routing.rip.ospf) {
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] += "redistribute ospf\n"
+            }
+            if (machine.routing.rip.en && machine.routing.rip.bgp) {
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] += "redistribute bgp\n"
+            }
+            if (machine.routing.ospf.en && machine.routing.ospf.rip) {
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "redistribute rip\n"
+            }
+            if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "redistribute bgp\n"
+            }
+
+            //nb: i costi vanno qui alla fine
+            if (machine.routing.ospf.en) {
+                for (let interface of machine.routing.ospf.if) {
+                    if (interface.cost != "" && interface.cost) {
+                        lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "interface eth" + interface.interface + "\n"
+                        lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "ospf cost " + interface.cost + "\n"
+                    }
+                }
+            }
+
+            //Free conf
+            if (machine.routing.ospf.en) {
+                if (machine.routing.ospf.free && machine.routing.ospf.free != "")
+                    lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\n" + machine.routing.ospf.free + "\n"
+            }
+            if (machine.routing.rip.en) {
+                if (machine.routing.rip.free && machine.routing.rip.free != "")
+                    lab.file[machine.name + "/etc/zebra/ripd.conf"] += "\n" + machine.routing.rip.free + "\n"
+            }
+            //nb: e infine i log
+            if (machine.routing.rip.en) {
+                lab.file[machine.name + "/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n"
+            }
+            if (machine.routing.ospf.en) {
+                lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n"
+            }
+        }
+    }
+}
+
+function makeOVSwitch(netkit, lab) {
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'switch') {
+            lab.file[machine.name + ".startup"] += "\n" +
+                "service openvswitch-switch start\n\n" +
+                "ovs-vsctl add-br br0\n\n" +
+                machine.interfaces.if.map(el => "ovs-vsctl add-port br0 eth" + el.eth.number).join('\n') +
+                "\n\nifconfig br0 up"
+        }
+    }
+}
+
+function makeRyuController(netkit, lab) {
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "" && machine.type == 'controller') {
+            // TODO
+        }
+    }
+}
+
+/* --------------------------------------------------- */
+/* ------------------ AUX FUNCTIONS ------------------ */
+/* --------------------------------------------------- */
+
+function makeStaticRouting(netkit, lab) {
+    // generazione networking e routing statico
+    for (let machine of netkit) {
+        if (machine.name && machine.name != "") {
+            let switchCounter = 0
+            for (let interface of machine.interfaces.if) {
+                if (interface.eth.number == 0 && (machine.type == 'switch' || machine.type == 'controller')){
+                    interface.ip = "192.168." + (switchCounter % 254) + "." + (machine.type == 'controller' ? 1 : (switchCounter + 2)) + "/16"
+                    switchCounter++
+                }
+                //ifconfig eth_ SELFADDRESS/MASK up
+                if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != ""){
+                    lab.file[machine.name + ".startup"] += "ifconfig eth" + interface.eth.number + " " + interface.ip + " up\n"
+                }
+            }
+
+            for (let gateway of machine.gateways.gw) {
+                if (gateway.gw && gateway.gw != "") {
+                    //route add default gw GATEWAY dev eth_
+                    if (gateway.route == "") {
+                        lab.file[machine.name + ".startup"] += "route add default gw " +
+                            gateway.gw + " dev eth" +
+                            gateway.if + "\n"
+                    }
+                    //route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
+                    else {
+                        lab.file[machine.name + ".startup"] += "route add -net " + gateway.route + " gw " +
+                            gateway.gw + " dev eth" +
+                            gateway.if + "\n"
+                    }
+                }
+            }
+
+            if (machine.interfaces.free && machine.interfaces.free != "")
+                lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n"
+        }
+    }
 }
 
 function makeBgpConf(router, lab) {
+    lab.file[router.name + "/etc/zebra/daemons"] += "bgpd=yes\n"
 
-    lab.file[router.name + "/etc/zebra/daemons"] += "bgpd=yes\n";
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] = "";
+    lab.file[router.name + "/etc/zebra/bgpd.conf"] = ""
+        + "hostname bgpd\n"
+        + "password zebra\n"
+        + "enable password zebra\n"
+        + "\n"
 
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "hostname bgpd\n";
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "password zebra\n";
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "enable password zebra\n";
-
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
-    // Inserimento nome AS
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
+        // Inserimento nome AS
+        + "router bgp " + router.routing.bgp.as + "\n\n"
 
     // Inserimento tutte le Network su cui annunciare BGP
-    for (let n in router.routing.bgp.network) {
-        if ((router.routing.bgp.network[n])  && router.routing.bgp.network[n] != "") {
-            lab.file[router.name + "/etc/zebra/bgpd.conf"] += "network " + router.routing.bgp.network[n] + "\n";
+    for (let network of router.routing.bgp.network) {
+        if (network && network != "") {
+            lab.file[router.name + "/etc/zebra/bgpd.conf"] += "network " + network + "\n"
         }
     }
 
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
+    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n"
 
     //Inserisco tutti i Neibourgh
-    for (let r in router.routing.bgp.remote) {
-        if ((router.routing.bgp.remote[r])  && router.routing.bgp.remote[r].neighbor != "" && router.routing.bgp.remote[r].as != "") {
+    for (let remote in router.routing.bgp.remote) {
+        if (remote && remote.neighbor != "" && remote.as != "") {
             //Aggiungo il remote-as
-            lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " remote-as " + router.routing.bgp.remote[r].as + "\n";
+            lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " remote-as " + remote.as + "\n"
 
             //Aggiungo la descrizione
-            if ((router.routing.bgp.remote[r].description)  && router.routing.bgp.remote[r].description != "") {
-                lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + router.routing.bgp.remote[r].neighbor + " description " + router.routing.bgp.remote[r].description + "\n";
+            if ((remote.description) && remote.description != "") {
+                lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " description " + remote.description + "\n"
             }
         }
     }
     //Free conf
-    if ((router.routing.bgp.free)  && router.routing.bgp.free != "")
-        lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n";
-    //
+    if (router.routing.bgp.free && router.routing.bgp.free != "")
+        lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n"
 
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n";
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates";
-
-    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
+    lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n"
+        + "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n"
 }
 
+function makeFilesStructure(netkit, labInfo) {
+    var lab = []    // <------ EHHHH????????????    TODO: sistemare (se ho tempo/voglia di ricontrollare bene tutto)
+    lab.folder = []
+    lab.file = []
+    lab["warning"] = 0
+    lab["error"] = 0
 
-function makeRouter(netkit, lab) {
-    // routing dinamico RIP e OSPF
-    for (let machineIndex in netkit) {
-        if ((netkit[machineIndex].name)  && netkit[machineIndex].name != "")
-            if (netkit[machineIndex].type == 'router') {
+    makeLabInfo(labInfo, lab)
 
-                if (netkit[machineIndex].routing.rip.en || netkit[machineIndex].routing.ospf.en || netkit[machineIndex].routing.bgp.en) {
-                    lab.file[netkit[machineIndex].name + ".startup"] += "/etc/init.d/zebra start\n";
-                    lab["folder"][netkit[machineIndex].name + "/etc/zebra"] = "";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/daemons"] = "zebra=yes\n";
+    makeMachineFolders(netkit, lab)
+    makeLabConfFile(netkit, lab)
+    makeStartupFiles(netkit, lab)
+    makeStaticRouting(netkit, lab)
+    makeTerminal(netkit, lab)
+    makeRouter(netkit, lab)
+    makeWebserver(netkit, lab)
+    makeNameserver(netkit, lab)
+    makeOther(netkit, lab)
+    makeOVSwitch(netkit, lab)
+    makeRyuController(netkit, lab)
 
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/zebra.conf"] = "";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/zebra.conf"] += "hostname zebra\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/zebra.conf"] += "password zebra\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/zebra.conf"] += "enable password zebra\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/zebra.conf"] += "\nlog file /var/log/zebra/zebra.log\n";
-                }
+    if (labInfo.toggle == "disable")
+        makeGraph(netkit)
 
-
-                if (netkit[machineIndex].routing.rip.en) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/daemons"] += "ripd=yes\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] = "";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "hostname ripd\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "password zebra\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "enable password zebra\n";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "\n";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "router rip\n";
-
-                    for (let n in netkit[machineIndex].routing.rip.network)
-                        lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "network " + netkit[machineIndex].routing.rip.network[n] + "\n";
-
-                    for (let r in netkit[machineIndex].routing.rip.route) {
-                        if ((netkit[machineIndex].routing.rip.route[r])  && netkit[machineIndex].routing.rip.route[r] != "")
-                            lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "route " + netkit[machineIndex].routing.rip.route[r] + "\n";
-                    }
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "\n";
-                }
-
-                if (netkit[machineIndex].routing.ospf.en) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/daemons"] += "ospfd=yes\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] = "";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "hostname ospfd\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "password zebra\n";
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "enable password zebra\n";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "\n";
-
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "router ospf\n";
-
-                    for (let m in netkit[machineIndex].routing.ospf.network) {
-                        lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "network " + netkit[machineIndex].routing.ospf.network[m] + " area " + netkit[machineIndex].routing.ospf.area[m] + "\n";
-                        if (netkit[machineIndex].routing.ospf.stub[m]) {
-                            lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "area " + netkit[machineIndex].routing.ospf.area[m] + " stub\n";
-                        }
-                    }
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "\n";
-                }
-
-                if (netkit[machineIndex].routing.bgp.en) {
-                    makeBgpConf(netkit[machineIndex], lab);
-                }
-
-                //nb: mantenere l'ordine
-                if (netkit[machineIndex].routing.rip.en && netkit[machineIndex].routing.rip.connected) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "redistribute connected\n";
-                }
-
-                if (netkit[machineIndex].routing.ospf.en && netkit[machineIndex].routing.ospf.connected) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "redistribute connected\n";
-                }
-
-                if (netkit[machineIndex].routing.rip.en && netkit[machineIndex].routing.rip.ospf) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "redistribute ospf\n";
-                }
-                if (netkit[machineIndex].routing.rip.en && netkit[machineIndex].routing.rip.bgp) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "redistribute bgp\n";
-                }
-
-                if (netkit[machineIndex].routing.ospf.en && netkit[machineIndex].routing.ospf.rip) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "redistribute rip\n";
-                }
-                if (netkit[machineIndex].routing.ospf.en && netkit[machineIndex].routing.ospf.bgp) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "redistribute bgp\n";
-                }
-
-                //nb: i costi vanno qui alla fine
-                if (netkit[machineIndex].routing.ospf.en) {
-                    for (let face in netkit[machineIndex].routing.ospf.if) {
-                        if (netkit[machineIndex].routing.ospf.if[face].cost != "" && (netkit[machineIndex].routing.ospf.if[face].cost) ) {
-                            lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "interface eth" + netkit[machineIndex].routing.ospf.if[face].interface + "\n";
-                            lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "ospf cost " + netkit[machineIndex].routing.ospf.if[face].cost + "\n";
-                        }
-                    }
-                }
-
-                //Free conf
-                if (netkit[machineIndex].routing.ospf.en) {
-                    if ((netkit[machineIndex].routing.ospf.free)  && netkit[machineIndex].routing.ospf.free != "")
-                        lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "\n" + netkit[machineIndex].routing.ospf.free + "\n";
-                }
-                if (netkit[machineIndex].routing.rip.en) {
-                    if ((netkit[machineIndex].routing.rip.free)  && netkit[machineIndex].routing.rip.free != "")
-                        lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "\n" + netkit[machineIndex].routing.rip.free + "\n";
-                }
-                //
-
-                //nb: e infine i log
-                if (netkit[machineIndex].routing.rip.en) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ripd.conf"] += "\nlog file /var/log/zebra/ripd.log\n";
-                }
-
-                if (netkit[machineIndex].routing.ospf.en) {
-                    lab.file[netkit[machineIndex].name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
-                }
-            }
-    }
-
-    return lab;
-}
-
-function makeFileStructure(netkit, labInfo) {
-    var lab = [];
-    lab["folder"] = [];
-    lab.file = [];
-    lab["warning"] = 0;
-    lab["error"] = 0;
-
-    addLabInfo(labInfo, lab);
-
-    makeMachineFolder(netkit, lab);
-    makeLabConf(netkit, lab);
-    makeStartup(netkit, lab);
-    makeStaticRouting(netkit, lab);
-    makeTerminal(netkit, lab);
-    makeRouter(netkit, lab);
-    makeWebserver(netkit, lab);
-    makeNameserver(netkit, lab);
-    makeOther(netkit, lab);
-
-    if (labInfo.toggle == "disable") {
-        makeGraph(netkit);
-    }
-
-    return lab;
+    return lab
 }
 
 function makeScript(lab) {
-    var text = "";
-    text += "#! /bin/sh\n";
-    text += "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n";
-    text += "\n";
-    text += 'rm -rf "$(dirname "$0")/lab"\n';
-    text += 'mkdir "$(dirname "$0")/lab"\n';
-    text += 'cd "$(dirname "$0")/lab"\n';
-    text += "\n";
-    for (let folderName in lab["folder"]) {
-        text += "mkdir -p " + folderName + "\n";
+    let text = "#! /bin/sh\n"
+        + "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
+        + "\n"
+        + 'rm -rf "$(dirname "$0")/lab"\n'
+        + 'mkdir "$(dirname "$0")/lab"\n'
+        + 'cd "$(dirname "$0")/lab"\n'
+        + "\n"
+
+    for (let folderName in lab.folder) {
+        text += "mkdir -p " + folderName + "\n"
     }
+
     for (let fileName in lab.file) {
-        text += "touch " + fileName + "\n";
-        var lines = lab.file[fileName].split("\n");
-        for (let lineIndex in lines) {
-            text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
+        text += "touch " + fileName + "\n"
+        let lines = lab.file[fileName].split("\n")
+        for (let line of lines) {
+            text += "echo '" + line + "' >> " + fileName + "\n"
         }
     }
-    text += "rm \"$0\"\n";
 
-    return text;
+    text += "rm \"$0\"\n"
+    return text
 }
 
 function makeZip(lab) {     // TODO: Si può spostare in controller.js? (per coerenza)
-    var zip = new JSZip();
+    let zip = new JSZip()
 
-    for (let folderName in lab["folder"]) {
-        zip.folder(folderName);
+    for (let folderName in lab.folder) {
+        zip.folder(folderName)
     }
     for (let fileName in lab.file) {
-        zip.file(fileName, lab.file[fileName]);
+        zip.file(fileName, lab.file[fileName])
     }
-    var content = zip.generate({ type: "blob" });
-    saveAs(content, "lab.zip");
+    let content = zip.generate({ type: "blob" })
+    saveAs(content, "lab.zip")
 }

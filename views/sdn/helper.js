@@ -116,27 +116,51 @@ function setInputPattern(value, inputEl) {
     // TODO: Ho già provato a fare 'switch(value){case ...: ...}' ma non va. Eventualmente riprova
     // TODO: Ammettere anche valori "192.*"
     let newPattern
-    if (value == "noselection") { inputEl.disabled = true; return }
-    else if (value == "MAC source") { newPattern = "([0-9A-F]{4}:){4}" }           // TODO: non sono sicuro che sia così
-    else if (value == "MAC destination") { newPattern = "([0-9A-F]{4}:){4}" }      // TODO: non sono sicuro che sia così
-    else if (value == "eth type") { newPattern = "ciao" }
-    else if (value == "MPLS label") { newPattern = "ciao" }
-    else if (value == "MPLS tc") { newPattern = "ciao" }
-    else if (value == "vlan id") { newPattern = "ciao" }
-    else if (value == "IP source") { newPattern = "([0-2]?[0-9]{,2}\.){4}" }       // TODO: quello che ho messo ora è (0-299.){4}
-    else if (value == "IP destination") { newPattern = "([0-2]?[0-9]{,2}\.){4}" }  // TODO: quello che ho messo ora è (0-299.){4}
-    else if (value == "IP port") { newPattern = "[0-6]?[0-9]{,4}" } // 0 - 65535   // TODO: quello che ho messo ora è 0-69999
-    else if (value == "TCP source port") { newPattern = "[0-6]?[0-9]{,4}" }
-    else if (value == "TCP destination port") { newPattern = "[0-6]?[0-9]{,4}" }
-    else if (value == "set MPLS label") { newPattern = "ciao" }
-    else if (value == "forward to port") { newPattern = "[0-6]?[0-9]{,4}" }    // 0 - 65535    // TODO: quello che ho messo ora è 0-69999
-    else if (value == "send to controller") { newPattern = "ciao" }
-    else if (value == "drop") { inputEl.disabled = true; return }
-    else if (value == "process l2") { newPattern = "ciao" }
-    else if (value == "process l3") { newPattern = "ciao" }
-    else if (value == "set field") { newPattern = "ciao" }
-    else if (value == "push header") { newPattern = "ciao" }
-    else if (value == "pop header") { newPattern = "ciao" }
+    if (value == "noselection") {
+        inputEl.disabled = true
+        return
+    } else if (value == "MAC source") {
+        newPattern = "([0-9A-F]{4}:){3}[0-9A-F]{4}"           // TODO: non sono sicuro che sia così
+    } else if (value == "MAC destination") {
+        newPattern = "([0-9A-F]{4}:){3}[0-9A-F]{4}"      // TODO: non sono sicuro che sia così
+    } else if (value == "eth type") {
+        newPattern = ".*"
+    } else if (value == "MPLS label") {
+        newPattern = ".*"
+    } else if (value == "MPLS tc") {
+        newPattern = ".*"
+    } else if (value == "vlan id") {
+        newPattern = ".*"
+    } else if (value == "IP source") {
+        newPattern = "([0-2]?[0-9]{,2}\.){4}"       // TODO: quello che ho messo ora è (0-299.){4}
+    } else if (value == "IP destination") {
+        newPattern = "([0-2]?[0-9]{,2}\.){4}"  // TODO: quello che ho messo ora è (0-299.){4}
+    } else if (value == "IP port") {
+        newPattern = "[0-6]?[0-9]{,4}" // 0 - 65535   // TODO: quello che ho messo ora è 0-69999
+    } else if (value == "TCP source port") {
+        newPattern = "[0-6]?[0-9]{,4}"
+    } else if (value == "TCP destination port") {
+        newPattern = "[0-6]?[0-9]{,4}"
+    } else if (value == "set MPLS label") {
+        newPattern = '(' + sdnData.getLabels().map(el => el.name).join(')|(') + ')'
+    } else if (value == "forward to port") {
+        newPattern = "[0-6]?[0-9]{,4}"    // 0 - 65535    // TODO: quello che ho messo ora è 0-69999
+    } else if (value == "send to controller") {
+        newPattern = ".*"
+    } else if (value == "drop") {
+        inputEl.disabled = true
+        return
+    } else if (value == "process l2") {
+        newPattern = ".*"
+    } else if (value == "process l3") {
+        newPattern = ".*"
+    } else if (value == "set field") {
+        newPattern = ".*"
+    } else if (value == "push header") {
+        newPattern = ".*"
+    } else if (value == "pop header") {
+        newPattern = ".*"
+    }
     inputEl.pattern = newPattern
     inputEl.disabled = false
 }

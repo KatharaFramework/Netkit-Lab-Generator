@@ -6,14 +6,18 @@ function loadSDN(config) {
     let networks = new Set()
 
     for (let macchina of config.netkit) {
-        let node = { id: macchina.name, type: macchina.type }
-        data.nodes.push(node)   // Creo i nodi delle macchine
+        if(macchina.type != 'controller'){
+            let node = { id: macchina.name, type: macchina.type }
+            data.nodes.push(node)   // Creo i nodi delle macchine
 
-        macchina.interfaces.if.forEach(function (interfaccia) {
-            let nomeDominio = interfaccia.eth.domain
-            networks.add(nomeDominio)
-            data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
-        })
+            macchina.interfaces.if.forEach(function (interfaccia) {
+                let nomeDominio = interfaccia.eth.domain
+                if(nomeDominio != 'SDNRESERVED'){
+                    networks.add(nomeDominio)
+                    data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
+                }
+            })
+        }
     }
 
     networks.forEach(domainName => data.nodes.push({ id: domainName, type: "network" }))   // Creo i nodi delle reti
@@ -33,11 +37,9 @@ function findEdgeNetworks(data) {
         if (node.type == "network") {
             let isInternal = false
             let isExternal = false
-            let isController = false
             for (let link of data.links) {
                 if (link.target == node.id) {
                     if (link.source.type == 'switch') isInternal = true
-                    else if (link.source.type == 'controller') isController = true
                     else if (link.source.type != 'switch') isExternal = true
                 }
 
@@ -46,7 +48,6 @@ function findEdgeNetworks(data) {
                     break
                 }
             }
-            if (isInternal && isController) node.type += ' control'
             if (!isInternal) node.type += ' external'
         }
     })
@@ -87,11 +88,8 @@ function startSimulation(data) {
 
     simulation.force("link")
         .distance(function (d) {
-            switch (d.source.type) {
-                case "controller": return 200
-                case "switch": return 60
-                default: return 40
-            }
+            if(d.source.type == "switch") return 80
+            return 60
         })
 
     simulation.force("charge")
