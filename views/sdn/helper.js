@@ -8,7 +8,7 @@ function removeNodesSelection() {
 /* ----------------------------------------------------------- */
 
 function resetButtons() {
-    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    let bottoni = document.querySelectorAll('#sdn-horizontal-buttons button')
     unhide(
         bottoni.item(1),    // Bottone per muovere i nodi
         bottoni.item(4)     // Bottone per aggiungere etichette
@@ -23,7 +23,7 @@ function resetButtons() {
 }
 
 function togglePathButtons(displayBool) {
-    let bottoni = document.getElementsByClassName('sdnBehaviour')
+    let bottoni = document.querySelectorAll('#sdn-horizontal-buttons button')
     if (displayBool) 
         unhide(
             bottoni.item(5),
@@ -88,81 +88,6 @@ function getDetails2Sections() {
 function cleanSVGs() {
     for (let svg of document.getElementsByTagName('svg'))
         svg.innerHTML = ""
-}
-
-/* ---------------------------------------------------- */
-/* ------------------- RULES MODAL--------------------- */
-/* ---------------------------------------------------- */
-
-function cleanRulesModal(){
-    let matchDiv = document.querySelector('#rule-modal .modal-body .half')
-    while(matchDiv.children.length != 5)
-        modalRemoveLine(matchDiv)
-}
-
-function modalMakeNewLine(parent){
-    parent.appendChild(parent.lastElementChild.previousElementSibling.cloneNode(true))
-    parent.appendChild(parent.lastElementChild.previousElementSibling.cloneNode(true))
-}
-
-function modalRemoveLine(parent){
-    if(parent.children.length > 5){
-        parent.lastElementChild.remove()
-        parent.lastElementChild.remove()
-    }
-}
-
-function setInputPattern(value, inputEl) {
-    // TODO: Ho già provato a fare 'switch(value){case ...: ...}' ma non va. Eventualmente riprova
-    // TODO: Ammettere anche valori "192.*"
-    let newPattern
-    if (value == "noselection") {
-        inputEl.disabled = true
-        return
-    } else if (value == "MAC source") {
-        newPattern = "([0-9A-F]{4}:){3}[0-9A-F]{4}"           // TODO: non sono sicuro che sia così
-    } else if (value == "MAC destination") {
-        newPattern = "([0-9A-F]{4}:){3}[0-9A-F]{4}"      // TODO: non sono sicuro che sia così
-    } else if (value == "eth type") {
-        newPattern = ".*"
-    } else if (value == "MPLS label") {
-        newPattern = ".*"
-    } else if (value == "MPLS tc") {
-        newPattern = ".*"
-    } else if (value == "vlan id") {
-        newPattern = ".*"
-    } else if (value == "IP source") {
-        newPattern = "([0-2]?[0-9]{,2}\.){4}"       // TODO: quello che ho messo ora è (0-299.){4}
-    } else if (value == "IP destination") {
-        newPattern = "([0-2]?[0-9]{,2}\.){4}"  // TODO: quello che ho messo ora è (0-299.){4}
-    } else if (value == "IP port") {
-        newPattern = "[0-6]?[0-9]{,4}" // 0 - 65535   // TODO: quello che ho messo ora è 0-69999
-    } else if (value == "TCP source port") {
-        newPattern = "[0-6]?[0-9]{,4}"
-    } else if (value == "TCP destination port") {
-        newPattern = "[0-6]?[0-9]{,4}"
-    } else if (value == "set MPLS label") {
-        newPattern = '(' + sdnData.getLabels().map(el => el.name).join(')|(') + ')'
-    } else if (value == "forward to port") {
-        newPattern = "[0-6]?[0-9]{,4}"    // 0 - 65535    // TODO: quello che ho messo ora è 0-69999
-    } else if (value == "send to controller") {
-        newPattern = ".*"
-    } else if (value == "drop") {
-        inputEl.disabled = true
-        return
-    } else if (value == "process l2") {
-        newPattern = ".*"
-    } else if (value == "process l3") {
-        newPattern = ".*"
-    } else if (value == "set field") {
-        newPattern = ".*"
-    } else if (value == "push header") {
-        newPattern = ".*"
-    } else if (value == "pop header") {
-        newPattern = ".*"
-    }
-    inputEl.pattern = newPattern
-    inputEl.disabled = false
 }
 
 /* ---------------------------------------------------- */

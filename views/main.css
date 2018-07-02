@@ -4,6 +4,10 @@
     --disclaimer-color: rgba(255, 0, 0, .2);
 }
 
+body {
+    padding-top: 45px;
+}
+
 .anchor-id {
     position: absolute;
     margin-top: -140px;
@@ -49,7 +53,7 @@ hr {
 .modal-kathara {
     display: block;
     z-index: 9999;
-    background: rgba(189, 189, 189, 0.5);
+	background: rgba(189, 189, 189, 0.5);
 }
 
 .modal-kathara .modal-title {
@@ -72,16 +76,12 @@ hr {
     position: fixed;
     border-radius: 0;
     width: 100%;
+	min-height: 0;
 }
 
 .navbar-kathara-primary {
     z-index: 9996;
     top: 0;
-}
-
-.navbar-kathara-secondary {
-    z-index: 9995;
-    top: 51px;
 }
 
 .navbar-kathara,
@@ -90,7 +90,16 @@ hr {
 .navbar-kathara li a:focus {
     background-color: var(--main-color);
     color: white;
-    font-weight: bolder;
+	font-weight: bolder;
+}
+
+.navbar-kathara li a {
+	padding: 14px
+}
+
+.navbar-kathara-secondary {
+    z-index: 9995;
+    top: 50px;
 }
 
 .navbar-kathara li a:active,
@@ -113,10 +122,6 @@ hr {
     cursor: not-allowed !important;
     opacity: 0.5;
     text-decoration: none;
-}
-
-body {
-    padding-top: 50px;
 }
 
 /* ------------------------------------------------------ */

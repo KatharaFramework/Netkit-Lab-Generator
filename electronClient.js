@@ -15,7 +15,7 @@ let tmp_folder = app.getPath('userData')
 
 app.on('ready', function () {
 
-  mainWindow = new BrowserWindow({ width: 1060, height: 750, minWidth: 800, minHeight: 720 })
+  mainWindow = new BrowserWindow({ width: 1060, height: 750, minWidth: 800, minHeight: 730 })
 
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),

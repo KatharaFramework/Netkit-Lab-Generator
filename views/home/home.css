@@ -5,7 +5,19 @@
 #right-controls {
     position: fixed;
     right: 5px;
-    top: 60px;
+    top: 55px;
+}
+
+@media (min-height: 820px) {
+	#right-controls {
+		top: 65px;
+	}
+}
+
+#labInfo {
+    width: 206px;
+    margin: 1em 0;
+    background-color: white;
 }
 
 @media (max-width: 1055px) {
@@ -22,16 +34,8 @@
         top: 5em;
         right: 5px;
         background-color: white;
-    }
-}
-
-#labInfo {
-    width: 206px;
-    margin: 1em 0;
-    background-color: white;
-}
-
-@media (max-width: 1055px) {
+	}
+	
     #labInfo tr:nth-child(4) {
         display: none;
     }
@@ -46,7 +50,7 @@
     padding: 0;
     font-size: 80%;
 
-    max-height: 15em;
+    max-height: 16em;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -55,7 +59,13 @@
 
 @media (min-height: 820px) {
     #minimap {
-        max-height: 28em;
+        max-height: 26em;
+    }
+}
+
+@media (min-height: 1000px) {
+    #minimap {
+        max-height: 39em;
     }
 }
 

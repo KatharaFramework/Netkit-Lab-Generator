@@ -2,7 +2,7 @@
     margin-bottom: 15px;
 }
 
-#comandiSDN,
+#sdn-vertical-buttons,
 #sdnGraph,
 #details,
 #details2,
@@ -18,7 +18,7 @@
 /* ---- COMANDI ---- */
 /* ----------------- */
 
-#comandiSDN {
+#sdn-vertical-buttons {
     width: 70px;
     height: 820px;
 
@@ -26,7 +26,7 @@
     padding: 0;
 }
 
-#comandiSDN button {
+#sdn-vertical-buttons button {
     padding: 5px 0;
     margin: 0;
     width: 100%;
@@ -39,12 +39,10 @@
 
 g.nodes circle {
     fill: darkgray;
-    r: 20;
 }
 
 g.nodes circle.network {
     fill: black;
-    r: 15;
 }
 
 g.nodes circle.network.external {
@@ -120,18 +118,11 @@ g.links line.selected {
     overflow: auto;
 }
 
-#details input,
-#details2 input {
-    margin-left: 10px;
-    margin-bottom: 10px;
-    padding-left: 10px;
-
-    max-width: 30%;
-}
-
-#details input:valid,
-#details2 input:valid {
-    background-image: none;
+.blu-bordered {
+	background-color: var(--secondary-color);
+    padding: 10px;
+    vertical-align: middle;
+    border: 1px solid black;
 }
 
 .colorTag {
@@ -141,19 +132,28 @@ g.links line.selected {
     margin-right: 10px;
 }
 
+.blu-bordered > input,
+.blu-bordered > button {
+	margin: 0 10px 0 0;
+    padding-left: 10px;
+
+    max-width: 30%;
+	border: 1px solid black;
+}
+
+#details input:valid {
+    background-image: none;
+}
+
 #details button {
     float: right;
     margin: 0;
     margin-left: 5px;
 }
 
-#details hr:last-child {
-    display: none;
-}
-
 .label-details {
-    border: 1px solid darkgray;
-    display: none;
+	border: 1px solid darkgray;
+	display: none;
 }
 
 /* --- Details table --- */
@@ -254,6 +254,10 @@ rect.bar {
 /* ----- MODAL ----- */
 /* ----------------- */
 
+#rule-modal {
+	text-align: center;
+}
+
 .half {
     width: 50%;
     float: left;
@@ -262,11 +266,13 @@ rect.bar {
 
 .modal-body input {
     margin: 10px;
+    border: 1px solid darkgray;
+	padding: 0 10px;
+	background-image: none;
 }
 
-.modal-body input {
-    border: 1px solid darkgray;
-    background-image: none;
+.modal-body select {
+	margin: 5px;
 }
 
 #rule-modal .half button {

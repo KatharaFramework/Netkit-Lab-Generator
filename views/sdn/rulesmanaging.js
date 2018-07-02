@@ -4,7 +4,7 @@ function createMatchRepresentation(matches, hasLabel = false){
         let cellContents = [
             document.createElement('p'),
             document.createElement('hr'),
-            document.createTextNode(match.match + " " + match.value)
+            document.createTextNode(match.name + " " + match.value)
         ]
         
         let labelColor = cellContents[0].appendChild(document.createElement('span'))
@@ -18,7 +18,7 @@ function createMatchRepresentation(matches, hasLabel = false){
         let len = matches.length
         let cellContents = []
         matches.forEach(function(match, index){
-            cellContents.push(document.createTextNode(match.match + " " + match.value))
+            cellContents.push(document.createTextNode(match.name + " " + match.value))
             if(len > index +1) cellContents.push(document.createElement('hr'))
         })
         return cellContents
@@ -42,19 +42,19 @@ function createPacketRule(callback) {
     let hardTimeoutDiv = inputDivs.item(4)
 
     let matches = []
-    for(let i = 3; i < matchDiv.children.length; i += 2){
+    for(let i = 2; i < matchDiv.children.length; i++){
         matches.push({
-            match: matchDiv.children[i].value,
-            value: matchDiv.children[i+1].value
+            name: matchDiv.children[i].firstElementChild.value,
+            value: matchDiv.children[i].lastElementChild.value
         })
-    }
+	}
 
     let rule = sdnData.addRule(
         device,
         matches,
         {
-            action: actionDiv.lastElementChild.previousElementSibling.value,
-            value: actionDiv.lastElementChild.value
+            name: actionDiv.lastElementChild.firstElementChild.value,
+            value: actionDiv.lastElementChild.lastElementChild.value
         },
         priorityDiv.lastElementChild.value,
         idleTimeoutDiv.lastElementChild.value,
@@ -81,7 +81,7 @@ function appendPacketRule(div, rule, counter) {
         createRow(
             counter,
             createMatchRepresentation(rule.matches),
-            rule.action.action + ' ' + rule.action.value,
+            rule.action.name + ' ' + rule.action.value,
             rule.priority, 
             rule.idleTimeout,
             rule.hardTimeout,
@@ -100,7 +100,7 @@ function showMovingLabelRules(data, reservedSpace, counter) {
             createRow(
                 counter++,
                 createMatchRepresentation(labelRule.matches, true),
-                labelRule.action.action + " " + labelRule.action.value,
+                labelRule.action.name + " " + labelRule.action.value,
                 labelRule.priority,
                 labelRule.idleTimeout,
                 labelRule.hardTimeout,

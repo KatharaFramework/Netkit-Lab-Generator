@@ -8,8 +8,7 @@ function loadSDN(config) {
     for (let macchina of config.netkit) {
         if(macchina.type != 'controller'){
             let node = { id: macchina.name, type: macchina.type }
-            data.nodes.push(node)   // Creo i nodi delle macchine
-
+			data.nodes.push(node)
             macchina.interfaces.if.forEach(function (interfaccia) {
                 let nomeDominio = interfaccia.eth.domain
                 if(nomeDominio != 'SDNRESERVED'){
@@ -25,7 +24,7 @@ function loadSDN(config) {
 
     cleanSVGs()
     resetButtons()
-    document.getElementById('details').innerHTML = ""
+    // document.getElementById('details').innerHTML = ""
     closeDetailsAndClean(3)
 
     sdnData = new SDNData() // TODO: Aprire un alert per chiedere conferma?
@@ -72,7 +71,11 @@ function startSimulation(data) {
         .attr('class', 'nodes')
         .selectAll('circle')
         .data(data.nodes)
-        .enter().append('circle')
+		.enter().append('circle')
+		.attr('r', function(d){
+			if(d.type == 'network' || d.type == 'network edge') return 15
+			return 25
+		})
         .attr('class', function (d) { return d.type })
     // .attr("xlink:href", assignImage)
 
@@ -114,8 +117,8 @@ function startSimulation(data) {
     d3.selectAll('g.nodes circle.switch').on('click', showSwitchDetails)
 }
 
-function toggleExternalVisibility(thisButton){
-    let externalNodes = d3.selectAll('g.nodes circle.external, g.nodes circle:not(.switch):not(.network):not(.controller)')
+function toggleExternalNetworkVisibility(thisButton){
+    let externalNodes = d3.selectAll('g.nodes circle.external, g.nodes circle:not(.switch):not(.network)')
     let externalLinks = d3.selectAll('g.links line.external')
     if(thisButton.stato){
         externalNodes.attr('hidden', null)

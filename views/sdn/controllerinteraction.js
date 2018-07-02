@@ -13,7 +13,7 @@ function getFromController(){
 }
 
 function enableControllerButtons(){
-    let bottoniDiv = document.getElementById('comandiSDN')
+    let bottoniDiv = document.getElementById('sdn-vertical-buttons')
     bottoniDiv.children[0].disabled = false
     bottoniDiv.children[1].disabled = false    
 }
