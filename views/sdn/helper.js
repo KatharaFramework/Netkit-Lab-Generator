@@ -1,6 +1,9 @@
 function removeNodesSelection() {
-    for (let el of document.querySelectorAll('svg .selected'))
-        el.classList.remove('selected')
+    for (let el of document.querySelectorAll('svg .selected')){
+		el.classList.remove('selected')
+		el.classList.remove('straight')
+		el.classList.remove('reversed')
+	}
 }
 
 /* ----------------------------------------------------------- */

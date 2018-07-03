@@ -105,7 +105,15 @@ g.links line:hover {
 
 
 g.links line.selected {
-    stroke: darkorange;
+	stroke: darkorange;
+}
+
+g.links line.selected.straight {
+	marker-start: url(#markerArrow1)
+}
+
+g.links line.selected.reversed {
+	marker-end: url(#markerArrow2)
 }
 
 /* ---------------------- */

@@ -188,7 +188,12 @@ function highlightSegmentOnGraph(device, from, to) {
 
 	d3.selectAll('line.switch')
 		.each(function(d, i, nodes){
-			if (d.source.id == device && (d.porta == from || d.porta == to))
+			if (d.source.id == device && d.porta == from){
 				nodes[i].classList.add('selected')
+				nodes[i].classList.add('straight')
+			} else if (d.source.id == device && d.porta == to){
+				nodes[i].classList.add('selected')
+				nodes[i].classList.add('reversed')
+			}
 		})
 }

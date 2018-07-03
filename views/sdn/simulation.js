@@ -114,7 +114,9 @@ function startSimulation(data) {
 
     linksGroup.attr('class', function (d) { return d.target.type + " " + d.source.type }) // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
 
-    d3.selectAll('g.nodes circle.switch').on('click', showSwitchDetails)
+	d3.selectAll('g.nodes circle.switch').on('click', showSwitchDetails)
+	
+	appendMarkersDefinitions(svg)
 }
 
 function toggleExternalNetworkVisibility(thisButton){
@@ -131,4 +133,26 @@ function toggleExternalNetworkVisibility(thisButton){
         thisButton.innerText = 'Show external network'
         thisButton.stato = true
     }
+}
+
+function appendMarkersDefinitions(svg){
+	// TODO: Potrei rimpicciolire il triangolo
+	let defs = svg.append('defs')
+	defs.append('marker')	// Questo marcatore va bene con marker-start
+		.attr('id', "markerArrow1")
+		.attr('markerWidth', "13").attr('markerHeight', "13")
+		.attr('refY', "6").attr('refX', "-4")
+		.attr('orient', "auto")
+			.append('path')
+			.attr('d', 'M2,6 L10,11 L10,2 L2,6')	// Triangolo con punta a sinistra
+			.style('fill', 'orange')
+
+	defs.append('marker')	// Questo marcatore va bene con marker-end
+		.attr('id', "markerArrow2")
+		.attr('markerWidth', "13").attr('markerHeight', "13")
+		.attr('refY', "6").attr('refX', "14")
+		.attr('orient', "auto")
+			.append('path')
+			.attr('d', 'M2,2 L2,11 L10,6 L2,2')		// Triangolo con punta a destra
+			.style('fill', 'orange')
 }
