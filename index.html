@@ -2,523 +2,768 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="author" content="Lykon, Lollo, Neeja" />
-    <title>Netkit Lab Generator</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg=="
-    />
-    <script src="assets/js/helper.js"></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="machine-ua-compatible" content="ie=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="author" content="Lykon, Lollo, Neeja" />
+	<title>Netkit Lab Generator</title>
+	<link rel="stylesheet" href="assets/vendor/css/bootstrap.min.css" />
+	<link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg=="
+	/>
+	<script src="views/helper.js"></script>
 </head>
 
 <body>
+	<script>
+		if (typeof JSON.clone !== "function") JSON.clone = function (obj) { return JSON.parse(JSON.stringify(obj)) }
+		if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0)
+			document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
+	</script>
 
-    <script>
-        if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0)
-            document.write('<p class="browserupgrade"><strong>Internet Explorer<\/strong> is not supported. Please upgrade your browser to <a href="https://www.google.com/chrome/browser/desktop/">Chrome<\/a> or <a href="https://www.mozilla.org/firefox/new/">Firefox<\/a>.<\/p>');
-    </script>
+	<!-- MAIN-->
+	<div data-ng-app="napp" data-ng-controller="nc">
+		<link rel="stylesheet" href="views/main.css" />
+		<script src="assets/vendor/js/angular.min.js"></script>
+		<script src="views/controller.js"></script>
 
-    <!-- MAIN-->
-    <div data-ng-app="napp" data-ng-controller="nc">
+		<!-- NAVBAR-->
+		<div>
+			<nav id="main-nav" class="navbar navbar-primary container-fluid navbar-kathara navbar-kathara-primary">
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="#home" onclick="toggle_tab(event, this)">Home</a>
+					</li>
+					<li>
+						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Graph</a>
+					</li>
+					<li>
+						<a href="#sdn" onclick="toggle_tab(event, this)">SDN</a>
+					</li>
+					<li>
+						<a onclick="toggle_submenu(0)">Download Lab</a>
+					</li>
+					<li>
+						<a onclick="toggle_submenu(1)">Save &amp; Load</a>
+					</li>
+					<li class="hidden">
+						<a onclick="toggle_submenu(2)">Run on Host</a>
+					</li>
+				</ul>
+			</nav>
 
-        <!-- Navbar-->
-        <nav id="main-nav" class="navbar navbar-primary container-fluid navbar-kathara navbar-kathara-primary">
-            <ul class="nav navbar-nav">
-                <li>
-                    <a href="#home" onclick="toggle_tab(event, this)">Home</a>
-                </li>
-                <li>
-                    <a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Graph</a>
-                </li>
-                <!-- <li class="hidden">
-                    <a href="#sdn" onclick="toggle_tab(this)">SDN</a>
-                </li> -->
-                <li class="hidden">
-                    <a onclick="toggle_submenu(0)">Run on Host</a>
-                </li>
-                <li>
-                    <a onclick="toggle_submenu(1)">Download Lab</a>
-                </li>
-                <li>
-                    <a onclick="toggle_submenu(2)">Save &amp; Load</a>
-                </li>
-            </ul>
-        </nav>
+			<!-- Sub-menu Download Lab -->
+			<nav id="submenu-0" class="navbar navbar-primary navbar-kathara container-fluid navbar-kathara-secondary ng-hide">
+				<script src="assets/vendor/js/jszip.min.js"></script>
+				<ul class="nav navbar-nav">
+					<li>
+						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')" onclick="toggle_submenu(-1)">Download .sh file</a>
+					</li>
+					<li>
+						<a data-ng-click="generateZip(netkit, labInfo)" onclick="toggle_submenu(-1)">Download .zip file</a>
+					</li>
+				</ul>
+			</nav>
 
-        <!-- Sub-menu Run Lab -->
-        <nav id="submenu-0" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide container-fluid">
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <ul class="nav navbar-nav">
-                <li>
-                    <a id="copyLab">Copy lab on Host *</a>
-                </li>
-                <li>
-                    <a id="lstart" class="disabledLink">Run LStart on Host **</a>
-                </li>
-                <li>
-                    <a id="lclean" class="disabledLink">Run LClean on Host **</a>
-                </li>
-            </ul>
-            <div>
-                <span class="label label-warning">
-                    * Requires something to run .sh files, even on Windows (like Git bash, associated with .sh files).
-                </span>
-                <br />
-                <span class="label label-warning">
-                    ** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
-                </span>
-            </div>
-        </nav>
+			<!-- Sub-menu Save and Load -->
+			<nav id="submenu-1" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
+				<script src="assets/vendor/js/FileSaver.min.js"></script>
+				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"
+				/>
+				<ul class="nav navbar-nav">
+					<li>
+						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
+					</li>
+					<li>
+						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')" onclick="toggle_submenu(-1)">Export configuration</a>
+					</li>
+				</ul>
+			</nav>
 
-        <!-- Sub-menu Download Lab -->
-        <nav id="submenu-1" class="navbar navbar-primary navbar-kathara container-fluid navbar-kathara-secondary ng-hide">
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <ul class="nav navbar-nav">
-                <li>
-                    <a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')">Download .sh file</a>
-                </li>
-                <li>
-                    <a data-ng-click="generateZip(netkit, labInfo)">Download .zip file</a>
-                </li>
-            </ul>
-        </nav>
+			<!-- Sub-menu Run Lab -->
+			<nav id="submenu-2" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide container-fluid">
+				<ul class="nav navbar-nav">
+					<li>
+						<a id="copyLab">Copy lab on Host *</a>
+					</li>
+					<li>
+						<a id="lstart" class="disabledLink">Run LStart on Host **</a>
+					</li>
+					<li>
+						<a id="lclean" class="disabledLink">Run LClean on Host **</a>
+					</li>
+				</ul>
+				<div>
+					<span class="label label-warning">
+						* Requires something to run .sh files, even on Windows (like Git bash, associated with .sh files).
+					</span>
+					<br />
+					<span class="label label-warning">
+						** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
+					</span>
+				</div>
+			</nav>
+		</div>
 
-        <!-- Sub-menu Save and Load -->
-        <nav id="submenu-2" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
-            <ul class="nav navbar-nav">
-                <li class="space-top">
-                    <span class="file">
-                        <input type="file" id="file" class="form-control hidden" onchange="document.getElementById('file-text').value = lastElem(lastElem(this.value.split('/')).split('\\'));"
-                        />
-                        <button style="color: black; background-color: white;" onclick="document.getElementById('file').click();">Browse...</button>
-                        <input id="file-text" type="text" class="form-control fakefile" title="file-text" onclick="document.getElementById('file').click();"
-                            readonly />
-                    </span>
-                </li>
-                <li>
-                    <a data-ng-click="import()">Import configuration</a>
-                </li>
-                <li>
-                    <a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')">Export configuration</a>
-                </li>
-            </ul>
-        </nav>
+		<!-- CONTENTS -->
+		<div class="tab-content">
 
-        <!-- Contents -->
-        <div id="contents" class="tab-content">
+			<!-- HOME -->
+			<div id="home" class="tab-pane active">
+				<link rel="stylesheet" href="views/home/home.css" />
+				<script src="views/home/model.js"></script>
+				<script src="views/home/make.js"></script>
+				<div>
+					<h1>Netkit Lab Generator</h1>
+					<h4>
+						<a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a>
+					</h4>
+					<hr/>
+					<p>
+						This tool allows to quickly generate most of the files and folders you need to run a working netkit lab. The main purpose
+						is to quickly generate the files and folders needed with low configuration options, so more advanced funtionalities
+						are omitted and some others are set by default (like zebra username and password). The tool also allows to visualize
+						the topology in the 'Graph' tab.
+					</p>
+					<p>
+						Once the form is compiled just download the bash script or the .zip file with the whole lab. It is also possible to export
+						and import the form configuration for future changes. DNS may not work with too many levels.
+					</p>
+					<p class="disclaimer">The
+						<a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
+						of this application do not take any responsibility for any malfunction. Remember to manually check the final configuration
+						for exams and production.
+						<a class="link" onclick="this.parentElement.classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
+					</p>
+					</p>
+				</div>
 
-            <!-- MAIN WINDOW -->
-            <div id="home" class="tab-pane active">
-                <div style="margin-bottom: 2em">
-                    <h1>Netkit Lab Generator</h1>
-                    <h4>
-                        <a href="https://github.com/Kidel/Netkit-Lab-Generator" target="_blank">https://github.com/Kidel/Netkit-Lab-Generator</a>
-                    </h4>
-                    <hr/>
-                    <p>
-                        This tool allows to quickly generate most of the files and folders you need to run a working netkit lab. The main purpose
-                        is to quickly generate the files and folders needed with low configuration options, so more advanced
-                        funtionalities are omitted and some others are set by default (like zebra username and password).
-                        The tool also allows to visualize the topology in the 'Graph' tab.
-                    </p>
-                    <p>
-                        Once the form is compiled just download the bash script or the .zip file with the whole lab. It is also possible to export
-                        and import the form configuration for future changes. DNS may not work with too many levels.
-                    </p>
-                    <p id="disclaimer">The
-                        <a href="https://github.com/Kidel/Netkit-Lab-Generator/graphs/contributors" target="_blank">authors</a>
-                        of this application do not take any responsibility for any malfunction. Remember to manually check the final configuration
-                        for exams and production.
-                        <a class="link" onclick="document.getElementById('disclaimer').classList.add('hidden');document.getElementsByClassName('mock-disclaimer').item(0).className = ''">click to close</a>
-                    </p>
-                    </p>
-                </div>
+				<!-- RIGHT MENU -->
+				<div id="right-controls">
+					<table id="labInfo">
+						<tbody>
+							<tr>
+								<th>Lab informations</th>
+							</tr>
 
-                <!-- RIGHT MENU -->
-                <div id="right-controls">
-                    <table id="labInfo">
-                        <tbody>
-                            <tr>
-                                <th>Lab informations</th>
-                            </tr>
+							<tr>
+								<td>
+									<label>Description:
+										<input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
+									</label>
+									<label>Version:
+										<input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
+									</label>
+									<label>Author(s):
+										<input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
+									</label>
+									<label>Email:
+										<input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
+									</label>
+									<label>Website:
+										<input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
+									</label>
+								</td>
+							</tr>
 
-                            <tr>
-                                <td>
-                                    <label>Description:
-                                        <input type="text" data-ng-model="labInfo.description" class="form-control" placeholder="Exam 2-A 'Harpoon'" />
-                                    </label>
-                                    <label>Version:
-                                        <input type="text" data-ng-model="labInfo.version" class="form-control" placeholder="1.0" />
-                                    </label>
-                                    <label>Author(s):
-                                        <input type="text" data-ng-model="labInfo.author" class="form-control" placeholder="M. Rossi, F. Bianchi" />
-                                    </label>
-                                    <label>Email:
-                                        <input type="email" data-ng-model="labInfo.email" class="form-control" placeholder="m.rossi@provider.dom" />
-                                    </label>
-                                    <label>Website:
-                                        <input type="text" data-ng-model="labInfo.web" class="form-control" placeholder="http://yoursite.dom" />
-                                    </label>
-                                </td>
-                            </tr>
+							<tr class="xs-floating-right">
+								<td>
+									<p class="btn btn-success" data-ng-click="addMachine()">Add machine</p>
+									<p class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</p>
+								</td>
+							</tr>
 
-                            <tr class="xs-floating-right">
-                                <td>
-                                    <p class="btn btn-success" data-ng-click="addMachine()">Add machine</p>
-                                    <p class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</p>
-                                </td>
-                            </tr>
+							<tr>
+								<td>
+									<label>Preview: </label>
+									<div id="minimap">
+										<div id="minimap-body" ng-style="{ 'transform': 'scale(1, ' + minimap_transform + ')' }">
 
-                            <tr>
-                                <td>
-                                    <label>Preview: </label>
-                                    <div id="minimap">
-                                        <div id="minimap-body" ng-style="{ 'transform': 'scale(1, ' + minimap_transform + ')' }">
+											<span id="mock-main-menu" class="mock mock-main-menu"></span>
 
-                                            <span id="mock-main-menu" class="mock mock-main-menu"></span>
+											<div class="mock mock-preview-text">Netkit Lab Generator</div>
+											<div class="mock mock-preview-text">The authors of this application do not take any responsibility for any malfunction. Remember to manually check
+												the final configuration for exams and production.</div>
+											<span class="mock mock-disclaimer"></span>
 
-                                            <div class="mock mock-preview-text">Netkit Lab Generator</div>
-                                            <div class="mock mock-preview-text">The authors of this application do not take any responsibility for any malfunction.
-                                                Remember to manually check the final configuration for exams and production.</div>
-                                            <span class="mock mock-disclaimer"></span>
+											<span id="mock-main-menu" class="mock mock-main-menu"></span>
+											<div data-ng-repeat="machine in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
+											 data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]">
+												<span class="mock-id">{{$index+1}}</span>{{machine.name}}</div>
 
-                                            <span id="mock-main-menu" class="mock mock-main-menu"></span>
-                                            <div data-ng-repeat="x in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
-                                                data-ng-click="scrollTo($event, x._uid)" ng-style="compensationScale[$index]"
-                                                ng-mouseenter="changeScale($index, true)" ng-mouseleave="changeScale($index, false)">
-                                                <span>{{$index+1}}</span>{{x.name}}</div>
+											<div class="mock mock-preview-text">Bash file preview:</div>
+											<span class="mock mock-preview-bash"></span>
 
-                                            <div class="mock mock-preview-text">Bash file preview:</div>
-                                            <span class="mock mock-preview-bash"></span>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+				<!-- NETWORK TABLE -->
+				<table id="netkit">
+					<tbody>
 
-                <!-- Building table -->
-                <table id="netkit">
-                    <tbody>
+						<tr>
+							<th>Machine informations</th>
+							<th>Network interfaces</th>
+							<th>Gateway (static):</th>
+							<th>Additional functions</th>
+						</tr>
 
-                        <tr>
-                            <th>Machine informations</th>
-                            <th>Network interfaces</th>
-                            <th>Gateway (static):</th>
-                            <th>Additional functions</th>
-                        </tr>
+						<!-- each row is a machine -->
+						<tr data-ng-repeat="machine in netkit track by $index">
+							<td>
+								<div id="{{machine._uid}}" class="anchor-id"></div>
+								<div>
+									<label>Machine {{machine.row}}:</label>
+									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc" required />
+								</div>
+								<p>
+									<input title="type" type="radio" value="terminal" data-ng-model="machine.type" /> Terminal</p>
+								<p>
+									<input title="type" type="radio" value="router" data-ng-model="machine.type" /> Router</p>
+								<p>
+									<input title="type" type="radio" value="ns" data-ng-model="machine.type" /> Name Server</p>
+								<p>
+									<input title="type" type="radio" value="ws" data-ng-model="machine.type" /> Web Server</p>
+								<p data-ng-show="toggleOVSwitchSelection(netkit, this.machine.type)">
+									<input title="type" type="radio" value="switch" data-ng-model="machine.type" /> Open vSwitch</p>
+								<p data-ng-show="toggleControllerSelection(netkit, this.machine.type)">
+									<input title="type" type="radio" value="controller" data-ng-model="machine.type" /> OpenFlow Ryu controller</p>
+								<p>
+									<input title="type" type="radio" value="other" data-ng-model="machine.type" /> Other</p>
+								<div data-ng-show="machine.type == 'other'">
+									<label>Image Name:</label>
+									<input type="text" data-ng-model="machine.other.image" class="form-control" required placeholder="e.g.: p4" required />
+								</div>
+							</td>
 
-                        <!-- EACH ROW IS A MACHINE -->
-                        <tr data-ng-repeat="x in netkit track by $index">
-                            <td>
-                                <div id="{{x._uid}}" class="anchor-id"></div>
-                                <div>
-                                    <label>Machine {{x.row}}:</label>
-                                    <input type="text" data-ng-model="x.name" class="form-control" placeholder="pc" required />
-                                </div>
-                                <p>
-                                    <input title="type" type="radio" value="terminale" data-ng-model="x.type" /> Terminal</p>
-                                <p>
-                                    <input title="type" type="radio" value="router" data-ng-model="x.type" /> Router</p>
-                                <p>
-                                    <input title="type" type="radio" value="ns" data-ng-model="x.type" /> Name Server</p>
-                                <p>
-                                    <input title="type" type="radio" value="ws" data-ng-model="x.type" /> Web Server</p>
-                                <p>
-                                    <input title="type" type="radio" value="other" data-ng-model="x.type" /> Other</p>
-                                <div data-ng-show="x.type == 'other'">
-                                    <label>Image Name:</label>
-                                    <input type="text" data-ng-model="x.other.image" class="form-control" required placeholder="e.g.: p4" required />
-                                </div>
-                            </td>
+							<td class="interfaces">
+								<p style="color:darkgray" data-ng-hide="(machine.type != 'switch' && machine.type != 'controller')">
+									Connection between switches and controller is automatically configured
+								</p>
+								<div data-ng-hide="machine.type == 'controller'">
+									<p>
+										<span class="btn btn-success" data-ng-click="addInterface(machine)">Add interface</span>
+										<span class="btn btn-danger" data-ng-click="removeInterface(machine)" data-ng-disabled="machine.interfaces.counter<=1">Remove last interface</span>
+									</p>
+									<div data-ng-repeat="i in machine.interfaces.if">
+										<div data-ng-hide="(machine.type == 'switch' && i.eth.number == 0)">
+											<div>
+												<label>Eth{{i.eth.number}}: </label>
+												<input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
+											</div>
+											<div>
+												<label> IP/Net: </label>
+												<input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
+											</div>
+											<div>
+												<label> Complete DNS Name: </label>
+												<input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
+											</div>
+											<hr>
+										</div>
+									</div>
+								</div>
+								<label>Directly in {{machine.name}}.startup:</label>
+								<textarea title="free" rows="3" class="form-control" data-ng-model="machine.interfaces.free"></textarea>
+							</td>
 
-                            <td class="interfaces">
-                                <p>
-                                    <span class="btn btn-success" data-ng-click="addInterface(x)">Add interface</span>
-                                    <span class="btn btn-danger" data-ng-click="removeInterface(x)" data-ng-disabled="x.interfaces.counter<=1">Remove last interface</span>
-                                </p>
-                                <div data-ng-repeat="i in x.interfaces.if">
-                                    <div>
-                                        <label>Eth{{i.eth.number}}: </label>
-                                        <input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
-                                    </div>
-                                    <div>
-                                        <label> IP/Net: </label>
-                                        <input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label> Complete DNS Name: </label>
-                                        <input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
-                                    </div>
-                                    <hr>
-                                </div>
-                                <label>Directly in {{x.name}}.startup:</label>
-                                <textarea title="free" rows="3" class="form-control" data-ng-model="x.interfaces.free"></textarea>
-                            </td>
+							<td class="gateways">
+								<p>
+									<span class="btn btn-success" data-ng-click="addGateway(machine)">
+										Add gateway</span>
+									<span class="btn btn-danger" data-ng-click="removeGateway(machine)" data-ng-disabled="machine.gateways.counter<=1">
+										Remove last gw</span>
+								</p>
+								<div data-ng-repeat="gateway in machine.gateways.gw">
+									<div>
+										<label>Route (empty for default gw):</label>
+										<input type="text" data-ng-model="gateway.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+									</div>
+									<div>
+										<label>GW (empty to generate nothing):</label>
+										<input type="text" data-ng-model="gateway.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
+									</div>
+									<div>
+										<label>Interface:</label>
+										<select title="eth" data-ng-model="gateway.if" class="form-control">
+											<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+										</select>
+									</div>
+									<hr>
+								</div>
+							</td>
 
-                            <td class="gateways">
-                                <p>
-                                    <span class="btn btn-success" data-ng-click="addGateway(x)">
-                                        Add gateway</span>
-                                    <span class="btn btn-danger" data-ng-click="removeGateway(x)" data-ng-disabled="x.gateways.counter<=1">
-                                        Remove last gw</span>
-                                </p>
-                                <div data-ng-repeat="j in x.gateways.gw">
-                                    <div>
-                                        <label>Route (empty for default gw):</label>
-                                        <input type="text" data-ng-model="j.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>GW (empty to generate nothing):</label>
-                                        <input type="text" data-ng-model="j.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label>Interface:</label>
-                                        <select title="eth" data-ng-model="j.if" class="form-control">
-                                            <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
-                                        </select>
-                                    </div>
-                                    <hr>
-                                </div>
-                            </td>
+							<td>
+								<div data-ng-show="machine.type=='terminal'">
+									<label>Reference DNS (resolv.conf nameserver):</label>
+									<select title="en" data-ng-model="machine.pc.dns">
+										<option value="-" selected>-</option>
+										<optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns' && m.ns.recursion" label="{{m.name}}">
+											<option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
+										</optgroup>
+									</select>
+								</div>
 
-                            <!-- ADDITIONAL FUNCTIONS (only some are visible) -->
-                            <td data-ng-show="x.type=='ns'">
-                                <p>
-                                    <input title="auth" type="checkbox" value="1" data-ng-model="x.ns.authority" /> I am a Nameserver Authority</p>
-                                <div data-ng-show="x.ns.authority">
-                                    <label>Zone (root is .):</label>
-                                    <input type="text" data-ng-model="x.ns.zone" class="form-control" required placeholder=".com." pattern="(^\..*\.$)|^.$" />
-                                </div>
-                                <p>
-                                    <input title="rec" type="checkbox" value="1" data-ng-model="x.ns.recursion" /> Enable recursive</p>
-                            </td>
+								<div data-ng-show="machine.type=='ns'">
+									<p>
+										<input title="auth" type="checkbox" value="1" data-ng-model="machine.ns.authority" /> I am a Nameserver Authority</p>
+									<div data-ng-show="machine.ns.authority">
+										<label>Zone (root is .):</label>
+										<input type="text" data-ng-model="machine.ns.zone" class="form-control" placeholder=".com." pattern="(^\..*\.$)|^.$" required />
+									</div>
+									<p>
+										<input title="rec" type="checkbox" value="1" data-ng-model="machine.ns.recursion" /> Enable recursive</p>
+								</div>
 
-                            <td data-ng-show="x.type=='ws'">
-                                <input title="userdir" type="checkbox" value="1" data-ng-model="x.ws.userdir" /> Enable
-                                <strong>userdir</strong> module?
-                            </td>
+								<div data-ng-show="machine.type=='ws'">
+									<input title="userdir" type="checkbox" value="1" data-ng-model="machine.ws.userdir" /> Enable
+									<strong>userdir</strong> module?
+								</div>
 
-                            <td data-ng-show="x.type=='terminale'">
-                                <label>Reference DNS (resolv.conf nameserver):</label>
-                                <select title="en" data-ng-model="x.pc.dns">
-                                    <option value="-" selected>-</option>
-                                    <optgroup data-ng-repeat="m in netkit" data-ng-if="m.type == 'ns' && m.ns.recursion" label="{{m.name}}">
-                                        <option data-ng-repeat="ifn in m.interfaces.if" value="{{ifn.ip.split('/')[0]}}">{{ifn.ip.split('/')[0]}}</option>
-                                    </optgroup>
-                                </select>
-                            </td>
+								<div data-ng-show="machine.type =='switch'">
+								</div>
 
-                            <td data-ng-show="x.type=='other'">
-                                <p class="btn btn-success" data-ng-click="addFile(x)">Add file</p>
-                                <p class="btn btn-danger" data-ng-click="removeFile(x)" data-ng-disabled="x.other.files<=1">Remove last file</p>
-                                <p>(files will be stored in /etc/scripts/)</p>
-                                <div data-ng-repeat="fl in x.other.files">
-                                    <div>
-                                        <label>File name:</label>
-                                        <input type="text" data-ng-model="fl.name" class="form-control" placeholder="e.g: my_switch.p4" required />
-                                    </div>
-                                    <div>
-                                        <label>File contents:</label>
-                                        <textarea title="free" rows="3" class="form-control" data-ng-model="fl.contents"></textarea>
-                                    </div>
-                                </div>
-                            </td>
+								<div data-ng-show="machine.type=='controller'">
+								</div>
 
-                            <td data-ng-show="x.type=='router'">
-                                <label>Dynamic routing: </label>
-                                <p>
-                                    <input title="en" type="checkbox" value="router" data-ng-model="x.routing.rip.en" /> rip</p>
+								<div data-ng-show="machine.type=='other'">
+									<p class="btn btn-success" data-ng-click="addFile(machine)">Add file</p>
+									<p class="btn btn-danger" data-ng-click="removeFile(machine)" data-ng-disabled="machine.other.files<=1">Remove last file</p>
+									<p>(files will be stored in /etc/scripts/)</p>
+									<div data-ng-repeat="fl in machine.other.files">
+										<div>
+											<label>File name:</label>
+											<input type="text" data-ng-model="fl.name" class="form-control" placeholder="e.g: my_switch.p4" required />
+										</div>
+										<div>
+											<label>File contents:</label>
+											<textarea title="free" rows="3" class="form-control" data-ng-model="fl.contents"></textarea>
+										</div>
+									</div>
+								</div>
+								<div data-ng-show="machine.type=='router'">
+									<label>Dynamic routing: </label>
+									<p>
+										<input title="en" type="checkbox" value="router" data-ng-model="machine.routing.rip.en" /> rip</p>
 
-                                <div data-ng-show="x.routing.rip.en">
-                                    <span class="btn btn-success" data-ng-click="addRipNetwork(x)">Add Network</span>
-                                    <span class="btn btn-danger" data-ng-click="removeRipNetwork(x)" data-ng-disabled="x.routing.rip.network.length<=1">Remove Network</span>
-                                    <div data-ng-repeat="rnet in x.routing.rip.network track by $index">
-                                        <label>Network: </label>
-                                        <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$"
-                                            class="form-control" data-ng-model="x.routing.rip.network[$index]" />
-                                    </div>
-                                    <hr>
-                                    <span class="btn btn-success" data-ng-click="addRipRoute(x)">Add Route</span>
-                                    <span class="btn btn-danger" data-ng-click="removeRipRoute(x)" data-ng-disabled="x.routing.rip.route.length<=1">Remove Route</span>
-                                    <div data-ng-repeat="rroute in x.routing.rip.route track by $index">
-                                        <label>Route (empty to omit): </label>
-                                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control"
-                                            data-ng-model="x.routing.rip.route[$index]" />
-                                    </div>
+									<div data-ng-show="machine.routing.rip.en">
+										<span class="btn btn-success" data-ng-click="addRipNetwork(machine)">Add Network</span>
+										<span class="btn btn-danger" data-ng-click="removeRipNetwork(machine)" data-ng-disabled="machine.routing.rip.network.length<=1">Remove Network</span>
+										<div data-ng-repeat="rnet in machine.routing.rip.network track by $index">
+											<label>Network: </label>
+											<input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$"
+											 class="form-control" data-ng-model="machine.routing.rip.network[$index]" />
+										</div>
+										<hr>
+										<span class="btn btn-success" data-ng-click="addRipRoute(machine)">Add Route</span>
+										<span class="btn btn-danger" data-ng-click="removeRipRoute(machine)" data-ng-disabled="machine.routing.rip.route.length<=1">Remove Route</span>
+										<div data-ng-repeat="rroute in machine.routing.rip.route track by $index">
+											<label>Route (empty to omit): </label>
+											<input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control"
+											 data-ng-model="machine.routing.rip.route[$index]" />
+										</div>
 
-                                    <div>
-                                        <input title="redistributeo" type="checkbox" value="1" data-ng-model="x.routing.rip.ospf" /> redistribute ospf</div>
-                                    <div>
-                                        <input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.rip.bgp" /> redistribute bgp</div>
-                                    <div>
-                                        <input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.rip.connected" /> redistribute connected</div>
-                                    <label>Directly in ripd.conf:</label>
-                                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.rip.free"></textarea>
-                                    <hr>
-                                </div>
+										<div>
+											<input title="redistributeo" type="checkbox" value="1" data-ng-model="machine.routing.rip.ospf" /> redistribute ospf</div>
+										<div>
+											<input title="redistributeb" type="checkbox" value="1" data-ng-model="machine.routing.rip.bgp" /> redistribute bgp</div>
+										<div>
+											<input title="redistributec" type="checkbox" value="1" data-ng-model="machine.routing.rip.connected" /> redistribute connected</div>
+										<label>Directly in ripd.conf:</label>
+										<textarea title="free" rows="3" class="form-control" data-ng-model="machine.routing.rip.free"></textarea>
+										<hr>
+									</div>
 
-                                <p>
-                                    <input title="en" type="checkbox" value="ns" data-ng-model="x.routing.ospf.en" /> ospf</p>
+									<p>
+										<input title="en" type="checkbox" value="ns" data-ng-model="machine.routing.ospf.en" /> ospf</p>
 
-                                <div data-ng-show="x.routing.ospf.en">
-                                    <span class="btn btn-success" data-ng-click="addOspfNetwork(x)">Add Network</span>
-                                    <span class="btn btn-danger" data-ng-click="removeOspfNetwork(x)" data-ng-disabled="x.routing.ospf.network.length<=1">Remove Newtork</span>
-                                    <div data-ng-repeat="onet in x.routing.ospf.network track by $index">
-                                        <div>
-                                            <label>Network: </label>
-                                            <input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$"
-                                                class="form-control" data-ng-model="x.routing.ospf.network[$index]" />
-                                        </div>
-                                        <div>
-                                            <label>Area: </label>
-                                            <input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control"
-                                                data-ng-model="x.routing.ospf.area[$index]" />
-                                        </div>
-                                        <input title="stub" type="checkbox" value="1" data-ng-model="x.routing.ospf.stub[$index]" /> stub?
-                                    </div>
+									<div data-ng-show="machine.routing.ospf.en">
+										<span class="btn btn-success" data-ng-click="addOspfNetwork(machine)">Add Network</span>
+										<span class="btn btn-danger" data-ng-click="removeOspfNetwork(machine)" data-ng-disabled="machine.routing.ospf.network.length<=1">Remove Newtork</span>
+										<div data-ng-repeat="onet in machine.routing.ospf.network track by $index">
+											<div>
+												<label>Network: </label>
+												<input type="text" placeholder="0.0.0.0/0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$"
+												 class="form-control" data-ng-model="machine.routing.ospf.network[$index]" />
+											</div>
+											<div>
+												<label>Area: </label>
+												<input type="text" placeholder="0.0.0.0" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control"
+												 data-ng-model="machine.routing.ospf.area[$index]" />
+											</div>
+											<input title="stub" type="checkbox" value="1" data-ng-model="machine.routing.ospf.stub[$index]" /> stub?
+										</div>
 
-                                    <div>
-                                        <input title="redistributer" type="checkbox" value="1" data-ng-model="x.routing.ospf.rip" /> redistribute rip</div>
-                                    <div>
-                                        <input title="redistributeb" type="checkbox" value="1" data-ng-model="x.routing.ospf.bgp" /> redistribute bgp</div>
-                                    <div>
-                                        <input title="redistributec" type="checkbox" value="1" data-ng-model="x.routing.ospf.connected" /> redistribute connected</div>
-                                    <label>Cost: </label>
-                                    <div data-ng-repeat="o in x.interfaces.if">
-                                        <div>
-                                            <input type="text" placeholder="0" class="form-control" data-ng-model="x.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*"
-                                            />
-                                        </div>
-                                        <select title="eth" data-ng-model="x.routing.ospf.if[o.eth.number].interface" class="form-control">
-                                            <option data-ng-repeat="i in x.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
-                                        </select>
-                                    </div>
-                                    <label>Directly in ospfd.conf:</label>
-                                    <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.ospf.free"></textarea>
-                                    <hr>
-                                </div>
-                                <p>
-                                    <input title="en" type="checkbox" value="router" data-ng-model="x.routing.bgp.en" /> bgp</p>
-                                <div data-ng-show="x.routing.bgp.en">
-                                    <label>AS: </label>
-                                    <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.as" required />
-                                    <span class="btn btn-success" data-ng-click="addBgpNetwork(x)">Add Network</span>
-                                    <span class="btn btn-danger" data-ng-click="removeBgpNetwork(x)" data-ng-disabled="x.routing.bgp.network.length<=1">Remove Network</span>
-                                    <div data-ng-repeat="bnet in x.routing.bgp.network track by $index">
-                                        <label>Network: </label>
-                                        <input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control"
-                                            data-ng-model="x.routing.bgp.network[$index]" />
-                                    </div>
-                                    <span class="btn btn-success" data-ng-click="addBgpNeighbor(x)">Add Neighbor</span>
-                                    <span class="btn btn-danger" data-ng-click="removeBgpNeighbor(x)" data-ng-disabled="x.routing.bgp.remote.length<=1">Remove Neighbor</span>
-                                    <div data-ng-repeat="bremote in x.routing.bgp.remote track by $index">
-                                        <label>Neighbor (empty to omit): </label>
-                                        <input type="text" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control"
-                                            data-ng-model="x.routing.bgp.remote[$index].neighbor" />
-                                        <label>Remote-AS: </label>
-                                        <input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="x.routing.bgp.remote[$index].as"
-                                        />
-                                        <label>Description: </label>
-                                        <input type="text" title="description" class="form-control" data-ng-model="x.routing.bgp.remote[$index].description" />
-                                    </div>
-                                    <div>
-                                        <label>Directly in bgpd.conf:</label>
-                                        <textarea title="free" rows="3" class="form-control" data-ng-model="x.routing.bgp.free"></textarea>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+										<div>
+											<input title="redistributer" type="checkbox" value="1" data-ng-model="machine.routing.ospf.rip" /> redistribute rip</div>
+										<div>
+											<input title="redistributeb" type="checkbox" value="1" data-ng-model="machine.routing.ospf.bgp" /> redistribute bgp</div>
+										<div>
+											<input title="redistributec" type="checkbox" value="1" data-ng-model="machine.routing.ospf.connected" /> redistribute connected</div>
+										<label>Cost: </label>
+										<div data-ng-repeat="o in machine.interfaces.if">
+											<div>
+												<input type="text" placeholder="0" class="form-control" data-ng-model="machine.routing.ospf.if[o.eth.number].cost" pattern="[0-9]*" />
+											</div>
+											<select title="eth" data-ng-model="machine.routing.ospf.if[o.eth.number].interface" class="form-control">
+												<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+											</select>
+										</div>
+										<label>Directly in ospfd.conf:</label>
+										<textarea title="free" rows="3" class="form-control" data-ng-model="machine.routing.ospf.free"></textarea>
+										<hr>
+									</div>
+									<p>
+										<input title="en" type="checkbox" value="router" data-ng-model="machine.routing.bgp.en" /> bgp</p>
+									<div data-ng-show="machine.routing.bgp.en">
+										<label>AS: </label>
+										<input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="machine.routing.bgp.as" required />
+										<span class="btn btn-success" data-ng-click="addBgpNetwork(machine)">Add Network</span>
+										<span class="btn btn-danger" data-ng-click="removeBgpNetwork(machine)" data-ng-disabled="machine.routing.bgp.network.length<=1">Remove Network</span>
+										<div data-ng-repeat="bnet in machine.routing.bgp.network track by $index">
+											<label>Network: </label>
+											<input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control"
+											 data-ng-model="machine.routing.bgp.network[$index]" />
+										</div>
+										<span class="btn btn-success" data-ng-click="addBgpNeighbor(machine)">Add Neighbor</span>
+										<span class="btn btn-danger" data-ng-click="removeBgpNeighbor(machine)" data-ng-disabled="machine.routing.bgp.remote.length<=1">Remove Neighbor</span>
+										<div data-ng-repeat="bremote in machine.routing.bgp.remote track by $index">
+											<label>Neighbor (empty to omit): </label>
+											<input type="text" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" class="form-control"
+											 data-ng-model="machine.routing.bgp.remote[$index].neighbor" />
+											<label>Remote-AS: </label>
+											<input type="text" placeholder="0" pattern="^[0-9]*$" class="form-control" data-ng-model="machine.routing.bgp.remote[$index].as" />
+											<label>Description: </label>
+											<input type="text" title="description" class="form-control" data-ng-model="machine.routing.bgp.remote[$index].description" />
+										</div>
+										<div>
+											<label>Directly in bgpd.conf:</label>
+											<textarea title="free" rows="3" class="form-control" data-ng-model="machine.routing.bgp.free"></textarea>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 
-                <!-- BASH PREVIEW -->
-                <div class="bash">
-                    <h4>Bash file preview:</h4>
-                    <textarea id="sh_script" title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
-                </div>
+				<!-- BASH PREVIEW -->
+				<div class="bash">
+					<h3>Bash file preview:</h3>
+					<textarea id="sh_script" title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
+				</div>
 
-            </div>
+			</div>
 
-            <!-- GRAPH WINDOW -->
-            <div class="tab-pane" id="graph">
-                <div class="btn btn-primary" data-ng-click="makeGraph(netkit)">
-                    <strong>Preview</strong>(force)</div>
-                <div id="mynetwork"></div>
-            </div>
+			<!-- GRAPH -->
+			<div id="graph" class="tab-pane">
+				<script src="assets/vendor/js/vis.js"></script>
+				<script src="views/graph/make_draw_model.js"></script>
+				<script src="views/graph/draw.js"></script>
+				<button style="margin-bottom: 15px" class="btn btn-primary" data-ng-click="makeGraph(netkit)">Reload</button>
+				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
+			</div>
 
-            <!-- SDN WINDOW-->
-            <!-- <div class="tab-pane" id="sdn">
-                    <div id="graph-area">
-                        <svg width="100%" height="100%"></svg>
-                    </div>
-                    <button>La</button>
-                </div> -->
-        </div>
-    </div>
+			<!-- SDN-->
+			<div id="sdn" class="tab-pane">
+				<link rel="stylesheet" href="views/sdn/sdn.css" />
+				<script src="assets/vendor/js/d3.min.js"></script>
+				<script src="assets/vendor/js/vue.js"></script>
+				<script src="views/sdn/dataclass.js"></script>
+				<script src="views/sdn/helper.js"></script>
+				<script src="views/sdn/simulation.js"></script>
+				<script src="views/sdn/graphinteraction.js"></script>
+				<script src="views/sdn/controllerinteraction.js"></script>
 
-    <!-- LSTART MODAL -->
-    <div id="command-modal" class="modal modal-kathara modal-dialog modal-content ng-hide">
-        <div class="modal-header">
-            <button type="button" class="close" onclick="close_modal(event)">&times;</button>
-            <h4 class="modal-title">Running Commands</h4>
-        </div>
-        <div class="modal-body">
-            <p>The command has been issued, please wait for its execution.</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-warning" onclick="close_modal(event)">Ok, I understand</button>
-        </div>
-    </div>
+				<p class="disclaimer hidden">Please update the size of the window to fit contents!
+					<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
+				</p>
 
-    <script src="assets/js/vendor/angular.min.js"></script>
-    <script src="assets/js/vendor/jszip.min.js"></script>
-    <script src="assets/js/vendor/FileSaver.min.js"></script>
+				<!-- Horizontal buttons -->
+				<div id="sdn-horizontal-buttons">
+					<button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Start simulation</button>
+					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
+					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
+					<button class="btn" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
+					<button class="btn btn-success" style="display:none" onclick="closeDetailsAndClean();labelsDiv.showLabelMaker()">Create new label</button>
+					<button class="btn btn-success" style="display:none" onclick="applyPath()">Conferma path</button>
+					<button class="btn btn-danger" style="display:none" onclick="discardPath()">Annulla path</button>
+				</div>
+				<div>
 
-    <script>
-        if (!angular)
-            document.write('<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"><\/script>');
-        if (!JSZip)
-            document.write('<script src="https://raw.githubusercontent.com/Stuk/jszip/master/dist/jszip.min.js"><\/script>');
-        if (!saveAs)
-            document.write('<script src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js"><\/script>');
-    </script>
+					<!-- Vertical buttons -->
+					<div id="sdn-vertical-buttons" class="hidden">
+						<button class="btn btn-success" onclick="submitToController()" disabled>Submit</button>
+						<button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
+						<button class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</button>
+						<!-- <button class="btn btn-warning">Scheduler</button> -->
+						<button style="position: relative; top:500px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
+						<button style="position: relative; top:500px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
+						<button style="position: relative; top:500px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+					</div>
 
-    <script src="assets/js/make_draw_model.js"></script>
-    <script src="assets/js/vendor/vis.js"></script>
-    <script src="assets/js/draw.js"></script>
-    <script src="assets/js/make.js"></script>
-    <script src="assets/js/model.js"></script>
-    <script src="assets/js/controller.js"></script>
+					<!-- Main graph (unfilled) -->
+					<svg id="sdnGraph" width="800" height="800"></svg>
+					
+					<!-- Details (labels details)-->
+					<div id="details" v-show="visible && (newLabel.show || labels.length)">
+						<div class="blu-bordered" v-if="newLabel.show">
+							<input type="text" v-model="newLabel.color" pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)' placeholder='color'></input>
+							<input type="text" v-model="newLabel.name" pattern='[A-z0-9]+' placeholder='name'></input>
+							<button v-on:click="createNewLabel()">Add</button>
+							<button v-on:click="hideLabelMaker()">Ignore</button>
+						</div>
 
-    <script>
-        window.onload = function () {
-            console.log("  _______          __   __   .__  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+						<label-div v-for="label in labels"
+							v-bind:name="label.name" v-bind:key="label.name"
+							v-bind:color="label.color">
+						</label-div>
+					</div>
+					<script src="views/sdn/labelmanaging.js"></script>
 
-            if (isElectron()) {
-                electron = require('electron');
-                isWin = electron.remote.getCurrentWindow().isWin;
+					<!-- Details2 (node details)-->
+					<div id="details2" v-show="visible">
+						<a v-on:click="close">X</a>
+						<h3>{{ device }}</h3>
+						<hr>
+						<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
+						<div id="rules">
+							<div>
+								<h2>Packet rules</h2>
+								<button class="btn btn-success" v-on:click="popupModal">Create new rule</button>
+								<table v-if="packetRules.length">
+									<thead>
+										<th>#</th>
+										<th>match</th>
+										<th>action</th>
+										<th>priority</th>
+										<th>idle timeout</th>
+										<th>hard timeout</th>
+										<th>stats</th>
+									</thead>
+									<tbody>
+										<tr v-for="(rule, index) in packetRules">
+											<td>{{ (index + 1) }}</td>
+											<td>
+												<rule-match-action v-for="match in rule.matches"
+													v-bind:name="match.name"
+													v-bind:value="match.value"
+													v-bind:label="match.label">
+												</rule-match-action>
+											</td>
+											<td>
+												<rule-match-action v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-match-action>
+											</td>
+											<td>{{ rule.priority }}</td>
+											<td>{{ rule.idleTimeout }}</td>
+											<td>{{ rule.hardTimeout }}</td>
+											<td>{{ rule.stats }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div v-if="labelRules.length">
+								<h2>Label rules</h2>
+								<table>
+									<thead>
+										<th>#</th>
+										<th>match</th>
+										<th>action</th>
+										<th>priority</th>
+										<th>idle timeout</th>
+										<th>hard timeout</th>
+										<th>stats</th>
+									</thead>
+									<tbody>
+										<tr v-for="(rule, index) in labelRules">
+											<td>{{ (packetRules.length + index + 1) }}</td>
+											<td>
+												<rule-match-action v-for="match in rule.matches"
+													v-bind:name="match.name"
+													v-bind:value="match.value"
+													v-bind:label="match.label">
+												</rule-match-action>
+											<td>
+												<rule-match-action v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-match-action>
+											</td>
+											<td>{{ rule.priority }}</td>
+											<td>{{ rule.idleTimeout }}</td>
+											<td>{{ rule.hardTimeout }}</td>
+											<td>{{ rule.stats }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<p class="disclaimer" v-if="!labelRules.length && !packetRules.length">
+							Nessuna regola installata sullo switch {{ device }}
+						</p>
+					</div>
+					<script src="views/sdn/rulesmanaging.js"></script>
 
-                var navElements = document.querySelectorAll("#main-nav li");
-                for (let el of navElements) {
-                    el.classList.remove("hidden")
-                }
+					<!-- Details3 (other stuffs)-->
+					<div id="details3" style="display: none">
+						<a onclick="closeDetailsAndClean()">X</a>
+						<div>
+							<h3>HOW TO:</h3>
+							<hr> ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... .....
+							..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... .....
+							..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course ..... .....
+							..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... .....
+							..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... .....
+							..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course .....
+							..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so .....
+							..... ..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and .....
+							..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course
+							..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... .....
+							so ..... ..... ..... ..... because ..... ..... ..... of course ..... ..... ..... .....
+						</div>
+						<div>
+							<h3>Controller</h3>
+							<hr>
+							<p>Connect
+								<button onclick="enableControllerButtons()">Connetti</button>
+							</p>
+							<p>Test connection</p>
+							<p>Reset connection</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-                document.getElementById('copyLab').addEventListener('click', copyLab);
-                document.getElementById('lstart').addEventListener('click', executeStart);
-                document.getElementById('lclean').addEventListener('click', executeClean);
-            }
-        }
-    </script>
+	<!-- RULE MODAL -->
+	<div id="rule-modal" v-bind:class="[visible ? '' : 'ng-hide', 'modal', 'modal-kathara']" v-if="visible">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" v-on:click="close">&times;</button>
+					<h4 class="modal-title">{{ header }}</h4>
+				</div>
+				<div class="modal-body">
+					<div class="half">
+						<h2>Match</h2>
+						<p>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewLine">Add</button>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastLine">Remove</button>
+						</p>
+						<div v-for="(match, index) in rule.matches">
+							<select v-model="match.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
+								<option disabled value="noselection">Select...</option>
+								<option v-if="index==0" value="any">Any</option>
+								<option value="MAC source">MAC src</option>
+								<option value="MAC destination">MAC dst</option>
+								<option value="eth type">ETH type</option>
+								<option value="MPLS label">MPLS label</option>
+								<option value="MPLS tc">MPLS TC</option>
+								<option value="vlan id">VLan ID</option>
+								<option value="IP source">IP src</option>
+								<option value="IP destination">IP dst</option>
+								<option value="IP port">IP port</option>
+								<option value="TCP source port">TCP sport</option>
+								<option value="TCP destination port">TCP dport</option>
+								<!-- TODO: eventualmente aggiungerne altri -->
+							</select>
+							<input v-model="match.value" type="text" hidden>
+						</div>
+					</div>
+					<div class="half">
+						<h2>Action</h2>
+						<div>
+							<select v-model="rule.action.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
+								<option disabled value="noselection">Select...</option>
+								<option value="set MPLS label">Set MPLS label</option>
+								<option value="forward to port">Forward to port</option>
+								<option value="send to controller">Send to controller</option>
+								<option value="drop">Drop</option>
+								<option value="process l2">Process (L2)</option>
+								<option value="process l3">Process (L3)</option>
+								<option value="set field">Set field</option>
+								<option value="push header">Push header</option>
+								<option value="pop header">Pop header</option>
+								<!-- TODO: eventualmente aggiungerne altri -->
+							</select>
+							<input v-model="rule.action.value" type="text" hidden>
+						</div>
+					</div>
+					<div class="half">
+						<h2>Priority</h2>
+						<input v-model="rule.priority" type="number" min="0">
+					</div>
+					<div class="half">
+						<h2>Idle timeout</h2>
+						<input v-model="rule.idleTimeout" type="number" min="0">
+					</div>
+					<div class="half">
+						<h2>Hard timeout</h2>
+						<input v-model="rule.hardTimeout" type="number" min="0">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" v-on:click="close">Undo</button>
+					<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="views/sdn/rulemodal.js"></script>
 
+	<!-- LSTART MODAL -->
+	<div id="command-modal" class="modal modal-kathara ng-hide">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" onclick="close_modal('command-modal')">&times;</button>
+					<h4 class="modal-title">Running Commands</h4>
+				</div>
+				<div class="modal-body">
+					<p>The command has been issued, please wait for its execution.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-warning" onclick="close_modal('command-modal')">Ok, I understand</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var electron, sdnData
+		var isCopied = false
+
+		window.onload = function () {
+			console.log("  _______          __   __    __  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
+
+			if (isElectron()) {
+				electron = require('electron')
+
+				let thisWin = electron.remote.getCurrentWindow()
+				let sdnDisclaimer = document.querySelector("#sdn .disclaimer")
+				thisWin.on('resize', function () {
+					if (thisWin.getBounds().height < 950 || thisWin.getBounds().width < 1560) {
+						sdnDisclaimer.classList.remove('hidden')
+					} else sdnDisclaimer.classList.add('hidden')
+				}).emit('resize')
+
+				document.querySelectorAll("#main-nav li").forEach((el) => el.classList.remove("hidden"))
+				document.getElementById('copyLab').addEventListener('click', copyLab)
+				document.getElementById('lstart').addEventListener('click', executeStart)
+				document.getElementById('lclean').addEventListener('click', executeClean)
+			}
+		}
+	</script>
 </body>
 
 </html>

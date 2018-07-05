@@ -1,9 +1,3 @@
-if (typeof JSON.clone !== "function") {
-    JSON.clone = function (obj) {
-        return JSON.parse(JSON.stringify(obj))
-    }
-}
-
 function lastElem(arr) {
     return arr[arr.length - 1]
 }
@@ -18,8 +12,8 @@ function toggle_tab(e, selectedTab) {
     }
 
     let href = selectedTab.getAttribute("href").replace("#", '')
-    let tab = document.getElementById(href)
-    tab.classList.add("active")
+    let currentTab = document.getElementById(href)
+    currentTab.classList.add("active")
     
     let rightControls = document.getElementById("right-controls")
     if (href == "home") {
@@ -49,19 +43,13 @@ function toggle_submenu(number, total = 3) {
     }
 }
 
-function close_modal(e) {
-    e.preventDefault()
-    let modal = document.getElementById("command-modal")
-    modal.classList.add("ng-hide")
+function close_modal(id) {
+    document.getElementById(id).classList.add("ng-hide")
 }
 
 function isElectron() {
     return window && window.process && window.process.type
 }
-
-var electron
-var isWin
-var isCopied = false
 
 function copyLab(e) {
     e.preventDefault()

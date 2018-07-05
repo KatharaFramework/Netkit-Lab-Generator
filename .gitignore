@@ -1,5 +1,7 @@
-.old/
-.idea/
 release-builds/
 tmp/lab/
 node_modules/
+
+.old/
+.idea/
+temp/

@@ -1,0 +1,335 @@
+#sdn button {
+    margin-bottom: 15px;
+}
+
+#sdn-vertical-buttons,
+#sdnGraph,
+#details,
+#details2,
+#details3 {
+    display: inline-block;
+	padding: 10px;
+	vertical-align: top;
+}
+
+#details,
+#details2,
+#details3 {
+	background-color: white;
+	box-shadow: 0 0 5px darkgray;
+	border: 1px solid darkgray;
+	position: absolute;
+	right: 10px;
+}
+
+@media (min-width: 1400px) {
+	#details,
+	#details2,
+	#details3 {
+		right: 100px;
+	}
+}
+
+/* ----------------- */
+/* ---- COMANDI ---- */
+/* ----------------- */
+
+#sdn-vertical-buttons {
+    width: 70px;
+    height: 800px;
+
+    overflow: hidden;
+    padding: 0;
+}
+
+#sdn-vertical-buttons:hover {
+	width: 110px;
+}
+
+#sdn-vertical-buttons button {
+    padding: 5px 0;
+    margin: 0;
+    width: 100%;
+    height: 50px;
+}
+
+/* ----------------- */
+/* ----- NODES ----- */
+/* ----------------- */
+
+g.nodes circle {
+    fill: lightgray;
+}
+
+g.nodes circle.network {
+    fill: black;
+}
+
+g.nodes circle.network.external {
+    fill: lightgray;
+}
+
+g.nodes circle.switch {
+    fill: blue;
+}
+
+g.nodes circle.edge {
+    stroke: black;
+    stroke-width: 1px;
+    fill: white;
+}
+
+/* --- mouseover --- */
+
+g.nodes circle:hover {
+    r: 30;
+}
+
+g.nodes circle.network:hover {
+    r: 20;
+}
+
+/* --- selection --- */
+
+g.nodes circle.selected,
+g.nodes circle.edge.selected {
+	stroke: black;
+	stroke-width: 2px;
+    fill: red;
+}
+
+/* ----------------- */
+/* ----- LINKS ----- */
+/* ----------------- */
+
+g.links line {
+    stroke: lightgray;
+    stroke-width: 4px;
+}
+
+g.links line.switch {
+    stroke: darkgray;
+}
+
+line.network.edge:not(.switch) {
+    stroke-dasharray: 10px 10px;
+}
+
+/* --- mouseover --- */
+
+
+g.links line:hover {
+    stroke-width: 6px;
+}
+
+/* --- selection --- */
+
+
+g.links line.selected {
+	stroke: red;
+}
+
+g.links line.selected.straight {
+	marker-start: url(#markerArrow1)
+}
+
+g.links line.selected.reversed {
+	marker-end: url(#markerArrow2)
+}
+
+/* ---------------------- */
+/* --- LABELS DETAILS --- */
+/* ---------------------- */
+
+#details {
+    width: 400px;
+    height: 800px;
+	overflow: auto;
+}
+
+.blu-bordered {
+	margin-bottom: 10px;
+	border: 1px solid black;
+	padding: 10px;
+
+	position: relative;
+	top: -10px;
+	left: -10px;
+	width: 398px;
+
+	background-color: var(--secondary-color);
+}
+
+.colorTag {
+    display: inline-block;
+    width: 30px;
+    height: 15px;
+    margin-right: 10px;
+}
+
+.blu-bordered > input,
+.blu-bordered > button {
+	margin: 0 10px 0 0;
+    padding-left: 10px;
+
+    max-width: 30%;
+	border: 1px solid black;
+}
+
+#details input:valid {
+    background-image: none;
+}
+
+#details button {
+    float: right;
+    margin: 0;
+    margin-left: 5px;
+}
+
+/* --- Details table --- */
+
+.label-details table {
+    margin: 3px auto;
+    width: 95%;
+}
+
+.label-details th {
+    padding: 0 10px;
+}
+
+.label-details td {
+    padding: 5px;
+}
+
+#details .label-details td input[type=number],
+#details2 td input[type=number] {
+    max-width: 50px;
+    margin: 0;
+    border: none;
+}
+
+/* -------------------- */
+/* --- NODE DETAILS --- */
+/* -------------------- */
+
+#details2 {
+    width: 600px;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: auto;
+	text-align: center;
+}
+
+#details2 > h3 {
+    margin-top: 10px;
+}
+
+#details2 > button {
+    float: right;
+    margin: 10px 20px;
+}
+
+#details2 > a,
+#details3 > a {
+    float: right;
+    color: red;
+    margin-bottom: 5px;
+}
+
+#details2 .disclaimer {
+    margin-top: 30px;
+}
+
+/* --- SVG --- */
+
+#details2 svg {
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin: 10px auto;
+}
+
+.x-axis,
+.y-axis {
+    fill: black;
+}
+
+.domain {
+    fill: white;
+}
+
+rect.bar {
+    fill: var(--main-color);
+}
+
+/* --- Rules --- */
+
+#rules {
+    margin: auto;
+    width: fit-content;
+    text-align: center;
+}
+
+#rules > div > h2 {
+    text-align: center;
+    text-decoration: underline;
+    color: var(--main-color);
+}
+
+#rules table {
+    margin: auto;
+}
+
+/* ----------------- */
+/* ----- MODAL ----- */
+/* ----------------- */
+
+#rule-modal {
+	text-align: center;
+}
+
+.half {
+    width: 50%;
+    float: left;
+    padding: 1em;
+}
+
+.modal-body input {
+    margin: 10px;
+    border: 1px solid darkgray;
+	padding: 0 10px;
+	background-image: none;
+}
+
+.modal-body select {
+	margin: 5px;
+}
+
+#rule-modal .half button {
+    min-width: 80px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+    padding: 0;
+}
+
+#rule-modal .half button.btn-danger {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+#rule-modal .half button.btn-success {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ----------------- */
+/* --- DETAILS 3 --- */
+/* ----------------- */
+
+#details3 {
+    width: 400px;
+	height: 800px;
+}
+
+#details3 h3 {
+    margin-top: 10px;
+}
