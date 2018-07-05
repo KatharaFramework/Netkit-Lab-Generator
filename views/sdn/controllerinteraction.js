@@ -6,9 +6,7 @@ function submitToController(){
 function getFromController(){
     // TODO
     sdnData.getRules().forEach(
-        el => el.rules.forEach(
-            el => el.stats = Math.floor(Math.random()*100)
-        )
+        rule => rule.stats = Math.floor(Math.random()*100)
     )
 }
 

@@ -8,10 +8,26 @@
 #details2,
 #details3 {
     display: inline-block;
-    border: 1px solid lightgray;
-    padding: 10px;
-    box-sizing: content-box;
-    vertical-align: top;
+	padding: 10px;
+	vertical-align: top;
+}
+
+#details,
+#details2,
+#details3 {
+	background-color: white;
+	box-shadow: 0 0 5px darkgray;
+	border: 1px solid darkgray;
+	position: absolute;
+	right: 10px;
+}
+
+@media (min-width: 1400px) {
+	#details,
+	#details2,
+	#details3 {
+		right: 100px;
+	}
 }
 
 /* ----------------- */
@@ -20,10 +36,14 @@
 
 #sdn-vertical-buttons {
     width: 70px;
-    height: 820px;
+    height: 800px;
 
     overflow: hidden;
     padding: 0;
+}
+
+#sdn-vertical-buttons:hover {
+	width: 110px;
 }
 
 #sdn-vertical-buttons button {
@@ -38,7 +58,7 @@
 /* ----------------- */
 
 g.nodes circle {
-    fill: darkgray;
+    fill: lightgray;
 }
 
 g.nodes circle.network {
@@ -46,7 +66,7 @@ g.nodes circle.network {
 }
 
 g.nodes circle.network.external {
-    fill: darkgray;
+    fill: lightgray;
 }
 
 g.nodes circle.switch {
@@ -62,7 +82,7 @@ g.nodes circle.edge {
 /* --- mouseover --- */
 
 g.nodes circle:hover {
-    r: 25;
+    r: 30;
 }
 
 g.nodes circle.network:hover {
@@ -73,8 +93,9 @@ g.nodes circle.network:hover {
 
 g.nodes circle.selected,
 g.nodes circle.edge.selected {
-    stroke: darkorange;
-    stroke-width: 5px;
+	stroke: black;
+	stroke-width: 2px;
+    fill: red;
 }
 
 /* ----------------- */
@@ -105,7 +126,7 @@ g.links line:hover {
 
 
 g.links line.selected {
-	stroke: darkorange;
+	stroke: red;
 }
 
 g.links line.selected.straight {
@@ -123,14 +144,20 @@ g.links line.selected.reversed {
 #details {
     width: 400px;
     height: 800px;
-    overflow: auto;
+	overflow: auto;
 }
 
 .blu-bordered {
+	margin-bottom: 10px;
+	border: 1px solid black;
+	padding: 10px;
+
+	position: relative;
+	top: -10px;
+	left: -10px;
+	width: 398px;
+
 	background-color: var(--secondary-color);
-    padding: 10px;
-    vertical-align: middle;
-    border: 1px solid black;
 }
 
 .colorTag {
@@ -157,11 +184,6 @@ g.links line.selected.reversed {
     float: right;
     margin: 0;
     margin-left: 5px;
-}
-
-.label-details {
-	border: 1px solid darkgray;
-	display: none;
 }
 
 /* --- Details table --- */
@@ -195,7 +217,7 @@ g.links line.selected.reversed {
     height: 800px;
     overflow-y: scroll;
     overflow-x: auto;
-    text-align: center;
+	text-align: center;
 }
 
 #details2 > h3 {
@@ -222,7 +244,6 @@ g.links line.selected.reversed {
 
 #details2 svg {
     border: 1px solid lightgray;
-    box-sizing: content-box;
     padding: 10px;
     margin: 10px auto;
 }
@@ -306,7 +327,7 @@ rect.bar {
 
 #details3 {
     width: 400px;
-    height: 800px;
+	height: 800px;
 }
 
 #details3 h3 {

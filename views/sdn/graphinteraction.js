@@ -8,29 +8,8 @@ function showSwitchDetails(d) {
 		discardPath()
 	}
 
-	let nodeRules = sdnData.getDeviceRules(d.id)
-	let { title, svg, disclaimer, packetRulesDiv, labelForwardingDiv } = openDetails(2)
-	title.innerHTML = d.id
-	disclaimer.innerText = 'Nessuna regola installata sullo switch ' + d.id
-	
-	if (!nodeRules) {
-		hide(svg, packetRulesDiv.lastElementChild/*the table*/, labelForwardingDiv)
-	} else {
-		hide(disclaimer)
-		let packetsData = nodeRules.filter(el => !el.isLabelForwarding)
-		let labelsData = nodeRules.filter(el => el.isLabelForwarding)
-
-		if(packetsData.length) {
-			unhide(packetRulesDiv.lastElementChild)
-			showPacketsRules(packetsData, packetRulesDiv, 1)
-		} else hide(packetRulesDiv.lastElementChild/*the table*/)
-
-		if(labelsData.length)
-			showMovingLabelRules(labelsData, labelForwardingDiv, packetsData.length + 1)
-		else hide(labelForwardingDiv)
-
-		fillRulesSVG(nodeRules)
-	}
+	closeDetailsAndClean()
+	rulesDiv.open(d.id)
 }
 
 /* -------------------------------------------------- */
@@ -160,12 +139,14 @@ function enablePathSelection() {
 
 function applyPath() {
 	for (let step of sdnData.getPathSteps()) {
-		labelsDiv.addRuleToActiveLabel(
+		let rule = sdnData.addRule(
 			step.device,
-			{ name: 'ingressPort', value: step.ingressPort },
-			{ name: 'egressPort', value: step.egressPort }
+			{ name: 'ingress port', value: step.ingressPort },
+			{ name: 'egress port', value: step.egressPort }
 		)
+		labelsDiv.addNewRuleToActiveLabel(rule)
 	}
+
 	togglePathButtons(false)
 	discardPath()
 }

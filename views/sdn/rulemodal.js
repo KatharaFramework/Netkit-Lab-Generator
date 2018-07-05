@@ -2,7 +2,8 @@ let ruleModal = new Vue({
 	el: '#rule-modal',
 	data: {
 		visible: false,
-		// header: '',	// very TODO: mettere il titolo. Nel caso il modal sia stato promptato, spiegare perché
+		header: 'TODO: see open(...)',
+		device: '',
 		rule: {
 			matches: [{
 				name: 'any',
@@ -26,12 +27,16 @@ let ruleModal = new Vue({
 			}
 		},
 
-		open: function(){
-			this.reset()
+		open: function(device, header){
+			this.resetRuleValues()
 			this.visible = true
+			this.device = device
+			this.header = header || 'Create new rule for ' + device
 		},
 
 		prompt: function(partialRule){	// es. {action: {name: 'MPLS label'}}
+			// TODO: Controlla
+			// TODO: Imposta l'header
 			if(this.visible){
 				this.queue.push(partialRule)
 			} else {
@@ -40,17 +45,16 @@ let ruleModal = new Vue({
 			}
 		},
 
-		makeNewLine(){
+		makeNewLine: function(){
 			this.rule.matches.push({name: 'noselection', value: ''})
 		},
 
-		removeLastLine(){
+		removeLastLine: function(){
 			if(this.rule.matches.length > 1)
 				this.rule.matches.pop()
 		},
 
-		reset(){
-			this.visible = false
+		resetRuleValues: function(){
 			this.rule = {
 				matches: [{ name: 'any', value: '' }],
 				action: { name: 'noselection', value: '' },
@@ -58,6 +62,19 @@ let ruleModal = new Vue({
 				idleTimeout: 100,
 				hardTimeout: 500
 			}
+		},
+
+		makeRule: function(){
+			let rule = sdnData.addRule(
+				this.device,
+				this.rule.matches,
+				this.rule.action,
+				this.rule.priority,
+				this.rule.idleTimeout,
+				this.rule.hardTimeout,
+			)
+			rulesDiv.packetRules.push(rule)
+			this.close()
 		}
 	}
 })

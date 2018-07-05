@@ -485,59 +485,57 @@
 
 				<!-- Horizontal buttons -->
 				<div id="sdn-horizontal-buttons">
-					<button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Load configuration</button>
+					<button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Start simulation</button>
 					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
-					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Enable path selection</button>
+					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
 					<button class="btn" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-					<button class="btn btn-success" style="display:none" onclick="closeDetailsAndClean(2);labelsDiv.showLabelMaker()">Create new label</button>
+					<button class="btn btn-success" style="display:none" onclick="closeDetailsAndClean();labelsDiv.showLabelMaker()">Create new label</button>
 					<button class="btn btn-success" style="display:none" onclick="applyPath()">Conferma path</button>
 					<button class="btn btn-danger" style="display:none" onclick="discardPath()">Annulla path</button>
 				</div>
 				<div>
 
 					<!-- Vertical buttons -->
-					<div id="sdn-vertical-buttons">
+					<div id="sdn-vertical-buttons" class="hidden">
 						<button class="btn btn-success" onclick="submitToController()" disabled>Submit</button>
 						<button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
 						<button class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</button>
 						<!-- <button class="btn btn-warning">Scheduler</button> -->
-						<button style="position: relative; top:520px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
-						<button style="position: relative; top:520px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
-						<button style="position: relative; top:520px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+						<button style="position: relative; top:500px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
+						<button style="position: relative; top:500px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
+						<button style="position: relative; top:500px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
 					</div>
 
 					<!-- Main graph (unfilled) -->
 					<svg id="sdnGraph" width="800" height="800"></svg>
 					
 					<!-- Details (labels details)-->
-					<div id="details" v-if="visible">
+					<div id="details" v-show="visible && (newLabel.show || labels.length)">
 						<div class="blu-bordered" v-if="newLabel.show">
 							<input type="text" v-model="newLabel.color" pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)' placeholder='color'></input>
 							<input type="text" v-model="newLabel.name" pattern='[A-z0-9]+' placeholder='name'></input>
 							<button v-on:click="createNewLabel()">Add</button>
 							<button v-on:click="hideLabelMaker()">Ignore</button>
 						</div>
-						<hr v-if="newLabel.show">
 
 						<label-div v-for="label in labels"
 							v-bind:name="label.name" v-bind:key="label.name"
-							v-bind:color="label.color"
-							v-bind:rules="label.rules"></label-div>
+							v-bind:color="label.color">
+						</label-div>
 					</div>
 					<script src="views/sdn/labelmanaging.js"></script>
 
 					<!-- Details2 (node details)-->
-					<div id="details2" style="display: none">
-						<a onclick="closeDetailsAndClean(2)">X</a>
-						<button style="display: none" class="btn-success">Apply</button>
-						<h3>Title</h3>
+					<div id="details2" v-show="visible">
+						<a v-on:click="close">X</a>
+						<h3>{{ device }}</h3>
 						<hr>
-						<svg width="563" height="200"></svg>
+						<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
 						<div id="rules">
 							<div>
 								<h2>Packet rules</h2>
-								<button class="btn btn-success" onclick="ruleModal.open()">Create new rule</button>
-								<table>
+								<button class="btn btn-success" v-on:click="popupModal">Create new rule</button>
+								<table v-if="packetRules.length">
 									<thead>
 										<th>#</th>
 										<th>match</th>
@@ -548,11 +546,31 @@
 										<th>stats</th>
 									</thead>
 									<tbody>
-
+										<tr v-for="(rule, index) in packetRules">
+											<td>{{ (index + 1) }}</td>
+											<td>
+												<rule-match-action v-for="match in rule.matches"
+													v-bind:name="match.name"
+													v-bind:value="match.value"
+													v-bind:label="match.label">
+												</rule-match-action>
+											</td>
+											<td>
+												<rule-match-action v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-match-action>
+											</td>
+											<td>{{ rule.priority }}</td>
+											<td>{{ rule.idleTimeout }}</td>
+											<td>{{ rule.hardTimeout }}</td>
+											<td>{{ rule.stats }}</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
-							<div>
+							<div v-if="labelRules.length">
 								<h2>Label rules</h2>
 								<table>
 									<thead>
@@ -565,18 +583,39 @@
 										<th>stats</th>
 									</thead>
 									<tbody>
-
+										<tr v-for="(rule, index) in labelRules">
+											<td>{{ (packetRules.length + index + 1) }}</td>
+											<td>
+												<rule-match-action v-for="match in rule.matches"
+													v-bind:name="match.name"
+													v-bind:value="match.value"
+													v-bind:label="match.label">
+												</rule-match-action>
+											<td>
+												<rule-match-action v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-match-action>
+											</td>
+											<td>{{ rule.priority }}</td>
+											<td>{{ rule.idleTimeout }}</td>
+											<td>{{ rule.hardTimeout }}</td>
+											<td>{{ rule.stats }}</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
 						</div>
-						<p class="disclaimer"></p>
+						<p class="disclaimer" v-if="!labelRules.length && !packetRules.length">
+							Nessuna regola installata sullo switch {{ device }}
+						</p>
 					</div>
 					<script src="views/sdn/rulesmanaging.js"></script>
 
 					<!-- Details3 (other stuffs)-->
 					<div id="details3" style="display: none">
-						<a onclick="closeDetailsAndClean(3)">X</a>
+						<a onclick="closeDetailsAndClean()">X</a>
 						<div>
 							<h3>HOW TO:</h3>
 							<hr> ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... .....
@@ -595,7 +634,7 @@
 							<h3>Controller</h3>
 							<hr>
 							<p>Connect
-								<button onclick=enableControllerButtons()>Connetti</button>
+								<button onclick="enableControllerButtons()">Connetti</button>
 							</p>
 							<p>Test connection</p>
 							<p>Reset connection</p>
@@ -611,15 +650,15 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" v-on:click="close()">&times;</button>
-					<h4 class="modal-title">Create new rule</h4>
+					<button type="button" class="close" v-on:click="close">&times;</button>
+					<h4 class="modal-title">{{ header }}</h4>
 				</div>
 				<div class="modal-body">
 					<div class="half">
 						<h2>Match</h2>
 						<p>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewLine()">Add</button>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastLine()">Remove</button>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewLine">Add</button>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastLine">Remove</button>
 						</p>
 						<div v-for="(match, index) in rule.matches">
 							<select v-model="match.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
@@ -674,8 +713,8 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" v-on:click="close()">Undo</button>
-					<button type="button" class="btn btn-success" onclick="createPacketRule(appendPacketRule)" v-on:click="close()">Confirm</button>
+					<button type="button" class="btn btn-danger" v-on:click="close">Undo</button>
+					<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
 				</div>
 			</div>
 		</div>

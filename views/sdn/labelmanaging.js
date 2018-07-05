@@ -20,7 +20,6 @@ let labelsDiv = new Vue({
 					this.labels.push({
 						name: this.newLabel.name,
 						color: this.newLabel.color,
-						rules: []
 					})
 
 					this.hideLabelMaker()
@@ -46,15 +45,13 @@ let labelsDiv = new Vue({
 			}
 		},
 
-		addRuleToActiveLabel: function(device, match, action){
-			let label = this.findActive()
-			if(label){
-				label.rules.push({
-					device,
-					matches: [match],
-					action
-				})
-			} else throw new Error('Chi chiama questo metodo dovrebbe aver fatto un controllo con isEditing()')
+		addNewRuleToActiveLabel: function(rule){
+			let labelComponent = this.findActive()
+			labelComponent.rules.push(rule)
+			
+			let label = this.labels.find(label => label.name == label.name)
+			rule.matches[1] = { name: 'MPLS label', value: label.name, label }
+			rule.actions[1] = { name: 'set MPLS label', value: label.name, label }
 		},
 
 		findActive: function(){
@@ -63,15 +60,24 @@ let labelsDiv = new Vue({
 
 		isEditing: function(){
 			return Boolean(this.findActive())
+		},
+
+		reset: function(){
+			this.hideLabelMaker()
+			this.labels = []
 		}
 	},
 
 	components: {'label-div': {
-		props: ['name', 'color', 'rules'],
+		props: ['name', 'color'],
 		data: function(){
 			return {
-				// rules <-- C'è ma non si vede. Così come 'name' e 'color'
-				show: false,	// TODO: trasforma anche questo come gli altri (anziché show/hide usa solo show o solo hide)
+				// name
+				// color	// <-- Questi 2 sono implicitamente definiti da props
+				show: {
+					active: false,
+					text: 'Show'
+				},
 				edit: {
 					active: false,
 					text: 'Edit...'
@@ -80,7 +86,7 @@ let labelsDiv = new Vue({
 					active: false,
 					text: 'Remove...'
 				},
-				ruleId: 0
+				rules: []
 			}
 		},
 		template:
@@ -92,25 +98,22 @@ let labelsDiv = new Vue({
 					'v-if="edit.active">{{ remove.text }}</button>' +
 				'<button v-bind:class="{ \'btn-success\': edit.active }" ' +
 					'v-on:click="toggleEdit()">{{ edit.text }}</button>' +
-				'<button v-on:click="toggleExpand()">Show/Hide</button>' +
+				'<button v-on:click="toggleExpand()">{{ show.text }}</button>' +
 	
-				'<div v-show="show" class="label-details" ' +
-					'style="display: block; margin-top: 10px">' +
-					'<table>' +
-						'<thead>' +
-							'<th>device</th>' +
-							'<th>match</th>' +
-							'<th>action</th>' +
-							'<th v-if="remove.active" style="text-align: center; width: 5px">-</th>' +
-						'</thead>' +
-						'<tbody>' +
-							'<label-rule v-for="rule in rules"' +
-								'v-bind:device="rule.device" ' +
-								'v-bind:matches="rule.matches" v-bind:action="rule.action">'+
-								'</label-rule>' +
-						'</tbody>' +
-					'</table>' +
-				'</div>' +
+				'<table v-show="show.active" style="margin-top: 15px; width: 100%;">' +
+					'<thead>' +
+						'<th>device</th>' +
+						'<th>match</th>' +
+						'<th>action</th>' +
+						'<th v-if="remove.active" style="text-align: center; width: 5px">-</th>' +
+					'</thead>' +
+					'<tbody>' +
+						'<label-rule v-for="rule in rules"' +
+							'v-bind:device="rule.device" ' +
+							'v-bind:matches="rule.matches" v-bind:actions="rule.actions">'+
+						'</label-rule>' +
+					'</tbody>' +
+				'</table>' +
 				'<hr>' +
 			'</div>',
 		methods: {
@@ -118,7 +121,6 @@ let labelsDiv = new Vue({
 				if(this.edit.active || forceDisable){
 					this.edit.active = false
 					this.edit.text = 'Edit...'
-					
 					this.toggleRemove(true)
 					
 					discardPath()
@@ -128,7 +130,7 @@ let labelsDiv = new Vue({
 	
 					this.edit.active = true
 					this.edit.text = 'EDITING'
-					this.show = true
+					this.toggleExpand(true)
 	
 					enablePathSelection()
 				}
@@ -144,8 +146,14 @@ let labelsDiv = new Vue({
 				}
 			},
 			
-			toggleExpand: function() {
-				this.show = !this.show
+			toggleExpand: function(forceShow) {
+				if(this.show.active && !forceShow){
+					this.show.active = false
+					this.show.text = 'Show'
+				} else {
+					this.show.active = true
+					this.show.text = 'Hide'
+				}
 			},
 
 			highlightChildrenOnGraph: function(){
@@ -158,12 +166,12 @@ let labelsDiv = new Vue({
 		},
 
 		components: {'label-rule': {
-			props: ['device', 'matches', 'action'],
+			props: ['device', 'matches', 'actions'],
 			template:
 				'<tr v-on:mouseenter="highlightMeOnGraph" v-on:mouseleave="unhighlightMeOnGraph">' +
 					'<td>{{ device }}</td>' +
 					'<td>{{ matches[0].name }} {{ matches[0].value }}</td>' +
-					'<td>{{ action.name }} {{ action.value }}</td>' +
+					'<td>{{ actions[0].name }} {{ actions[0].value }}</td>' +
 					'<td v-if="$parent.remove.active">' +
 						'<button class="btn-danger" ' +
 						'v-on:click="removeMe()">-</button>' +
@@ -171,16 +179,17 @@ let labelsDiv = new Vue({
 				'</tr>',
 			methods: {
 				removeMe: function(){
+					// TODO: Rimuovere in dataclass.js oltre che qui
 					let rule = this.$parent.rules.find(rule => 
 						rule.device == this.device &&
 						rule.matches[0].value == this.matches[0].value &&
-						rule.action.value == this.action.value
+						rule.actions[0].value == this.actions[0].value
 					)
 					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1)
 				},
 
 				highlightMeOnGraph: function(){
-					highlightSegmentOnGraph(this.device, this.matches[0].value, this.action.value)
+					highlightSegmentOnGraph(this.device, this.matches[0].value, this.actions[0].value)
 				},
 
 				unhighlightMeOnGraph: function(){

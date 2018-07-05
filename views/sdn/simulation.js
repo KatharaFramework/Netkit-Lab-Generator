@@ -23,9 +23,9 @@ function loadSDN(config) {
     findEdgeNetworks(data)
 
     cleanSVGs()
-    resetButtons()
-    // document.getElementById('details').innerHTML = ""
-    closeDetailsAndClean(3)
+	resetButtons()
+	labelsDiv.reset()
+	closeDetailsAndClean()
 
     sdnData = new SDNData() // TODO: Aprire un alert per chiedere conferma?
     startSimulation(data)
@@ -140,19 +140,19 @@ function appendMarkersDefinitions(svg){
 	let defs = svg.append('defs')
 	defs.append('marker')	// Questo marcatore va bene con marker-start
 		.attr('id', "markerArrow1")
-		.attr('markerWidth', "13").attr('markerHeight', "13")
-		.attr('refY', "6").attr('refX', "-4")
+		.attr('markerWidth', "10").attr('markerHeight', "10")
+		.attr('refY', "3").attr('refX', "-5")
 		.attr('orient', "auto")
 			.append('path')
-			.attr('d', 'M2,6 L10,11 L10,2 L2,6')	// Triangolo con punta a sinistra
-			.style('fill', 'orange')
+			.attr('d', 'M5,1 L5,5 L1,3 L5,1')	// Triangolo con punta a destra
+			.style('fill', 'red')
 
 	defs.append('marker')	// Questo marcatore va bene con marker-end
 		.attr('id', "markerArrow2")
-		.attr('markerWidth', "13").attr('markerHeight', "13")
-		.attr('refY', "6").attr('refX', "14")
+		.attr('markerWidth', "10").attr('markerHeight', "10")
+		.attr('refY', "3").attr('refX', "9")
 		.attr('orient', "auto")
 			.append('path')
-			.attr('d', 'M2,2 L2,11 L10,6 L2,2')		// Triangolo con punta a destra
-			.style('fill', 'orange')
+			.attr('d', 'M1,1 L1,5 L5,3 L1,1')	// Triangolo con punta a sinistra
+			.style('fill', 'red')
 }
