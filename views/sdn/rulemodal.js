@@ -2,8 +2,8 @@ let ruleModal = new Vue({
 	el: '#rule-modal',
 	data: {
 		visible: false,
-		header: 'TODO: see open(...)',
-		device: '',
+		header: '',
+		device: '',	// TODO: ha senso metterlo dentro 'rule'?
 		rule: {
 			matches: [{
 				name: 'any',
@@ -16,15 +16,13 @@ let ruleModal = new Vue({
 			priority: 1,
 			idleTimeout: 100,
 			hardTimeout: 500
-		},
-		queue: []
+		}
 	},
 	methods: {
 		close: function(){
 			this.visible = false
-			if(this.queue.length){
-				this.prompt(this.queue.pop())
-			}
+			this.device = ''
+			this.header = ''
 		},
 
 		open: function(device, header){
@@ -34,22 +32,11 @@ let ruleModal = new Vue({
 			this.header = header || 'Create new rule for ' + device
 		},
 
-		prompt: function(partialRule){	// es. {action: {name: 'MPLS label'}}
-			// TODO: Controlla
-			// TODO: Imposta l'header
-			if(this.visible){
-				this.queue.push(partialRule)
-			} else {
-				this.open()
-				Object.assign(this.rule, partialRule)
-			}
-		},
-
-		makeNewLine: function(){
+		makeNewMatchLine: function(){
 			this.rule.matches.push({name: 'noselection', value: ''})
 		},
 
-		removeLastLine: function(){
+		removeLastMatchLine: function(){
 			if(this.rule.matches.length > 1)
 				this.rule.matches.pop()
 		},
@@ -75,6 +62,12 @@ let ruleModal = new Vue({
 			)
 			rulesDiv.packetRules.push(rule)
 			this.close()
+		},
+
+		editRule: function(partialRule, header, device){
+			if(!device) device = partialRule.device
+			this.open(device, header)
+			Object.assign(this.rule, partialRule)
 		}
 	}
 })

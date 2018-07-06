@@ -1,4 +1,4 @@
-#sdn button {
+#sdn button {	/* TODO: Non mi piace che '#sdn button' abbiano tutti il margin bottom */
     margin-bottom: 15px;
 }
 
@@ -22,10 +22,20 @@
 	right: 10px;
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1500px) {
 	#details,
-	#details2,
 	#details3 {
+		right: 100px;
+	}
+}
+
+@media (min-width: 1700px) {
+	#details,
+	#details3 {
+		right: 200px;
+	}
+
+	#details2 {
 		right: 100px;
 	}
 }
@@ -236,6 +246,10 @@ g.links line.selected.reversed {
     margin-bottom: 5px;
 }
 
+#details2 td > div:first-child hr {
+	display: none;
+}
+
 #details2 .disclaimer {
     margin-top: 30px;
 }
@@ -332,4 +346,27 @@ rect.bar {
 
 #details3 h3 {
     margin-top: 10px;
+}
+
+#details3 input {
+	background: none;
+    border: 1px solid darkgray;
+    padding: 3px 10px;
+    width: 150px;
+}
+
+#details3 button {
+	margin-bottom: 0;
+}
+
+#details3 textarea:disabled {
+	background-color: #fafafa;
+	height: 650px;
+}
+
+#details3 .minimal-input,
+.minimal-input {
+	border: 0px;
+	border-bottom: 1px solid lightblue;
+	text-align: right;
 }

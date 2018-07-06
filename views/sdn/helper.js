@@ -45,27 +45,9 @@ function togglePathButtons(displayBool) {
 /* --------------------- DETAILS DIV ----------------------- */
 /* --------------------------------------------------------- */
 
-function openDetails(num, subsection) {	// TODO: rivedere
-    closeDetailsAndClean()
-    labelsDiv.visible = false
-    switch(num){
-		case 2:
-			break // TODO
-        case 3:
-            let details3 = document.getElementById('details3')
-            let subsections = details3.querySelectorAll('div')
-            unhide(subsections.item(subsection - 1), details3)
-	}
-}
-
-function closeDetailsAndClean() {	// TODO: rivedere
-    let details3 = document.getElementById('details3')
-    for(let section of details3.querySelectorAll('div')) hide(section)
-	hide(details3)
-
+function closeDetailsSections() {
+    controllerDiv.close()
 	rulesDiv.close()
-	
-    labelsDiv.visible = true
 }
 
 function cleanSVGs() {

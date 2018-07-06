@@ -30,21 +30,26 @@ let rulesDiv = new Vue({
 
 		popupModal: function(){
 			ruleModal.open(this.device)
+		},
+
+		editMe: function(){
+			// TODO
+			console.log(this.$el.children)
 		}
 	},
+
 	components: {
-		'rule-match-action': {
+		'rule-match': {
 			props: ['name', 'value', 'label'],
 			template:
-			// TODO: Volevo aggiungere un <hr> ma mi divide in 2 il <p>
-			// .... MA! Posso provare a metter un div come root
-				'<p>' +
+				'<div>' +
+					'<hr>' +
 					'<span v-if="label" class="colorTag" ' +
 						'v-bind:style="{ backgroundColor: label.color }">' +
 					'</span>' +
 					'<span v-else>{{ name }} </span>' +
 					'{{ value }}' +
-				'</p>'
+				'</div>'
 		},
 	}
 })

@@ -8,7 +8,7 @@ function showSwitchDetails(d) {
 		discardPath()
 	}
 
-	closeDetailsAndClean()
+	closeDetailsSections()
 	rulesDiv.open(d.id)
 }
 
@@ -84,10 +84,11 @@ function enablePathSelection() {
 			.on("end", function (_, i, data) {
 				if(data[i].classList.contains('edge')) {
 					if(startsFromEdge) {
-						// ruleModal.prompt({action: {name: 'set MPLS label', value: ''}})
+						// TOOD
 					}
-					// ruleModal.prompt({matches: [{name: 'MPLS label', value: /* TODO: Qui ci vuole il nome del label*/ ''}]})
+					// TOOD
 				}
+				startsFromEdge = false
 				if (linkLock == 1 && sdnData.pathHasAtLeastOneStep()){
 					togglePathButtons(true)
 				} else discardPath()

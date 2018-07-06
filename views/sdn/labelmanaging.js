@@ -51,7 +51,6 @@ let labelsDiv = new Vue({
 			
 			let label = this.labels.find(label => label.name == label.name)
 			rule.matches[1] = { name: 'MPLS label', value: label.name, label }
-			rule.actions[1] = { name: 'set MPLS label', value: label.name, label }
 		},
 
 		findActive: function(){
@@ -110,7 +109,7 @@ let labelsDiv = new Vue({
 					'<tbody>' +
 						'<label-rule v-for="rule in rules"' +
 							'v-bind:device="rule.device" ' +
-							'v-bind:matches="rule.matches" v-bind:actions="rule.actions">'+
+							'v-bind:matches="rule.matches" v-bind:action="rule.action">'+
 						'</label-rule>' +
 					'</tbody>' +
 				'</table>' +
@@ -166,12 +165,12 @@ let labelsDiv = new Vue({
 		},
 
 		components: {'label-rule': {
-			props: ['device', 'matches', 'actions'],
+			props: ['device', 'matches', 'action'],
 			template:
 				'<tr v-on:mouseenter="highlightMeOnGraph" v-on:mouseleave="unhighlightMeOnGraph">' +
 					'<td>{{ device }}</td>' +
 					'<td>{{ matches[0].name }} {{ matches[0].value }}</td>' +
-					'<td>{{ actions[0].name }} {{ actions[0].value }}</td>' +
+					'<td>{{ action.name }} {{ action.value }}</td>' +
 					'<td v-if="$parent.remove.active">' +
 						'<button class="btn-danger" ' +
 						'v-on:click="removeMe()">-</button>' +
@@ -179,17 +178,17 @@ let labelsDiv = new Vue({
 				'</tr>',
 			methods: {
 				removeMe: function(){
-					// TODO: Rimuovere in dataclass.js oltre che qui
 					let rule = this.$parent.rules.find(rule => 
 						rule.device == this.device &&
 						rule.matches[0].value == this.matches[0].value &&
-						rule.actions[0].value == this.actions[0].value
+						rule.action.value == this.action.value
 					)
+					rule.deleted = true
 					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1)
 				},
 
 				highlightMeOnGraph: function(){
-					highlightSegmentOnGraph(this.device, this.matches[0].value, this.actions[0].value)
+					highlightSegmentOnGraph(this.device, this.matches[0].value, this.action.value)
 				},
 
 				unhighlightMeOnGraph: function(){

@@ -477,7 +477,6 @@
 				<script src="views/sdn/helper.js"></script>
 				<script src="views/sdn/simulation.js"></script>
 				<script src="views/sdn/graphinteraction.js"></script>
-				<script src="views/sdn/controllerinteraction.js"></script>
 
 				<p class="disclaimer hidden">Please update the size of the window to fit contents!
 					<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
@@ -489,7 +488,7 @@
 					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
 					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
 					<button class="btn" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-					<button class="btn btn-success" style="display:none" onclick="closeDetailsAndClean();labelsDiv.showLabelMaker()">Create new label</button>
+					<button class="btn btn-success" style="display:none" onclick="closeDetailsSections();labelsDiv.showLabelMaker()">Create new label</button>
 					<button class="btn btn-success" style="display:none" onclick="applyPath()">Conferma path</button>
 					<button class="btn btn-danger" style="display:none" onclick="discardPath()">Annulla path</button>
 				</div>
@@ -501,9 +500,10 @@
 						<button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
 						<button class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</button>
 						<!-- <button class="btn btn-warning">Scheduler</button> -->
-						<button style="position: relative; top:500px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
-						<button style="position: relative; top:500px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
-						<button style="position: relative; top:500px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+						<button style="position: relative; top:450px" onclick="controllerDiv.open(1)" class="btn btn-primary">HOW TO</button>
+						<button style="position: relative; top:450px" onclick="controllerDiv.open(3)" class="btn btn-primary">SHOW RULES</button>
+						<button style="position: relative; top:450px" onclick="controllerDiv.open(2)" class="btn btn-success">CONTROLLER</button>
+						<button style="position: relative; top:450px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
 					</div>
 
 					<!-- Main graph (unfilled) -->
@@ -546,21 +546,18 @@
 										<th>stats</th>
 									</thead>
 									<tbody>
-										<tr v-for="(rule, index) in packetRules">
+										<tr v-for="(rule, index) in packetRules"
+											v-on:click="editMe">
 											<td>{{ (index + 1) }}</td>
 											<td>
-												<rule-match-action v-for="match in rule.matches"
+												<rule-match v-for="match in rule.matches"
 													v-bind:name="match.name"
 													v-bind:value="match.value"
 													v-bind:label="match.label">
-												</rule-match-action>
+												</rule-match>
 											</td>
 											<td>
-												<rule-match-action v-for="action in rule.actions"
-													v-bind:name="action.name"
-													v-bind:value="action.value"
-													v-bind:label="action.label">
-												</rule-match-action>
+												{{ rule.action.name }} {{ rule.action.value }}
 											</td>
 											<td>{{ rule.priority }}</td>
 											<td>{{ rule.idleTimeout }}</td>
@@ -586,17 +583,13 @@
 										<tr v-for="(rule, index) in labelRules">
 											<td>{{ (packetRules.length + index + 1) }}</td>
 											<td>
-												<rule-match-action v-for="match in rule.matches"
+												<rule-match v-for="match in rule.matches"
 													v-bind:name="match.name"
 													v-bind:value="match.value"
 													v-bind:label="match.label">
-												</rule-match-action>
+												</rule-match>
 											<td>
-												<rule-match-action v-for="action in rule.actions"
-													v-bind:name="action.name"
-													v-bind:value="action.value"
-													v-bind:label="action.label">
-												</rule-match-action>
+												{{ rule.action.name }} {{ rule.action.value }}
 											</td>
 											<td>{{ rule.priority }}</td>
 											<td>{{ rule.idleTimeout }}</td>
@@ -614,9 +607,9 @@
 					<script src="views/sdn/rulesmanaging.js"></script>
 
 					<!-- Details3 (other stuffs)-->
-					<div id="details3" style="display: none">
-						<a onclick="closeDetailsAndClean()">X</a>
-						<div>
+					<div id="details3" v-if="visible">
+						<a v-on:click="close">X</a>
+						<div v-if="howtoVisibility">
 							<h3>HOW TO:</h3>
 							<hr> ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... .....
 							..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... .....
@@ -630,16 +623,38 @@
 							..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... .....
 							so ..... ..... ..... ..... because ..... ..... ..... of course ..... ..... ..... .....
 						</div>
-						<div>
+						<div v-if="controllerSection.visible">
 							<h3>Controller</h3>
 							<hr>
-							<p>Connect
-								<button onclick="enableControllerButtons()">Connetti</button>
+							<p>Connect to
+								<input class="minimal-input" type="text" v-model="controllerSection.ip">
+								<button style="float: right"
+									v-bind:class="[controllerSection.connected ? 'btn-success' : '']"
+									v-on:click="connect">{{ controllerSection.buttonText }}</button>
 							</p>
-							<p>Test connection</p>
-							<p>Reset connection</p>
+							<div v-if="controllerSection.connected">
+								<hr>
+								<p>Test connection
+									<button style="float: right" class="btn-warning">Test connection</button></p>
+								<hr>
+								<p>Reset connection
+									<button style="float: right" class="btn-danger">Reset connection</button></p>
+								</p>
+							</div>
+						</div>
+						<div v-if="rulesSection.visible">
+							<h3>Rules</h3>
+							<hr>
+							<div style="text-align: right; margin-bottom: 10px">
+								<input v-on:change="filterRulesByDevice"
+									v-model="rulesSection.filter"
+									type="text" placeholder="Device name">
+							</div>
+							<textarea v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
 						</div>
 					</div>
+					<script src="views/sdn/controllerinteraction.js"></script>
+
 				</div>
 			</div>
 		</div>
@@ -657,8 +672,8 @@
 					<div class="half">
 						<h2>Match</h2>
 						<p>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewLine">Add</button>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastLine">Remove</button>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewMatchLine">Add</button>
+							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastMatchLine">Remove</button>
 						</p>
 						<div v-for="(match, index) in rule.matches">
 							<select v-model="match.name" onchange="setInputPattern(this.value, this.nextElementSibling)">

@@ -25,7 +25,7 @@ function loadSDN(config) {
     cleanSVGs()
 	resetButtons()
 	labelsDiv.reset()
-	closeDetailsAndClean()
+	closeDetailsSections()
 
     sdnData = new SDNData() // TODO: Aprire un alert per chiedere conferma?
     startSimulation(data)
@@ -136,7 +136,6 @@ function toggleExternalNetworkVisibility(thisButton){
 }
 
 function appendMarkersDefinitions(svg){
-	// TODO: Potrei rimpicciolire il triangolo
 	let defs = svg.append('defs')
 	defs.append('marker')	// Questo marcatore va bene con marker-start
 		.attr('id', "markerArrow1")

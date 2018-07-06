@@ -2,10 +2,10 @@ class SDNData {
     constructor() {
         this.simulation = null
 
-        this.newPath = new Set()
+        this._newPath = new Set()
         this._pendingStep = null
 
-        this.rules = []
+        this._rules = []
     }
 
 	/* --------------------------------------------- */
@@ -23,17 +23,17 @@ class SDNData {
                 egressPort: options.egressPort
             }
             this._pendingStep = null
-            this.newPath.add(step)
+            this._newPath.add(step)
         }
     }
 
     pathHasAtLeastOneStep() {
-        return this.newPath.size > 0
+        return this._newPath.size > 0
     }
 
     discardPath() {
-		if (this.newPath.size)
-			this.newPath = new Set()
+		if (this._newPath.size)
+			this._newPath = new Set()
         this._pendingStep = null
     }
 
@@ -44,28 +44,27 @@ class SDNData {
     addRule() {
 		let device,
 			matches,
-			actions,
+			action,
 			priority = 0,
 			idleTimeout = 5000,
 			hardTimeout = 10000,
 			stats = 0
 
 		if(arguments.length == 3){
-			[device, matches, actions] = arguments
+			[device, matches, action] = arguments
 		} else if(arguments.length == 6){
-			[device, matches, actions, priority, idleTimeout, hardTimeout] = arguments
+			[device, matches, action, priority, idleTimeout, hardTimeout] = arguments
 		}
 
 		if(!Array.isArray(matches)) matches = [matches]
-		if(!Array.isArray(actions)) actions = [actions]
 		
-		let rule = { device, matches, actions, priority, idleTimeout, hardTimeout, stats }
-		this.rules.push(rule)
+		let rule = { device, matches, action, priority, idleTimeout, hardTimeout, stats }
+		this._rules.push(rule)
 		return rule
     }
 
     getDeviceRules(deviceName) {
-        return this.rules.filter(rule => rule.device == deviceName)
+        return this._rules.filter(rule => rule.device == deviceName)
     }
 
 	/* --------------------------------------------- */
@@ -82,10 +81,10 @@ class SDNData {
 
     getPathSteps() {
         if (this.pathHasAtLeastOneStep())
-            return this.newPath
+            return this._newPath
     }
 
     getRules(){
-        return this.rules
+        return this._rules
     }
 }
