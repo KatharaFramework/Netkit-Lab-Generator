@@ -1,5 +1,6 @@
 class SDNData {
-    constructor() {
+    constructor(kataraConfig) {
+		this._kataraConfig = kataraConfig.netkit
         this.simulation = null
 
         this._newPath = new Set()
@@ -66,6 +67,27 @@ class SDNData {
     getDeviceRules(deviceName) {
         return this._rules.filter(rule => rule.device == deviceName)
     }
+
+	/* ---------------------------------------------- */
+    /* --------------- NETWORK CONFIG --------------- */
+	/* ---------------------------------------------- */
+
+	getDeviceInfo(deviceName) {
+		let deviceInfos = this._kataraConfig.find(
+			deviceInfos => deviceInfos.name == deviceName
+		)
+		return {
+			interfaces: deviceInfos.interfaces.if.map(function (interfaccia) {
+				return {
+					number: interfaccia.eth.number,
+					domain: interfaccia.eth.domain,
+					ip: interfaccia.ip
+				}
+			}),
+			name: deviceInfos.name,
+			type: deviceInfos.type
+		}
+	}
 
 	/* --------------------------------------------- */
     /* ------------- GETTERS & SETTERS ------------- */

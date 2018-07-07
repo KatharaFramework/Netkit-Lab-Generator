@@ -1,34 +1,42 @@
 /* ------------------------- PREPARE RAW DATA ------------------------- */
 
-function loadSDN(config) {
-    config = JSON.parse(config)[0]
-    let data = { nodes: [], links: [] }
-    let networks = new Set()
-
-    for (let macchina of config.netkit) {
-        if(macchina.type != 'controller'){
-            let node = { id: macchina.name, type: macchina.type }
-			data.nodes.push(node)
-            macchina.interfaces.if.forEach(function (interfaccia) {
-                let nomeDominio = interfaccia.eth.domain
-                if(nomeDominio != 'SDNRESERVED'){
-                    networks.add(nomeDominio)
-                    data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
-                }
-            })
-        }
-    }
-
-    networks.forEach(domainName => data.nodes.push({ id: domainName, type: "network" }))   // Creo i nodi delle reti
-    findEdgeNetworks(data)
-
-    cleanSVGs()
-	resetButtons()
-	labelsDiv.reset()
-	closeDetailsSections()
-
-    sdnData = new SDNData() // TODO: Aprire un alert per chiedere conferma?
-    startSimulation(data)
+function loadSDN(config, forceStart) {	// TODO: Dividere in sottomoduli
+	if(!sdnData || forceStart){
+		config = JSON.parse(config)[0]
+		let data = { nodes: [], links: [] }
+		let networks = new Set()
+	
+		for (let macchina of config.netkit) {
+			if(macchina.type != 'controller'){
+				let node = { id: macchina.name, type: macchina.type }
+				data.nodes.push(node)
+				macchina.interfaces.if.forEach(function (interfaccia) {
+					let nomeDominio = interfaccia.eth.domain
+					if(nomeDominio != 'SDNRESERVED'){
+						networks.add(nomeDominio)
+						data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
+					}
+				})
+			}
+		}
+	
+		networks.forEach(domainName => data.nodes.push({ id: domainName, type: "network" }))   // Creo i nodi delle reti
+		findEdgeNetworks(data)
+	
+		resetButtons()
+		sdnData = new SDNData(config)
+		startSimulation(data)
+	} else {
+		let answ = confirm('Are you sure? All data will be lost')
+		if (answ) {
+			cleanSVGs()
+			labelsDiv.reset()
+			rulesDiv.close()
+			controllerDiv.close()
+			
+			loadSDN(config, true)
+		}
+	}
 }
 
 function findEdgeNetworks(data) {

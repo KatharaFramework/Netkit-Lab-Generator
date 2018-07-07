@@ -8,7 +8,9 @@ let rulesDiv = new Vue({
 		labelRules: []
 	},
 	methods: {
-		open: function(device){
+		open(device){
+			controllerDiv.close()
+			
 			this.visible = true
 			this.device = device
 			
@@ -21,18 +23,18 @@ let rulesDiv = new Vue({
 			fillRulesSVG(this.packetRules.concat(this.labelRules))
 		},
 
-		close: function(){
+		close(){
 			this.visible = false
 			this.device = null
 			this.packetRules = []
 			this.labelRules = []
 		},
 
-		popupModal: function(){
+		popupModal(){
 			ruleModal.open(this.device)
 		},
 
-		editMe: function(){
+		editMe(){
 			// TODO
 			console.log(this.$el.children)
 		}

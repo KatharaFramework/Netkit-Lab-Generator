@@ -10,7 +10,7 @@ let labelsDiv = new Vue({
 		labels: []
 	},
 	methods: {
-		createNewLabel: function() {
+		createNewLabel() {
 			if (this.newLabel.name && this.newLabel.color){
 				let colorInputEl = this.$el.firstElementChild.firstElementChild
 				let nameInputEl = colorInputEl.nextElementSibling
@@ -27,25 +27,31 @@ let labelsDiv = new Vue({
 			}
 		},
 
-		hideLabelMaker: function(){
+		hide(){
+			this.visible = false
+			// TODO: triggera qui l'aggiornamento delle regole in details3
+			// TODO: Poi usa sempre questo metodo per nascondere questo div piuttosto che 'labelsDiv.visible = false'
+		},
+
+		hideLabelMaker(){
 			this.newLabel.show = false
 			this.newLabel.name = ''
 			this.newLabel.color = ''
 			unhide(document.querySelectorAll('#sdn-horizontal-buttons button').item(4))
 		},
 
-		showLabelMaker: function(){
+		showLabelMaker(){
 			this.newLabel.show = true
 			hide(document.querySelectorAll('#sdn-horizontal-buttons button').item(4))
 		},
 
-		setAllEditButtonsDisabled: function(){
+		setAllEditButtonsDisabled(){
 			for(let child of this.$children){
 				child.toggleEdit(true)
 			}
 		},
 
-		addNewRuleToActiveLabel: function(rule){
+		addNewRuleToActiveLabel(rule){
 			let labelComponent = this.findActive()
 			labelComponent.rules.push(rule)
 			
@@ -53,15 +59,15 @@ let labelsDiv = new Vue({
 			rule.matches[1] = { name: 'MPLS label', value: label.name, label }
 		},
 
-		findActive: function(){
+		findActive(){
 			return this.$children.find(el => el.edit.active)
 		},
 
-		isEditing: function(){
+		isEditing(){
 			return Boolean(this.findActive())
 		},
 
-		reset: function(){
+		reset(){
 			this.hideLabelMaker()
 			this.labels = []
 		}
@@ -116,7 +122,7 @@ let labelsDiv = new Vue({
 				'<hr>' +
 			'</div>',
 		methods: {
-			toggleEdit: function(forceDisable) {
+			toggleEdit(forceDisable) {
 				if(this.edit.active || forceDisable){
 					this.edit.active = false
 					this.edit.text = 'Edit...'
@@ -135,7 +141,7 @@ let labelsDiv = new Vue({
 				}
 			},
 			
-			toggleRemove: function(forceDisable) {
+			toggleRemove(forceDisable) {
 				if(this.remove.active || forceDisable){
 					this.remove.active = false
 					this.remove.text = 'Remove...'
@@ -145,7 +151,7 @@ let labelsDiv = new Vue({
 				}
 			},
 			
-			toggleExpand: function(forceShow) {
+			toggleExpand(forceShow) {
 				if(this.show.active && !forceShow){
 					this.show.active = false
 					this.show.text = 'Show'
@@ -155,11 +161,11 @@ let labelsDiv = new Vue({
 				}
 			},
 
-			highlightChildrenOnGraph: function(){
+			highlightChildrenOnGraph(){
 				this.$children.forEach(el => el.highlightMeOnGraph())
 			},
 
-			unhighlightChildrenOnGraph: function(){
+			unhighlightChildrenOnGraph(){
 				this.$children.forEach(el => el.unhighlightMeOnGraph())
 			}
 		},
@@ -169,7 +175,9 @@ let labelsDiv = new Vue({
 			template:
 				'<tr v-on:mouseenter="highlightMeOnGraph" v-on:mouseleave="unhighlightMeOnGraph">' +
 					'<td>{{ device }}</td>' +
-					'<td>{{ matches[0].name }} {{ matches[0].value }}</td>' +
+					'<td>{{ matches[0].name }} {{ matches[0].value }} ' +
+						'<span style="color: orange" v-if="matches.length > 2">+</span>' +
+					'</td>' +
 					'<td>{{ action.name }} {{ action.value }}</td>' +
 					'<td v-if="$parent.remove.active">' +
 						'<button class="btn-danger" ' +
@@ -177,7 +185,7 @@ let labelsDiv = new Vue({
 					'</td>' +
 				'</tr>',
 			methods: {
-				removeMe: function(){
+				removeMe(){
 					let rule = this.$parent.rules.find(rule => 
 						rule.device == this.device &&
 						rule.matches[0].value == this.matches[0].value &&
@@ -187,11 +195,11 @@ let labelsDiv = new Vue({
 					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1)
 				},
 
-				highlightMeOnGraph: function(){
+				highlightMeOnGraph(){
 					highlightSegmentOnGraph(this.device, this.matches[0].value, this.action.value)
 				},
 
-				unhighlightMeOnGraph: function(){
+				unhighlightMeOnGraph(){
 					if(!sdnData.pathHasAtLeastOneStep())
 						removeNodesSelection()
 				}

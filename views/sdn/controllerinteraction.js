@@ -16,7 +16,9 @@ let controllerDiv = new Vue({
 		}
 	},
 	methods: {
-		open: function (section) {
+		open(section) {
+			rulesDiv.close()
+
 			this.close()
 			this.visible = true
 			if (section == 1) this.howtoVisibility = true
@@ -27,7 +29,7 @@ let controllerDiv = new Vue({
 			}
 		},
 
-		close: function () {
+		close() {
 			this.visible = false
 			this.howtoVisibility = false
 			this.controllerSection.visible = false
@@ -36,7 +38,7 @@ let controllerDiv = new Vue({
 			this.rulesSection.filter = ''
 		},
 
-		connect: function(){
+		connect(){
 			let bottoniDiv = document.getElementById('sdn-vertical-buttons')
 			bottoniDiv.children[0].disabled = false
 			bottoniDiv.children[1].disabled = false
@@ -45,7 +47,7 @@ let controllerDiv = new Vue({
 			this.controllerSection.buttonText = 'Connected'
 		},
 
-		filterRulesByDevice: function () {
+		filterRulesByDevice() {
 			if(!this.rulesSection.filter) {
 				this.rulesSection.rules = JSON.stringify(
 					sdnData.getRules().filter(rule => !rule.deleted), null, 4
@@ -62,7 +64,7 @@ let controllerDiv = new Vue({
 
 function submitToController() {
 	// TODO
-	alert('done!')
+	confirm('Rules are going to be installed in the controller')
 }
 
 function getFromController() {

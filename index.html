@@ -488,7 +488,7 @@
 					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
 					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
 					<button class="btn" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-					<button class="btn btn-success" style="display:none" onclick="closeDetailsSections();labelsDiv.showLabelMaker()">Create new label</button>
+					<button class="btn btn-success" style="display:none" onclick="controllerDiv.close();rulesDiv.close();labelsDiv.showLabelMaker()">Create new label</button>
 					<button class="btn btn-success" style="display:none" onclick="applyPath()">Conferma path</button>
 					<button class="btn btn-danger" style="display:none" onclick="discardPath()">Annulla path</button>
 				</div>
@@ -610,23 +610,32 @@
 					<div id="details3" v-if="visible">
 						<a v-on:click="close">X</a>
 						<div v-if="howtoVisibility">
-							<h3>HOW TO:</h3>
-							<hr> ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... .....
-							..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... .....
-							..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course ..... .....
-							..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... .....
-							..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... .....
-							..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course .....
-							..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so .....
-							..... ..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and .....
-							..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course
-							..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... .....
-							so ..... ..... ..... ..... because ..... ..... ..... of course ..... ..... ..... .....
+							<h3>Instructions:</h3>
+							<hr>
+							This tool allows you to configure the network flow of a software defined network (SDN) built on Katharà.
+							Firstly you need to specify topology in the main tab.
+							Then you can click 'Start simulation' and you will see your network appear: blue circles are the switches,
+							black ones are the netwroks. Gray circles represent the external network. They can be hidden with the button on
+							the left. The controller node is hidden, but it exists and it is connected to all switches through a dedicated
+							network!
+							<hr>
+							Labels represent a flow inside the network. They are like colored tunnels in which packets moves accordingly
+							to certain rules. Colors and paths are arbitrary.
+							To create a tunnel click on the green button on top of the graph. Once created there is no rule to tell
+							the packets how to get in the tunnel yet.
+							<hr>
+							To let a flow of packets enter a tunnel you have to create a 'packet rule' by clicking on a switch and then on the 'create
+							new rule' button. This will prompt a window where you can specify which packet should match the definition of flow
+							and which should not. You can use the 'action' dropdown to indicate a label to apply to those packets.
+							<hr>
+							When flows and matches are defined, you can submit the newly created rules to the controller by clicking the
+							'controller' tab and specifying the parameters of the controller connection.
+							TODO
 						</div>
 						<div v-if="controllerSection.visible">
 							<h3>Controller</h3>
 							<hr>
-							<p>Connect to
+							<p>Connect to:
 								<input class="minimal-input" type="text" v-model="controllerSection.ip">
 								<button style="float: right"
 									v-bind:class="[controllerSection.connected ? 'btn-success' : '']"
@@ -669,6 +678,7 @@
 					<h4 class="modal-title">{{ header }}</h4>
 				</div>
 				<div class="modal-body">
+
 					<div class="half">
 						<h2>Match</h2>
 						<p>
@@ -676,56 +686,81 @@
 							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastMatchLine">Remove</button>
 						</p>
 						<div v-for="(match, index) in rule.matches">
-							<select v-model="match.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
+							<select v-model="match.name">
 								<option disabled value="noselection">Select...</option>
-								<option v-if="index==0" value="any">Any</option>
+								<option v-if="index==0 && rule.matches.length < 2" value="any">Any</option>
+								<option value="MPLS label">MPLS label</option>
 								<option value="MAC source">MAC src</option>
 								<option value="MAC destination">MAC dst</option>
 								<option value="eth type">ETH type</option>
-								<option value="MPLS label">MPLS label</option>
-								<option value="MPLS tc">MPLS TC</option>
-								<option value="vlan id">VLan ID</option>
 								<option value="IP source">IP src</option>
 								<option value="IP destination">IP dst</option>
 								<option value="IP port">IP port</option>
 								<option value="TCP source port">TCP sport</option>
 								<option value="TCP destination port">TCP dport</option>
-								<!-- TODO: eventualmente aggiungerne altri -->
+								<!--<option value="MPLS tc">MPLS TC</option>
+								<option value="vlan id">VLan ID</option>
+								TODO: altre opzioni eventualmente -->
 							</select>
-							<input v-model="match.value" type="text" hidden>
+							<dynamic-selection v-model="match.value"
+								v-bind:selection="match.name">
+							</dynamic-selection>
 						</div>
 					</div>
+
 					<div class="half">
 						<h2>Action</h2>
 						<div>
-							<select v-model="rule.action.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
+							<select v-model="rule.action.name">
 								<option disabled value="noselection">Select...</option>
-								<option value="set MPLS label">Set MPLS label</option>
+								<option v-if="labels.length" value="set MPLS label">Set MPLS label</option>
 								<option value="forward to port">Forward to port</option>
 								<option value="send to controller">Send to controller</option>
 								<option value="drop">Drop</option>
-								<option value="process l2">Process (L2)</option>
+								<!--<option value="process l2">Process (L2)</option>
 								<option value="process l3">Process (L3)</option>
 								<option value="set field">Set field</option>
 								<option value="push header">Push header</option>
 								<option value="pop header">Pop header</option>
-								<!-- TODO: eventualmente aggiungerne altri -->
+								TODO: altre opzioni eventualmente -->
+								<option value="prova">Prova</option><!-- TODO: cancellare questa riga -->
 							</select>
-							<input v-model="rule.action.value" type="text" hidden>
+							<div>
+								<select v-if="rule.action.name == 'set MPLS label'"
+									v-model="rule.action.value" class="answer-selection">
+									<option v-for="label in labels" v-bind:value="label.name">
+										{{ label.name }}
+									</option>
+								</select>
+								<select v-else-if="rule.action.name == 'forward to port'"
+									v-model="rule.action.value" class="answer-selection">
+									<option v-for="interface in deviceInfos.interfaces"
+										v-bind:value="interface.number">
+										eth{{ interface.number }}
+									</option>
+								</select>
+								<input v-model="rule.action.value"
+									v-else-if="['prova'].includes(rule.action.name)">
+								</input><!-- TODO: eventualmente cancellare questo elemento-->
+							</div>
 						</div>
 					</div>
+
 					<div class="half">
 						<h2>Priority</h2>
 						<input v-model="rule.priority" type="number" min="0">
 					</div>
+
 					<div class="half">
 						<h2>Idle timeout</h2>
 						<input v-model="rule.idleTimeout" type="number" min="0">
 					</div>
+
 					<div class="half">
 						<h2>Hard timeout</h2>
 						<input v-model="rule.hardTimeout" type="number" min="0">
 					</div>
+					
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-danger" v-on:click="close">Undo</button>

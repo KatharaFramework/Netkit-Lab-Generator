@@ -370,3 +370,9 @@ rect.bar {
 	border-bottom: 1px solid lightblue;
 	text-align: right;
 }
+
+.answer-selection {
+	background-color: white;
+    min-width: 180px;
+	padding: 1px 10px;
+}

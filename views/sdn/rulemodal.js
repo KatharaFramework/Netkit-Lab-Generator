@@ -3,7 +3,6 @@ let ruleModal = new Vue({
 	data: {
 		visible: false,
 		header: '',
-		device: '',	// TODO: ha senso metterlo dentro 'rule'?
 		rule: {
 			matches: [{
 				name: 'any',
@@ -16,32 +15,35 @@ let ruleModal = new Vue({
 			priority: 1,
 			idleTimeout: 100,
 			hardTimeout: 500
-		}
+		},
+		labels: [],
+		deviceInfos: null
 	},
 	methods: {
-		close: function(){
+		close() {
 			this.visible = false
-			this.device = ''
 			this.header = ''
 		},
 
-		open: function(device, header){
-			this.resetRuleValues()
+		open(device, header) {
 			this.visible = true
-			this.device = device
 			this.header = header || 'Create new rule for ' + device
+
+			this.labels = labelsDiv.labels
+			this.deviceInfos = sdnData.getDeviceInfo(device)
+			this.resetRuleValues()
 		},
 
-		makeNewMatchLine: function(){
-			this.rule.matches.push({name: 'noselection', value: ''})
+		makeNewMatchLine() {
+			this.rule.matches.push({ name: 'noselection', value: '' })
 		},
 
-		removeLastMatchLine: function(){
-			if(this.rule.matches.length > 1)
+		removeLastMatchLine() {
+			if (this.rule.matches.length > 1)
 				this.rule.matches.pop()
 		},
 
-		resetRuleValues: function(){
+		resetRuleValues() {
 			this.rule = {
 				matches: [{ name: 'any', value: '' }],
 				action: { name: 'noselection', value: '' },
@@ -51,9 +53,9 @@ let ruleModal = new Vue({
 			}
 		},
 
-		makeRule: function(){
+		makeRule() {
 			let rule = sdnData.addRule(
-				this.device,
+				this.deviceInfos.name,
 				this.rule.matches,
 				this.rule.action,
 				this.rule.priority,
@@ -64,68 +66,31 @@ let ruleModal = new Vue({
 			this.close()
 		},
 
-		editRule: function(partialRule, header, device){
-			if(!device) device = partialRule.device
+		editRule(partialRule, header, device) {
+			if (!device) device = partialRule.device
 			this.open(device, header)
 			Object.assign(this.rule, partialRule)
 		}
+	},
+
+	components: {
+		'dynamic-selection': {
+			props: ['selection'],
+			data() {
+				return { content: '' }
+			},
+			template:
+				'<div>' +
+					'<select v-model="content" v-if="selection == \'MPLS label\'"' +
+						'@change="$emit(\'input\', content)" class="answer-selection">' +
+						'<option v-for="label in $parent.labels" v-bind:value="label.name">' +
+							'{{ label.name }}' +
+						'</option>' +
+					'</select>' +
+					'<input v-model="content" @change="$emit(\'input\', content)" ' +
+						'v-else-if="![\'any\'].includes(selection)">' +
+					'</input>' +
+				'</div>'
+		}
 	}
 })
-
-function setInputPattern(value, inputEl) {
-    // TODO: Ho già provato a fare 'switch(value){case ...: ...}' ma non va. Eventualmente riprova
-    // TODO: Completare
-    // TODO: Ricordati di ammettere valori tipo: 192.*
-	let newPattern
-	if (value == "any") {
-		inputEl.hidden = true
-		return
-	} else if (value == "noselection") {
-        inputEl.hidden = true
-        return
-    } else if (value == "MAC source") {
-        newPattern = ".*"
-    } else if (value == "MAC destination") {
-        newPattern = ".*"
-    } else if (value == "eth type") {
-        newPattern = ".*"
-    } else if (value == "MPLS label") {
-        newPattern = ".*"
-    } else if (value == "MPLS tc") {
-        newPattern = ".*"
-    } else if (value == "vlan id") {
-        newPattern = ".*"
-    } else if (value == "IP source") {
-        newPattern = ".*"
-    } else if (value == "IP destination") {
-        newPattern = ".*"
-    } else if (value == "IP port") {
-        newPattern = ".*"
-    } else if (value == "TCP source port") {
-        newPattern = ".*"
-    } else if (value == "TCP destination port") {
-        newPattern = ".*"
-    } else if (value == "set MPLS label") {
-		newPattern = '(' + labelsDiv.labels.map(el => el.name).join(')|(') + ')'
-		// TODO: Anziché un pattern inserire un menu a selezione
-    } else if (value == "forward to port") {
-        newPattern = ".*"
-    } else if (value == "send to controller") {
-        newPattern = ".*"
-    } else if (value == "drop") {
-        inputEl.hidden = true
-        return
-    } else if (value == "process l2") {
-        newPattern = ".*"
-    } else if (value == "process l3") {
-        newPattern = ".*"
-    } else if (value == "set field") {
-        newPattern = ".*"
-    } else if (value == "push header") {
-        newPattern = ".*"
-    } else if (value == "pop header") {
-        newPattern = ".*"
-    }
-    inputEl.pattern = newPattern
-    inputEl.hidden = false
-}

@@ -41,20 +41,6 @@ function togglePathButtons(displayBool) {
     )
 }
 
-/* --------------------------------------------------------- */
-/* --------------------- DETAILS DIV ----------------------- */
-/* --------------------------------------------------------- */
-
-function closeDetailsSections() {
-    controllerDiv.close()
-	rulesDiv.close()
-}
-
-function cleanSVGs() {
-    for (let svg of document.getElementsByTagName('svg'))
-        svg.innerHTML = ""
-}
-
 /* ---------------------------------------------------- */
 /* --------------------- GENERIC----------------------- */
 /* ---------------------------------------------------- */
@@ -67,4 +53,9 @@ function hide(...elements){
 function unhide(...elements){
     for (let el of elements)
         el.style.display = null
+}
+
+function cleanSVGs() {
+    for (let svg of document.getElementsByTagName('svg'))
+        svg.innerHTML = ""
 }
