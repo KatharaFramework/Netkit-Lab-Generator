@@ -12,10 +12,11 @@ let ruleModal = new Vue({
 				name: 'noselection',
 				value: ''
 			},
-			priority: 1,
-			idleTimeout: 100,
-			hardTimeout: 500
+			priority: 0,
+			idleTimeout: 0,
+			hardTimeout: 0
 		},
+		originalRule: null,
 		labels: [],
 		deviceInfos: null
 	},
@@ -23,6 +24,7 @@ let ruleModal = new Vue({
 		close() {
 			this.visible = false
 			this.header = ''
+			this.originalRule = null
 		},
 
 		open(device, header) {
@@ -47,37 +49,50 @@ let ruleModal = new Vue({
 			this.rule = {
 				matches: [{ name: 'any', value: '' }],
 				action: { name: 'noselection', value: '' },
-				priority: 1,
-				idleTimeout: 100,
-				hardTimeout: 500
+				priority: 0,
+				idleTimeout: 0,
+				hardTimeout: 0
 			}
 		},
 
 		makeRule() {
-			let rule = sdnData.addRule(
-				this.deviceInfos.name,
-				this.rule.matches,
-				this.rule.action,
-				this.rule.priority,
-				this.rule.idleTimeout,
-				this.rule.hardTimeout,
-			)
-			rulesDiv.packetRules.push(rule)
-			this.close()
+			if(!this.originalRule){
+				if(this.rule.action.name != 'noselection' &&
+					!this.rule.matches.some(match => match.name == 'noselection')){
+					let rule = sdnData.addRule(
+						this.deviceInfos.name,
+						this.rule.matches,
+						this.rule.action,
+						this.rule.priority,
+						this.rule.idleTimeout,
+						this.rule.hardTimeout,
+					)
+					rulesDiv.packetRules.push(rule)
+					this.close()
+				}
+			} else this.close()
 		},
 
-		editRule(partialRule, header, device) {
-			if (!device) device = partialRule.device
-			this.open(device, header)
-			Object.assign(this.rule, partialRule)
+		editRule(rule) {
+			if(!rule.deleted){
+				this.originalRule = rule
+				let device = rule.device
+				this.open(device, 'Modifica la regola per ' + device)
+				Object.assign(this.rule, rule)
+			}
+		},
+
+		deleteRule(){
+			this.originalRule.deleted = true
+			this.close()
 		}
 	},
 
 	components: {
 		'dynamic-selection': {
-			props: ['selection'],
+			props: ['selection', 'value'],
 			data() {
-				return { content: '' }
+				return { content: this.value }
 			},
 			template:
 				'<div>' +
@@ -85,6 +100,13 @@ let ruleModal = new Vue({
 						'@change="$emit(\'input\', content)" class="answer-selection">' +
 						'<option v-for="label in $parent.labels" v-bind:value="label.name">' +
 							'{{ label.name }}' +
+						'</option>' +
+					'</select>' +
+					'<select v-model="content" v-else-if="selection == \'source port\'"' +
+						'@change="$emit(\'input\', content)" class="answer-selection">' +
+						'<option v-for="interface in $parent.deviceInfos.interfaces" ' +
+							'v-bind:value="interface.number">' +
+							'eth{{ interface.number }}' +
 						'</option>' +
 					'</select>' +
 					'<input v-model="content" @change="$emit(\'input\', content)" ' +

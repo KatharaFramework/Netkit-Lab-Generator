@@ -6,7 +6,8 @@ class SDNData {
         this._newPath = new Set()
         this._pendingStep = null
 
-        this._rules = []
+		this._rules = []
+		this._ruleId = 0
     }
 
 	/* --------------------------------------------- */
@@ -47,8 +48,8 @@ class SDNData {
 			matches,
 			action,
 			priority = 0,
-			idleTimeout = 5000,
-			hardTimeout = 10000,
+			idleTimeout = 0,
+			hardTimeout = 0,
 			stats = 0
 
 		if(arguments.length == 3){

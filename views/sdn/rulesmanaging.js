@@ -16,8 +16,8 @@ let rulesDiv = new Vue({
 			
 			let rules = sdnData.getDeviceRules(device)
 			if(rules){
-				this.packetRules = rules.filter(rule => !rule.matches.some(match => match.label))
-				this.labelRules = rules.filter(rule => !this.packetRules.includes(rule))
+				this.packetRules = rules.filter(rule => !rule.matches.some(match => match.label) && !rule.deleted)
+				this.labelRules = rules.filter(rule => !this.packetRules.includes(rule) && !rule.deleted)
 			}
 			
 			fillRulesSVG(this.packetRules.concat(this.labelRules))
@@ -30,13 +30,15 @@ let rulesDiv = new Vue({
 			this.labelRules = []
 		},
 
-		popupModal(){
-			ruleModal.open(this.device)
-		},
-
-		editMe(){
-			// TODO
-			console.log(this.$el.children)
+		popupModal(_, ruleIndex){
+			if(!ruleIndex && ruleIndex != 0){
+				ruleModal.open(this.device)
+			} else if(ruleIndex < this.packetRules.length) {
+				ruleModal.editRule(this.packetRules[ruleIndex])
+			} else {
+				ruleIndex -= this.packetRules.length
+				ruleModal.editRule(this.labelRules[ruleIndex])
+			}
 		}
 	},
 
@@ -55,6 +57,10 @@ let rulesDiv = new Vue({
 		},
 	}
 })
+
+function triggerEdit(el){
+	rulesDiv.popupModal(undefined, el.firstElementChild.innerText - 1)
+}
 
 /* -------------- SVG -------------- */
 

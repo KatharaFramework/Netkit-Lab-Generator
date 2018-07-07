@@ -142,8 +142,8 @@ function applyPath() {
 	for (let step of sdnData.getPathSteps()) {
 		let rule = sdnData.addRule(
 			step.device,
-			{ name: 'ingress port', value: step.ingressPort },
-			{ name: 'egress port', value: step.egressPort }
+			{ name: 'source port', value: step.ingressPort },
+			{ name: 'forward to port', value: step.egressPort }
 		)
 		labelsDiv.addNewRuleToActiveLabel(rule)
 	}

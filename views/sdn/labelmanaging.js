@@ -113,7 +113,7 @@ let labelsDiv = new Vue({
 						'<th v-if="remove.active" style="text-align: center; width: 5px">-</th>' +
 					'</thead>' +
 					'<tbody>' +
-						'<label-rule v-for="rule in rules"' +
+						'<label-rule v-for="rule in rules" v-if="!rule.deleted"' +
 							'v-bind:device="rule.device" ' +
 							'v-bind:matches="rule.matches" v-bind:action="rule.action">'+
 						'</label-rule>' +
@@ -176,7 +176,7 @@ let labelsDiv = new Vue({
 				'<tr v-on:mouseenter="highlightMeOnGraph" v-on:mouseleave="unhighlightMeOnGraph">' +
 					'<td>{{ device }}</td>' +
 					'<td>{{ matches[0].name }} {{ matches[0].value }} ' +
-						'<span style="color: orange" v-if="matches.length > 2">+</span>' +
+						'<span style="color: orange; float: right" v-if="matches.length > 2">+</span>' +
 					'</td>' +
 					'<td>{{ action.name }} {{ action.value }}</td>' +
 					'<td v-if="$parent.remove.active">' +

@@ -547,7 +547,8 @@
 									</thead>
 									<tbody>
 										<tr v-for="(rule, index) in packetRules"
-											v-on:click="editMe">
+											v-bind:style="{ textDecoration: (rule.deleted ? 'line-through' : 'none')}"
+											onclick="triggerEdit(this)">
 											<td>{{ (index + 1) }}</td>
 											<td>
 												<rule-match v-for="match in rule.matches"
@@ -580,7 +581,8 @@
 										<th>stats</th>
 									</thead>
 									<tbody>
-										<tr v-for="(rule, index) in labelRules">
+										<tr v-for="(rule, index) in labelRules"
+											onclick="triggerEdit(this)">
 											<td>{{ (packetRules.length + index + 1) }}</td>
 											<td>
 												<rule-match v-for="match in rule.matches"
@@ -627,6 +629,8 @@
 							To let a flow of packets enter a tunnel you have to create a 'packet rule' by clicking on a switch and then on the 'create
 							new rule' button. This will prompt a window where you can specify which packet should match the definition of flow
 							and which should not. You can use the 'action' dropdown to indicate a label to apply to those packets.
+							You can edit or remove a rule opening the switch details and clicking on the row of the table which represents it: the modal
+							will popup.
 							<hr>
 							When flows and matches are defined, you can submit the newly created rules to the controller by clicking the
 							'controller' tab and specifying the parameters of the controller connection.
@@ -689,10 +693,11 @@
 							<select v-model="match.name">
 								<option disabled value="noselection">Select...</option>
 								<option v-if="index==0 && rule.matches.length < 2" value="any">Any</option>
-								<option value="MPLS label">MPLS label</option>
+								<option v-if="labels.length" value="MPLS label">MPLS label</option>
+								<option value="source port">Source port</option>
 								<option value="MAC source">MAC src</option>
 								<option value="MAC destination">MAC dst</option>
-								<option value="eth type">ETH type</option>
+								<option value="eth type">Eth type</option>
 								<option value="IP source">IP src</option>
 								<option value="IP destination">IP dst</option>
 								<option value="IP port">IP port</option>
@@ -760,10 +765,11 @@
 						<h2>Hard timeout</h2>
 						<input v-model="rule.hardTimeout" type="number" min="0">
 					</div>
-					
+
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" v-on:click="close">Undo</button>
+					<button v-if="originalRule" v-on:click="deleteRule" class="btn btn-danger">Delete rule</button>
+					<button v-if="!originalRule" type="button" class="btn btn-danger" v-on:click="close">Undo</button>
 					<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
 				</div>
 			</div>
