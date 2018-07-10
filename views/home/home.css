@@ -102,8 +102,8 @@
 }
 
 .mock-disclaimer {
-    width: 40%;
-    height: 2px;
+    width: 80%;
+    height: 4px;
     background-color: var(--disclaimer-color);
     margin: 3px;
 }

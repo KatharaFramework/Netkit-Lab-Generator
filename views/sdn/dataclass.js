@@ -1,10 +1,12 @@
 class SDNData {
     constructor(kataraConfig) {
 		this._kataraConfig = kataraConfig.netkit
-        this.simulation = null
-
-        this._newPath = new Set()
-        this._pendingStep = null
+		this.simulation = null
+		
+		this._path = {
+			steps: new Set(),
+			pendingStep: null
+		}
 
 		this._rules = []
 		this._ruleId = 0
@@ -16,28 +18,28 @@ class SDNData {
 
     appendPathStep(options) {  
 		// options è: {device, ingressPort || egressPort }. Ogni campo è string || number
-        if (!this._pendingStep) {
-            this._pendingStep = options
+        if (!this._path.pendingStep) {
+            this._path.pendingStep = options
         } else {
             let step = {
                 device: options.device,
-                ingressPort: this._pendingStep.ingressPort,
+                ingressPort: this._path.pendingStep.ingressPort,
                 egressPort: options.egressPort
             }
-            this._pendingStep = null
-            this._newPath.add(step)
+            this._path.pendingStep = null
+            this._path.steps.add(step)
         }
     }
 
     pathHasAtLeastOneStep() {
-        return this._newPath.size > 0
+        return this._path.steps.size > 0
     }
 
     discardPath() {
-		if (this._newPath.size)
-			this._newPath = new Set()
-        this._pendingStep = null
-    }
+		if (this._path.steps.size)
+			this._path.steps = new Set()
+		this._path.pendingStep = null
+	}
 
 	/* --------------------------------------------- */
     /* ------------------- RULES ------------------- */
@@ -104,7 +106,7 @@ class SDNData {
 
     getPathSteps() {
         if (this.pathHasAtLeastOneStep())
-            return this._newPath
+            return this._path.steps
     }
 
     getRules(){

@@ -1,6 +1,6 @@
 function makeMachineFolders(netkit, lab) {
     for (let machine of netkit)
-        lab.folder[machine.name] = ""
+        lab.folders.push(machine.name)
 }
 
 function makeStartupFiles(netkit, lab) {
@@ -26,7 +26,8 @@ function makeLabInfo(info, lab) {
         if (info.email && info.email != "")
             lab.file["lab.conf"] += 'LAB_EMAIL="' + info.email + '"\n'
         if (info.web && info.web != "")
-            lab.file["lab.conf"] += 'LAB_WEB="' + info.web + '"\n'
+			lab.file["lab.conf"] += 'LAB_WEB="' + info.web + '"\n'
+		if (lab.file["lab.conf"] != "") lab.file["lab.conf"] += '\n'
     }
 }
 
@@ -42,8 +43,7 @@ function makeLabConfFile(netkit, lab) {
                 lab.file["lab.conf"] += machine.name + "[" + interface.eth.number + "]=" + interface.eth.domain + "\n"
             }
         }
-        if (lab.file["lab.conf"] != "")
-            lab.file["lab.conf"] += "\n"
+		lab.file["lab.conf"] += "\n"
     }
 }
 
@@ -54,7 +54,7 @@ function makeLabConfFile(netkit, lab) {
 function makeTerminal(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'terminal' && machine.pc.dns && machine.pc.dns != "-") {
-            lab.folder[machine.name + "/etc"] = ""
+            lab.folders.push(machine.name + "/etc")
             lab.file[machine.name + "/etc/resolv.conf"] = "nameserver " + machine.pc.dns + "\n"
         }
     }
@@ -64,7 +64,7 @@ function makeWebserver(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'ws') {
             if (machine.ws.userdir == true) {
-                lab.folder[machine.name + "/home/guest/public_html"] = ""
+                lab.folders.push(machine.name + "/home/guest/public_html")
                 lab.file[machine.name + "/home/guest/public_html/index.html"] = '<html><head><title>Guest Home</title></head><body>Guest Home</body></html>'
                 lab.file[machine.name + ".startup"] += "a2enmod userdir\n"
             }
@@ -94,7 +94,7 @@ function makeNameserver(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'ns') {
             lab.file[machine.name + ".startup"] += "/etc/init.d/bind start\n"
-            lab.folder[machine.name + "/etc/bind"] = ""
+            lab.folders.push(machine.name + "/etc/bind")
             lab.file[machine.name + "/etc/bind/named.conf"] = ""
         }
         //Trovo il root-ns e lo salvo
@@ -207,7 +207,7 @@ function makeRouter(netkit, lab) {
         if (machine.name && machine.name != "" && machine.type == 'router') {
             if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
                 lab.file[machine.name + ".startup"] += "/etc/init.d/zebra start\n"
-                lab.folder[machine.name + "/etc/zebra"] = ""
+                lab.folders.push(machine.name + "/etc/zebra")
                 lab.file[machine.name + "/etc/zebra/daemons"] = "zebra=yes\n"
 
                 lab.file[machine.name + "/etc/zebra/zebra.conf"] = "hostname zebra\n"
@@ -307,11 +307,20 @@ function makeRouter(netkit, lab) {
 function makeOVSwitch(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
-            lab.file[machine.name + ".startup"] += "\n" +
+			lab.file[machine.name + ".startup"] += "\n" +
+				// "sleep 15\n\n" +		// TODO: Gabriele ha fatto così
                 "service openvswitch-switch start\n\n" +
-                "ovs-vsctl add-br br0\n\n" +
-                machine.interfaces.if.map(el => "ovs-vsctl add-port br0 eth" + el.eth.number).join('\n') +
-                "\n\nifconfig br0 up"
+                "ovs-vsctl add-br br0\n" +
+                machine.interfaces.if.map(function(el){
+					if (el.eth.number != 0) return "ovs-vsctl add-port br0 eth" + el.eth.number
+				}).join('\n') +
+				"\n" +
+				machine.interfaces.if.map(function(el){
+					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " up"
+				}).join('\n') +
+				"\n\n" +
+				"ovs-vsctl set bridge br0 protocols=[OpenFlow13]\n" +
+				"ovs-vsctl set-controller br0 tcp:192.168.0.1:6633\n"
         }
     }
 }
@@ -319,7 +328,10 @@ function makeOVSwitch(netkit, lab) {
 function makeRyuController(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'controller') {
-            // TODO
+			lab.folders.push(machine.name + "/etc/ryu")
+			lab.file[machine.name + "/etc/ryu/custom_app.py"] = ""	// TODO: Riempire il file. Come fare?
+			lab.file[machine.name + ".startup"] += "\n" +
+				"ryu-manager /etc/ryu/custom_app.py\n"
         }
     }
 }
@@ -330,13 +342,13 @@ function makeRyuController(netkit, lab) {
 
 function makeStaticRouting(netkit, lab) {
     // generazione networking e routing statico
+	let switchCounter = 0
     for (let machine of netkit) {
         if (machine.name && machine.name != "") {
-            let switchCounter = 0
             for (let interface of machine.interfaces.if) {
                 if (interface.eth.number == 0 && (machine.type == 'switch' || machine.type == 'controller')){
-                    interface.ip = "192.168." + (switchCounter % 254) + "." + (machine.type == 'controller' ? 1 : (switchCounter + 2)) + "/16"
-                    switchCounter++
+					interface.ip = "192.168." + (machine.type == 'controller' ? 0 : Math.floor(switchCounter / 254))
+						+ "." + (machine.type == 'controller' ? 1 : (switchCounter++ + 2)) + "/16"
                 }
                 //ifconfig eth_ SELFADDRESS/MASK up
                 if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != ""){
@@ -409,8 +421,8 @@ function makeBgpConf(router, lab) {
 }
 
 function makeFilesStructure(netkit, labInfo) {
-    var lab = []    // <------ EHHHH????????????    TODO: sistemare (se ho tempo/voglia di ricontrollare bene tutto)
-    lab.folder = []
+    var lab = []		// <------ EHHHH????????????    TODO: sistemare (se ho tempo/voglia di ricontrollare bene tutto)
+    lab.folders = []
     lab.file = []
     lab["warning"] = 0
     lab["error"] = 0
@@ -444,7 +456,7 @@ function makeScript(lab) {
         + 'cd "$(dirname "$0")/lab"\n'
         + "\n"
 
-    for (let folderName in lab.folder) {
+    for (let folderName of lab.folders) {
         text += "mkdir -p " + folderName + "\n"
     }
 
@@ -460,10 +472,10 @@ function makeScript(lab) {
     return text
 }
 
-function makeZip(lab) {     // TODO: Si può spostare in controller.js? (per coerenza)
+function makeZip(lab) {
     let zip = new JSZip()
 
-    for (let folderName in lab.folder) {
+    for (let folderName of lab.folders) {
         zip.folder(folderName)
     }
     for (let fileName in lab.file) {

@@ -1,6 +1,6 @@
 /* ------------------------- PREPARE RAW DATA ------------------------- */
 
-function loadSDN(config, forceStart) {	// TODO: Dividere in sottomoduli
+function loadSDN(config, forceStart) {	// TODO: Dividere in metodi più piccoli
 	if(!sdnData || forceStart){
 		config = JSON.parse(config)[0]
 		let data = { nodes: [], links: [] }
@@ -27,7 +27,7 @@ function loadSDN(config, forceStart) {	// TODO: Dividere in sottomoduli
 		sdnData = new SDNData(config)
 		startSimulation(data)
 	} else {
-		let answ = confirm('Are you sure? All data will be lost')
+		let answ = confirm('Are you sure? All labels and rules will be lost')
 		if (answ) {
 			cleanSVGs()
 			labelsDiv.reset()

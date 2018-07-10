@@ -218,7 +218,7 @@
 								<div id="{{machine._uid}}" class="anchor-id"></div>
 								<div>
 									<label>Machine {{machine.row}}:</label>
-									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc" required />
+									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc{{machine.row}}" required />
 								</div>
 								<p>
 									<input title="type" type="radio" value="terminal" data-ng-model="machine.type" /> Terminal</p>
@@ -255,11 +255,11 @@
 												<label>Eth{{i.eth.number}}: </label>
 												<input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
 											</div>
-											<div>
+											<div data-ng-show="machine.type!='switch'">
 												<label> IP/Net: </label>
 												<input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
 											</div>
-											<div>
+											<div data-ng-show="machine.type!='switch'">
 												<label> Complete DNS Name: </label>
 												<input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
 											</div>
@@ -272,28 +272,30 @@
 							</td>
 
 							<td class="gateways">
-								<p>
-									<span class="btn btn-success" data-ng-click="addGateway(machine)">
-										Add gateway</span>
-									<span class="btn btn-danger" data-ng-click="removeGateway(machine)" data-ng-disabled="machine.gateways.counter<=1">
-										Remove last gw</span>
-								</p>
-								<div data-ng-repeat="gateway in machine.gateways.gw">
-									<div>
-										<label>Route (empty for default gw):</label>
-										<input type="text" data-ng-model="gateway.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+								<div data-ng-show="machine.type!='switch' && machine.type!='controller'">
+									<p>
+										<span class="btn btn-success" data-ng-click="addGateway(machine)">
+											Add gateway</span>
+										<span class="btn btn-danger" data-ng-click="removeGateway(machine)" data-ng-disabled="machine.gateways.counter<=1">
+											Remove last gw</span>
+									</p>
+									<div data-ng-repeat="gateway in machine.gateways.gw">
+										<div>
+											<label>Route (empty for default gw):</label>
+											<input type="text" data-ng-model="gateway.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+										</div>
+										<div>
+											<label>GW (empty to generate nothing):</label>
+											<input type="text" data-ng-model="gateway.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
+										</div>
+										<div>
+											<label>Interface:</label>
+											<select title="eth" data-ng-model="gateway.if" class="form-control">
+												<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+											</select>
+										</div>
+										<hr>
 									</div>
-									<div>
-										<label>GW (empty to generate nothing):</label>
-										<input type="text" data-ng-model="gateway.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
-									</div>
-									<div>
-										<label>Interface:</label>
-										<select title="eth" data-ng-model="gateway.if" class="form-control">
-											<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
-										</select>
-									</div>
-									<hr>
 								</div>
 							</td>
 
@@ -705,7 +707,7 @@
 								<option value="TCP destination port">TCP dport</option>
 								<!--<option value="MPLS tc">MPLS TC</option>
 								<option value="vlan id">VLan ID</option>
-								TODO: altre opzioni eventualmente -->
+								TODO: altre opzioni eventualmente. Imposta anche i pattern -->
 							</select>
 							<dynamic-selection v-model="match.value"
 								v-bind:selection="match.name">
@@ -727,7 +729,7 @@
 								<option value="set field">Set field</option>
 								<option value="push header">Push header</option>
 								<option value="pop header">Pop header</option>
-								TODO: altre opzioni eventualmente -->
+								TODO: altre opzioni eventualmente. Imposta anche i pattern -->
 								<option value="prova">Prova</option><!-- TODO: cancellare questa riga -->
 							</select>
 							<div>
@@ -796,8 +798,7 @@
 	</div>
 
 	<script>
-		var electron, sdnData
-		var isCopied = false
+		var electron, sdnData, isCopied = false
 
 		window.onload = function () {
 			console.log("  _______          __   __    __  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
