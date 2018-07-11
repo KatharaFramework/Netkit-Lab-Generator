@@ -40,29 +40,28 @@
 	}
 }
 
+#sdnGraph {
+	margin-left: 5px;
+	background-image: url("../../assets/images/background.png");
+}
+
 /* ----------------- */
 /* ---- COMANDI ---- */
 /* ----------------- */
 
 #sdn-vertical-buttons {
-    width: 70px;
+    width: 80px;
     height: 800px;
 
-    overflow: hidden;
-    padding: 0;
+	overflow: hidden;
+	position: relative;
+	
+	text-overflow: ellipsis;
 }
 
 #sdn-vertical-buttons:hover {
-	width: 110px;
+	overflow: visible;
 }
-
-#sdn-vertical-buttons button {
-    padding: 5px 0;
-    margin: 0;
-    width: 100%;
-    height: 50px;
-}
-
 /* ----------------- */
 /* ----- NODES ----- */
 /* ----------------- */
@@ -325,14 +324,17 @@ rect.bar {
 #details3 .minimal-input,
 .minimal-input {
 	border: 0px;
-	border-bottom: 1px solid lightblue;
+	border-bottom: 2px solid lightblue;
 	text-align: right;
 }
 
-.answer-selection {
-	background-color: white;
-    min-width: 180px;
-	padding: 1px 10px;
+#details3 .tab {
+	cursor: pointer;
+	padding: 5px;
+}
+
+#details3 .tab.active {
+	border-bottom: 2px solid lightblue;
 }
 
 /* ----------------- */
@@ -375,4 +377,10 @@ rect.bar {
 #rule-modal .half:first-child button.btn-success {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+.answer-selection {
+	background-color: white;
+    min-width: 180px;
+	padding: 1px 10px;
 }

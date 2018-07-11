@@ -218,7 +218,7 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
     }
 
     $scope.loadSDN = function(netkitData, labInfoData){
-        loadSDN($scope.generateConfig(netkitData, labInfoData))
+        loadSDN(JSON.parse($scope.generateConfig(netkitData, labInfoData))[0].netkit)
     }
 
     $scope.import = function () {

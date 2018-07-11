@@ -10,8 +10,12 @@ let controllerDiv = new Vue({
 			ip: ''
 		},
 		rulesSection: {
-			visible: false,
+			visible: 0,
 			rules: '',
+			submittedRules: {
+				rules: [],
+				representation: ''
+			},
 			filter: ''
 		}
 	},
@@ -24,7 +28,7 @@ let controllerDiv = new Vue({
 			if (section == 1) this.howtoVisibility = true
 			else if (section == 2) this.controllerSection.visible = true
 			else if (section == 3) {
-				this.rulesSection.visible = true
+				this.rulesSection.visible = 1
 				this.filterRulesByDevice()
 			}
 		},
@@ -33,31 +37,52 @@ let controllerDiv = new Vue({
 			this.visible = false
 			this.howtoVisibility = false
 			this.controllerSection.visible = false
-			this.rulesSection.visible = false
+			this.rulesSection.visible = 0
 
 			this.rulesSection.filter = ''
 		},
 
 		connect(){
 			let bottoniDiv = document.getElementById('sdn-vertical-buttons')
-			bottoniDiv.children[0].disabled = false
-			bottoniDiv.children[1].disabled = false
+			bottoniDiv.children[0].classList.remove('disabled')
+			bottoniDiv.children[1].classList.remove('disabled')
 		
 			this.controllerSection.connected = true
 			this.controllerSection.buttonText = 'Connected'
 		},
 
 		filterRulesByDevice() {
+			let rules = this.rulesSection.visible == 1 ? sdnData.getRules() : this.rulesSection.submittedRules.rules
+			let representation
+
 			if(!this.rulesSection.filter) {
-				this.rulesSection.rules = JSON.stringify(
-					sdnData.getRules().filter(rule => !rule.deleted), null, 4
+				representation = JSON.stringify(
+					rules.filter(rule => !rule.deleted), null, 4
 				)
 			} else {
-				this.rulesSection.rules = JSON.stringify(
-					sdnData.getRules().filter(rule => !rule.deleted && rule.device == this.rulesSection.filter),
-					null, 4
+				representation = JSON.stringify(
+					rules.filter(rule => !rule.deleted && rule.device == this.rulesSection.filter),null, 4
 				)
 			}
+
+			if(this.rulesSection.visible == 1) this.rulesSection.rules = representation
+			else if(this.rulesSection.visible == 2) this.rulesSection.submittedRules.representation = representation
+		},
+
+		showSimulatedRules(){
+			this.rulesSection.filter = ''
+			this.rulesSection.visible = 1
+			this.filterRulesByDevice()
+		},
+
+		showSubmittedRules(){
+			this.rulesSection.filter = ''
+			this.rulesSection.visible = 2
+			this.filterRulesByDevice()
+		},
+
+		submit(){
+			this.rulesSection.submittedRules.rules = JSON.parse(JSON.stringify(sdnData.getRules()))
 		}
 	}
 })
@@ -65,6 +90,7 @@ let controllerDiv = new Vue({
 function submitToController() {
 	// TODO
 	confirm('Rules are going to be installed in the controller')
+	controllerDiv.submit()
 }
 
 function getFromController() {

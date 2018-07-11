@@ -23,7 +23,7 @@ function resetButtons() {
 	)
 
 	document.getElementById('sdn-vertical-buttons').classList.remove('hidden')
-	let hideNetworkButton = document.querySelectorAll('#sdn-vertical-buttons button').item(2)
+	let hideNetworkButton = document.querySelectorAll('#sdn-vertical-buttons a').item(2)
 	hideNetworkButton.innerText = 'Hide external network'
 	hideNetworkButton.stato = false
 }

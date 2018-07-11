@@ -40,45 +40,33 @@ function draw(nodes, edges) {
         },
         groups: {
             'terminal': {
-                color: BLUE,
                 image: DIR + 'terminal.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white'},
-                value: 8
             },
             'router': {
-                color: ORANGE,
                 image: DIR + 'router.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white', size: 15},
-                value: 6
             },
             'ns': {
-                color: GREEN,
                 image: DIR + 'nameserver.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white'},
-                value: 8
             },
             'ws': {
-                color: RED,
                 image: DIR + 'webserver.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white'},
                 value: 8
             },
             'switch': {
-                
+				image: DIR + 'switch.png',
+                shape: 'image',
             },
             'controller': {
-                
+				image: DIR + 'controller.png',
+                shape: 'image',
             },
             'other': {
-                color: GREEN,
                 image: DIR + 'other.png',
                 shape: 'image',
-                font: {strokeWidth: 2, strokeColor: 'white'},
-                value: 8
             },
             'domain': {
                 color: BLACK,

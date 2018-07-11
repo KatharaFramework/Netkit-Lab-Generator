@@ -1,42 +1,47 @@
 /* ------------------------- PREPARE RAW DATA ------------------------- */
 
-function loadSDN(config, forceStart) {	// TODO: Dividere in metodi più piccoli
-	if(!sdnData || forceStart){
-		config = JSON.parse(config)[0]
-		let data = { nodes: [], links: [] }
-		let networks = new Set()
-	
-		for (let macchina of config.netkit) {
-			if(macchina.type != 'controller'){
-				let node = { id: macchina.name, type: macchina.type }
-				data.nodes.push(node)
-				macchina.interfaces.if.forEach(function (interfaccia) {
-					let nomeDominio = interfaccia.eth.domain
-					if(nomeDominio != 'SDNRESERVED'){
-						networks.add(nomeDominio)
-						data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
-					}
-				})
-			}
-		}
-	
-		networks.forEach(domainName => data.nodes.push({ id: domainName, type: "network" }))   // Creo i nodi delle reti
-		findEdgeNetworks(data)
-	
+function loadSDN(machinesConfig, forceStart) {
+	if(!machinesConfig.some(machine => machine.type == 'switch'))
+		alert("La rete descritta non è SDN: inserire almeno 1 controller e 1 switch")
+
+	else if(!sdnData || forceStart){
+		let simulationData = makeNodesAndEdges(machinesConfig)
+		sdnData = new SDNData(machinesConfig)
+
 		resetButtons()
-		sdnData = new SDNData(config)
-		startSimulation(data)
-	} else {
-		let answ = confirm('Are you sure? All labels and rules will be lost')
-		if (answ) {
-			cleanSVGs()
-			labelsDiv.reset()
-			rulesDiv.close()
-			controllerDiv.close()
-			
-			loadSDN(config, true)
+		startSimulation(simulationData)
+		
+	} else if (confirm('Are you sure? All labels and rules will be lost')) {
+		cleanSVGs()
+		labelsDiv.reset()
+		rulesDiv.close()
+		controllerDiv.close()
+		
+		loadSDN(machinesConfig, true)
+	}
+}
+
+function makeNodesAndEdges(machines){
+	let data = { nodes: [], links: [] }
+	let networks = new Set()
+
+	for (let machine of machines) {
+		if(machine.type != 'controller'){
+			let node = { id: machine.name, type: machine.type }
+			data.nodes.push(node)
+			machine.interfaces.if.forEach(function (interfaccia) {
+				let nomeDominio = interfaccia.eth.domain
+				if(nomeDominio != 'SDNRESERVED'){
+					networks.add(nomeDominio)
+					data.links.push({ source: node, target: nomeDominio, porta: interfaccia.eth.number })    // Creo i link macchina-dominio
+				}
+			})
 		}
 	}
+
+	networks.forEach(domainName => data.nodes.push({ id: domainName, type: "network" }))   // Creo i nodi delle reti
+	findEdgeNetworks(data)
+	return data
 }
 
 function findEdgeNetworks(data) {

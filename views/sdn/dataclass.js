@@ -1,6 +1,6 @@
 class SDNData {
     constructor(kataraConfig) {
-		this._kataraConfig = kataraConfig.netkit
+		this._kataraConfig = kataraConfig
 		this.simulation = null
 		
 		this._path = {

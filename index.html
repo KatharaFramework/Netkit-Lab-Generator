@@ -34,7 +34,7 @@
 						<a href="#home" onclick="toggle_tab(event, this)">Home</a>
 					</li>
 					<li>
-						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Graph</a>
+						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Topology</a>
 					</li>
 					<li>
 						<a href="#sdn" onclick="toggle_tab(event, this)">SDN</a>
@@ -112,6 +112,7 @@
 				<link rel="stylesheet" href="views/home/home.css" />
 				<script src="views/home/model.js"></script>
 				<script src="views/home/make.js"></script>
+				
 				<div>
 					<h1>Netkit Lab Generator</h1>
 					<h4>
@@ -498,14 +499,14 @@
 
 					<!-- Vertical buttons -->
 					<div id="sdn-vertical-buttons" class="hidden">
-						<button class="btn btn-success" onclick="submitToController()" disabled>Submit</button>
-						<button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
-						<button class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</button>
-						<!-- <button class="btn btn-warning">Scheduler</button> -->
-						<button style="position: relative; top:450px" onclick="controllerDiv.open(1)" class="btn btn-primary">HOW TO</button>
-						<button style="position: relative; top:450px" onclick="controllerDiv.open(3)" class="btn btn-primary">SHOW RULES</button>
-						<button style="position: relative; top:450px" onclick="controllerDiv.open(2)" class="btn btn-success">CONTROLLER</button>
-						<button style="position: relative; top:450px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
+						<a class="btn btn-success disabled" onclick="submitToController()">Submit</a>
+						<a class="btn btn-success disabled" onclick="getFromController()">Update</a>
+						<a class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</a>
+						<!-- <a class="btn btn-warning">Scheduler</a> -->
+						<a style="position: relative; top:500px" onclick="controllerDiv.open(1)" class="btn btn-primary">HOW TO</a>
+						<a style="position: relative; top:500px" onclick="controllerDiv.open(3)" class="btn btn-primary">SHOW RULES</a>
+						<a style="position: relative; top:500px" onclick="controllerDiv.open(2)" class="btn btn-success">CONTROLLER</a>
+						<a style="position: relative; top:525px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</a>
 					</div>
 
 					<!-- Main graph (unfilled) -->
@@ -660,12 +661,16 @@
 						<div v-if="rulesSection.visible">
 							<h3>Rules</h3>
 							<hr>
-							<div style="text-align: right; margin-bottom: 10px">
-								<input v-on:change="filterRulesByDevice"
-									v-model="rulesSection.filter"
-									type="text" placeholder="Device name">
-							</div>
-							<textarea v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
+							<span onclick="this.classList.add('active'); this.nextElementSibling.classList.remove('active')"
+								class="tab active" v-on:click="showSimulatedRules">Simulated</span>
+							<span onclick="this.classList.add('active'); this.previousElementSibling.classList.remove('active')"
+								class="tab" v-on:click="showSubmittedRules">Submitted</span>
+							<input style="float: right; margin: 0 0 5px 5px"
+								v-on:change="filterRulesByDevice"
+								v-model="rulesSection.filter"
+								type="text" placeholder="Device name">
+							<textarea v-if="rulesSection.visible==1" v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
+							<textarea v-else-if="rulesSection.visible==2" v-model="rulesSection.submittedRules.representation" cols="30" rows="10" disabled></textarea>
 						</div>
 					</div>
 					<script src="views/sdn/controllerinteraction.js"></script>

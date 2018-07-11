@@ -74,7 +74,8 @@ hr {
 
 .navbar-kathara {
     position: fixed;
-    border-radius: 0;
+	border: none;
+	border-radius: 0;
     width: 100%;
 	min-height: 0;
 }
@@ -99,7 +100,7 @@ hr {
 
 .navbar-kathara-secondary {
     z-index: 9995;
-    top: 50px;
+    top: 48px;
 }
 
 .navbar-kathara li a:active,
