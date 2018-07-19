@@ -100,7 +100,7 @@ function startSimulation(data) {
         .force("link", d3.forceLink(data.links)
             .id(function (d) { return d.id }))      // <-- specificando id posso riferirmi ai nodi attraverso il loro campo 'id' piuttosto che al loro indice nell'array dei nodi
         .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter(+svg.attr('width') / 2, +svg.attr('height') / 2))
+        .force("center", d3.forceCenter(450, 400))
 
     simulation.force("link")
         .distance(function (d) {

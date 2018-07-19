@@ -72,26 +72,32 @@ function enablePathSelection() {
 		let linkLock = 0
 		let lastSelection = null
 		let startsFromEdge = false
+		let lastSelectedIsEdge = false
 
 		d3.selectAll("circle.network:not(.external)").call(d3.drag()
 			.on("start", function (d, i, data) {
-				if(data[i].classList.contains('edge')) startsFromEdge = true
+				discardPath()
+
+				if(data[i].classList.contains('edge'))
+					startsFromEdge = true
 				data[i].classList.add('selected')
+
 				linkLock = 1
 				lastSelection = d.id
 				togglePathButtons(false)
 			})
-			.on("end", function (_, i, data) {
-				if(data[i].classList.contains('edge')) {
-					if(startsFromEdge) {
-						// TOOD
-					}
-					// TOOD
-				}
-				startsFromEdge = false
+			.on("end", function (d, i, data) {
 				if (linkLock == 1 && sdnData.pathHasAtLeastOneStep()){
+					if(startsFromEdge)
+						sdnData.setPathEdgeProps(true, false)
+					if(lastSelectedIsEdge)
+						sdnData.setPathEdgeProps(false, true)
+
 					togglePathButtons(true)
 				} else discardPath()
+
+				startsFromEdge = false
+				lastSelectedIsEdge = false
                 machineLocked = true
                 networksLocked = true
 				linkLock = 0
@@ -102,6 +108,10 @@ function enablePathSelection() {
 				if (!networksLocked && d.id == lastSelection && !data[i].classList.contains('selected')) {
 					linkLock++
 					networksLocked = true
+
+					if(data[i].classList.contains('edge'))
+						lastSelectedIsEdge = true
+					else lastSelectedIsEdge = false
 
 					data[i].classList.add('selected')
 				}
@@ -139,14 +149,7 @@ function enablePathSelection() {
 }
 
 function applyPath() {
-	for (let step of sdnData.getPathSteps()) {
-		let rule = sdnData.addRule(
-			step.device,
-			{ name: 'source port', value: step.ingressPort },
-			{ name: 'forward to port', value: step.egressPort }
-		)
-		labelsDiv.addNewRuleToActiveLabel(rule)
-	}
+	sdnData.getPath().forEach(step => labelsDiv.addStep(step))
 
 	togglePathButtons(false)
 	discardPath()

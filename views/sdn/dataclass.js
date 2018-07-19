@@ -4,8 +4,10 @@ class SDNData {
 		this.simulation = null
 		
 		this._path = {
-			steps: new Set(),
-			pendingStep: null
+			steps: [],
+			pendingStep: null,
+			startsFromEdge: false,
+			endsOnEdge: false
 		}
 
 		this._rules = []
@@ -24,22 +26,42 @@ class SDNData {
             let step = {
                 device: options.device,
                 ingressPort: this._path.pendingStep.ingressPort,
-                egressPort: options.egressPort
+				egressPort: options.egressPort,
+				isStart: false,
+				isEnd: false
             }
             this._path.pendingStep = null
-            this._path.steps.add(step)
+            this._path.steps.push(step)
         }
     }
 
     pathHasAtLeastOneStep() {
-        return this._path.steps.size > 0
+        return this._path.steps.length > 0
     }
 
     discardPath() {
-		if (this._path.steps.size)
-			this._path.steps = new Set()
+		if (this._path.steps.length)
+			this._path.steps = []
 		this._path.pendingStep = null
+		this._path.startsFromEdge = false
+		this._path.endsOnEdge = false
 	}
+
+	setPathEdgeProps(startsFromEdge, endsOnEdge){
+		if(startsFromEdge) this._path.startsFromEdge = true
+		if(endsOnEdge) this._path.endsOnEdge = true
+	}
+
+    getPath() {
+        if (this.pathHasAtLeastOneStep()){
+			if(this._path.startsFromEdge)
+				this._path.steps[0].isStart = true
+			if(this._path.endsOnEdge)
+				this._path.steps[this._path.steps.length - 1].isEnd = true
+
+            return this._path.steps
+		}
+    }
 
 	/* --------------------------------------------- */
     /* ------------------- RULES ------------------- */
@@ -48,21 +70,22 @@ class SDNData {
     addRule() {
 		let device,
 			matches,
-			action,
+			actions,
 			priority = 0,
 			idleTimeout = 0,
 			hardTimeout = 0,
 			stats = 0
 
 		if(arguments.length == 3){
-			[device, matches, action] = arguments
+			[device, matches, actions] = arguments
 		} else if(arguments.length == 6){
-			[device, matches, action, priority, idleTimeout, hardTimeout] = arguments
+			[device, matches, actions, priority, idleTimeout, hardTimeout] = arguments
 		}
 
 		if(!Array.isArray(matches)) matches = [matches]
+		if(!Array.isArray(actions)) actions = [actions]
 		
-		let rule = { device, matches, action, priority, idleTimeout, hardTimeout, stats }
+		let rule = { device, matches, actions, priority, idleTimeout, hardTimeout, stats }
 		this._rules.push(rule)
 		return rule
     }
@@ -102,11 +125,6 @@ class SDNData {
 
     setSimulation(simulation) {
         this.simulation = simulation
-    }
-
-    getPathSteps() {
-        if (this.pathHasAtLeastOneStep())
-            return this._path.steps
     }
 
     getRules(){

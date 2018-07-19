@@ -510,7 +510,7 @@
 					</div>
 
 					<!-- Main graph (unfilled) -->
-					<svg id="sdnGraph" width="800" height="800"></svg>
+					<svg id="sdnGraph" width="900" height="800"></svg>
 					
 					<!-- Details (labels details)-->
 					<div id="details" v-show="visible && (newLabel.show || labels.length)">
@@ -554,14 +554,18 @@
 											onclick="triggerEdit(this)">
 											<td>{{ (index + 1) }}</td>
 											<td>
-												<rule-match v-for="match in rule.matches"
+												<rule-element v-for="match in rule.matches"
 													v-bind:name="match.name"
 													v-bind:value="match.value"
 													v-bind:label="match.label">
-												</rule-match>
+												</rule-element>
 											</td>
 											<td>
-												{{ rule.action.name }} {{ rule.action.value }}
+												<rule-element v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-element>
 											</td>
 											<td>{{ rule.priority }}</td>
 											<td>{{ rule.idleTimeout }}</td>
@@ -588,13 +592,17 @@
 											onclick="triggerEdit(this)">
 											<td>{{ (packetRules.length + index + 1) }}</td>
 											<td>
-												<rule-match v-for="match in rule.matches"
+												<rule-element v-for="match in rule.matches"
 													v-bind:name="match.name"
 													v-bind:value="match.value"
 													v-bind:label="match.label">
-												</rule-match>
+												</rule-element>
 											<td>
-												{{ rule.action.name }} {{ rule.action.value }}
+												<rule-element v-for="action in rule.actions"
+													v-bind:name="action.name"
+													v-bind:value="action.value"
+													v-bind:label="action.label">
+												</rule-element>
 											</td>
 											<td>{{ rule.priority }}</td>
 											<td>{{ rule.idleTimeout }}</td>
@@ -620,20 +628,20 @@
 							This tool allows you to configure the network flow of a software defined network (SDN) built on Katharà.
 							Firstly you need to specify topology in the main tab.
 							Then you can click 'Start simulation' and you will see your network appear: blue circles are the switches,
-							black ones are the netwroks. Gray circles represent the external network. They can be hidden with the button on
-							the left. The controller node is hidden, but it exists and it is connected to all switches through a dedicated
-							network!
+							black ones are the netwroks. Gray and white circles represent the external network. They can be hidden with
+							the button on the left. The controller node is hidden, but it exists and it is connected to all switches
+							through a dedicated network!
 							<hr>
 							Labels represent a flow inside the network. They are like colored tunnels in which packets moves accordingly
 							to certain rules. Colors and paths are arbitrary.
-							To create a tunnel click on the green button on top of the graph. Once created there is no rule to tell
-							the packets how to get in the tunnel yet.
+							To create a tunnel click on the green button on top of the graph. Packets don't survive the external networks
+							so, when a white circle is included in the flow, the program will automatically add a rule to tag/untag the
+							packets. The default match for tagging packets is the port from where the packet is received.
 							<hr>
-							To let a flow of packets enter a tunnel you have to create a 'packet rule' by clicking on a switch and then on the 'create
-							new rule' button. This will prompt a window where you can specify which packet should match the definition of flow
-							and which should not. You can use the 'action' dropdown to indicate a label to apply to those packets.
-							You can edit or remove a rule opening the switch details and clicking on the row of the table which represents it: the modal
-							will popup.
+							To create a custom rule, click on a switch and then click on the 'create new rule' button. This will prompt
+							a window where you can specify which packet should match the rule and which action will be applied on it.
+							You can edit or remove a rule created before by opening the switch details and clicking on the row of the
+							table which represents that rule: the modal will popup again.
 							<hr>
 							When flows and matches are defined, you can submit the newly created rules to the controller by clicking the
 							'controller' tab and specifying the parameters of the controller connection.
@@ -671,6 +679,7 @@
 								type="text" placeholder="Device name">
 							<textarea v-if="rulesSection.visible==1" v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
 							<textarea v-else-if="rulesSection.visible==2" v-model="rulesSection.submittedRules.representation" cols="30" rows="10" disabled></textarea>
+							<button v-if="rulesSection.visible==1" class="btn btn-warning" style="float: right;">Export JSON</button>
 						</div>
 					</div>
 					<script src="views/sdn/controllerinteraction.js"></script>
@@ -693,8 +702,12 @@
 					<div class="half">
 						<h2>Match</h2>
 						<p>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewMatchLine">Add</button>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastMatchLine">Remove</button>
+							<button class="btn btn-success"
+								:disabled="rule.matches.some(el => el.name=='any')"
+								v-on:click="makeNewMatchLine">Add</button>
+							<button v-if=""
+								:disabled="rule.matches.length==1 || rule.matches.some(el => el.name=='any')"
+								class="btn btn-danger" v-on:click="removeLastMatchLine">Remove</button>
 						</p>
 						<div v-for="(match, index) in rule.matches">
 							<select v-model="match.name">
@@ -704,12 +717,12 @@
 								<option value="source port">Source port</option>
 								<option value="MAC source">MAC src</option>
 								<option value="MAC destination">MAC dst</option>
-								<option value="eth type">Eth type</option>
 								<option value="IP source">IP src</option>
 								<option value="IP destination">IP dst</option>
 								<option value="IP port">IP port</option>
 								<option value="TCP source port">TCP sport</option>
 								<option value="TCP destination port">TCP dport</option>
+								<!-- <option value="eth type">Eth type</option> -->
 								<!--<option value="MPLS tc">MPLS TC</option>
 								<option value="vlan id">VLan ID</option>
 								TODO: altre opzioni eventualmente. Imposta anche i pattern -->
@@ -722,10 +735,18 @@
 
 					<div class="half">
 						<h2>Action</h2>
-						<div>
-							<select v-model="rule.action.name">
+						<p>
+							<button class="btn btn-success"
+								v-on:click="makeNewActionLine">Add</button>
+							<button class="btn btn-danger"
+								:disabled="rule.actions.length==1"
+								v-on:click="removeLastActionLine">Remove</button>
+						</p>
+						<div v-for="(action, index) in rule.actions">
+							<select v-model="action.name">
 								<option disabled value="noselection">Select...</option>
 								<option v-if="labels.length" value="set MPLS label">Set MPLS label</option>
+								<option value="remove MPLS label">Remove MPLS label</option>
 								<option value="forward to port">Forward to port</option>
 								<option value="send to controller">Send to controller</option>
 								<option value="drop">Drop</option>
@@ -738,21 +759,21 @@
 								<option value="prova">Prova</option><!-- TODO: cancellare questa riga -->
 							</select>
 							<div>
-								<select v-if="rule.action.name == 'set MPLS label'"
-									v-model="rule.action.value" class="answer-selection">
+								<select v-if="action.name == 'set MPLS label' || action.name == 'remove MPLS label'"
+									v-model="action.value" class="answer-selection">
 									<option v-for="label in labels" v-bind:value="label.name">
 										{{ label.name }}
 									</option>
 								</select>
-								<select v-else-if="rule.action.name == 'forward to port'"
-									v-model="rule.action.value" class="answer-selection">
+								<select v-else-if="action.name == 'forward to port'"
+									v-model="action.value" class="answer-selection">
 									<option v-for="interface in deviceInfos.interfaces"
 										v-bind:value="interface.number">
 										eth{{ interface.number }}
 									</option>
 								</select>
-								<input v-model="rule.action.value"
-									v-else-if="['prova'].includes(rule.action.name)">
+								<input v-model="action.value"
+									v-else-if="['prova'].includes(action.name)">
 								</input><!-- TODO: eventualmente cancellare questo elemento-->
 							</div>
 						</div>

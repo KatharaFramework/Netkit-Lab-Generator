@@ -51,12 +51,26 @@ let labelsDiv = new Vue({
 			}
 		},
 
-		addNewRuleToActiveLabel(rule){
+		addStep(step){
+			let rule = sdnData.addRule(
+				step.device,
+				[{ name: 'source port', value: step.ingressPort }],
+				[{ name: 'forward to port', value: step.egressPort }]
+			)
+
+			this._addNewRuleToActiveLabel(rule, step.isStart, step.isEnd)
+		},
+
+		_addNewRuleToActiveLabel(rule, isStart, isEnd){
 			let labelComponent = this.findActive()
+			let label = this.labels.find(label => label.name == labelComponent.name)
+
+			if(!isStart) rule.matches.push({ name: 'MPLS label', value: label.name, label })
+			else rule.actions.push({ name: 'set MPLS label', value: label.name, label })
+
+			if(isEnd) rule.actions.push({ name: 'remove MPLS label', value: label.name, label })
+
 			labelComponent.rules.push(rule)
-			
-			let label = this.labels.find(label => label.name == label.name)
-			rule.matches[1] = { name: 'MPLS label', value: label.name, label }
 		},
 
 		findActive(){
@@ -109,13 +123,15 @@ let labelsDiv = new Vue({
 					'<thead>' +
 						'<th>device</th>' +
 						'<th>match</th>' +
+						'<th>auto tag</th>' +
 						'<th>action</th>' +
+						'<th>auto untag</th>' +
 						'<th v-if="remove.active" style="text-align: center; width: 5px">-</th>' +
 					'</thead>' +
 					'<tbody>' +
 						'<label-rule v-for="rule in rules" v-if="!rule.deleted"' +
 							'v-bind:device="rule.device" ' +
-							'v-bind:matches="rule.matches" v-bind:action="rule.action">'+
+							'v-bind:matches="rule.matches" v-bind:actions="rule.actions">'+
 						'</label-rule>' +
 					'</tbody>' +
 				'</table>' +
@@ -171,14 +187,22 @@ let labelsDiv = new Vue({
 		},
 
 		components: {'label-rule': {
-			props: ['device', 'matches', 'action'],
+			props: ['device', 'matches', 'actions'],
+			data: function(){
+				return {
+					autoTag: (this.actions[1] && !this.matches[1]) ? "Yes" : "No",
+					autoUntag: (this.actions[1] && this.matches[1]) ? "Yes" : "No"
+				}
+			},
 			template:
 				'<tr v-on:mouseenter="highlightMeOnGraph" v-on:mouseleave="unhighlightMeOnGraph">' +
 					'<td>{{ device }}</td>' +
 					'<td>{{ matches[0].name }} {{ matches[0].value }} ' +
 						'<span style="color: orange; float: right" v-if="matches.length > 2">+</span>' +
 					'</td>' +
-					'<td>{{ action.name }} {{ action.value }}</td>' +
+					'<td>{{ autoTag }}</td>' +
+					'<td>{{ actions[0].name }} {{ actions[0].value }}</td>' +
+					'<td>{{ autoUntag }}</td>' +
 					'<td v-if="$parent.remove.active">' +
 						'<button class="btn-danger" ' +
 						'v-on:click="removeMe()">-</button>' +
@@ -189,14 +213,14 @@ let labelsDiv = new Vue({
 					let rule = this.$parent.rules.find(rule => 
 						rule.device == this.device &&
 						rule.matches[0].value == this.matches[0].value &&
-						rule.action.value == this.action.value
+						rule.actions[0].value == this.actions[0].value
 					)
 					rule.deleted = true
 					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1)
 				},
 
 				highlightMeOnGraph(){
-					highlightSegmentOnGraph(this.device, this.matches[0].value, this.action.value)
+					highlightSegmentOnGraph(this.device, this.matches[0].value, this.actions[0].value)
 				},
 
 				unhighlightMeOnGraph(){

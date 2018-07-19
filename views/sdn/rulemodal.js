@@ -8,10 +8,10 @@ let ruleModal = new Vue({
 				name: 'any',
 				value: ''
 			}],
-			action: {
+			actions: [{
 				name: 'noselection',
 				value: ''
-			},
+			}],
 			priority: 0,
 			idleTimeout: 0,
 			hardTimeout: 0
@@ -45,10 +45,19 @@ let ruleModal = new Vue({
 				this.rule.matches.pop()
 		},
 
+		makeNewActionLine(){
+			this.rule.actions.push({ name: 'noselection', value: '' })
+		},
+
+		removeLastActionLine(){
+			if (this.rule.actions.length > 1)
+				this.rule.actions.pop()
+		},
+
 		resetRuleValues() {
 			this.rule = {
 				matches: [{ name: 'any', value: '' }],
-				action: { name: 'noselection', value: '' },
+				actions: [{ name: 'noselection', value: '' }],
 				priority: 0,
 				idleTimeout: 0,
 				hardTimeout: 0
@@ -57,12 +66,12 @@ let ruleModal = new Vue({
 
 		makeRule() {
 			if(!this.originalRule){
-				if(this.rule.action.name != 'noselection' &&
+				if(!this.rule.actions.some(action => action.name == 'noselection') &&
 					!this.rule.matches.some(match => match.name == 'noselection')){
 					let rule = sdnData.addRule(
 						this.deviceInfos.name,
 						this.rule.matches,
-						this.rule.action,
+						this.rule.actions,
 						this.rule.priority,
 						this.rule.idleTimeout,
 						this.rule.hardTimeout,

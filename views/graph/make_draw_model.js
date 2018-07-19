@@ -229,10 +229,6 @@ function generate_nodes_edges(lab) {
 					length: LENGTH_CLOSE, width: WIDTH_SCALE
 				})
 			}
-			// switch to domain
-		// TODO
-			// switch to switch
-		// TODO
 		}
 	}
 	return { nodes, edges }

@@ -362,19 +362,19 @@ rect.bar {
 	margin: 5px;
 }
 
-#rule-modal .half:first-child button {
+#rule-modal .half button {
     min-width: 80px;
     margin-bottom: 5px;
     border-radius: 15px;
     padding: 0;
 }
 
-#rule-modal .half:first-child button.btn-danger {
+#rule-modal .half button.btn-danger {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
-#rule-modal .half:first-child button.btn-success {
+#rule-modal .half button.btn-success {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }

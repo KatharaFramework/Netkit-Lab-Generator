@@ -16,7 +16,10 @@ let rulesDiv = new Vue({
 			
 			let rules = sdnData.getDeviceRules(device)
 			if(rules){
-				this.packetRules = rules.filter(rule => !rule.matches.some(match => match.label) && !rule.deleted)
+				this.packetRules = rules.filter(rule =>
+					!( rule.matches.some(match => match.label)
+						|| rule.actions.some(action => action.label)
+					) && !rule.deleted)
 				this.labelRules = rules.filter(rule => !this.packetRules.includes(rule) && !rule.deleted)
 			}
 			
@@ -43,7 +46,7 @@ let rulesDiv = new Vue({
 	},
 
 	components: {
-		'rule-match': {
+		'rule-element': {
 			props: ['name', 'value', 'label'],
 			template:
 				'<div>' +
@@ -51,7 +54,7 @@ let rulesDiv = new Vue({
 					'<span v-if="label" class="colorTag" ' +
 						'v-bind:style="{ backgroundColor: label.color }">' +
 					'</span>' +
-					'<span v-else>{{ name }} </span>' +
+					'<span>{{ name }} </span>' +
 					'{{ value }}' +
 				'</div>'
 		},
