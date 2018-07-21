@@ -59,3 +59,14 @@ function cleanSVGs() {
     for (let svg of document.getElementsByTagName('svg'))
         svg.innerHTML = ""
 }
+
+function downloadString(string, filename){
+	let element = document.body.appendChild(document.createElement('a'))
+	element.setAttribute('href', 'data:text/plaincharset=utf-8,' + encodeURIComponent(string))
+	element.setAttribute('download', filename)
+	element.style.display = 'none'
+	
+	element.click()
+	
+	document.body.removeChild(element)
+}

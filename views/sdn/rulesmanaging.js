@@ -5,7 +5,10 @@ let rulesDiv = new Vue({
 
 		device: null,
 		packetRules: [],
-		labelRules: []
+		labelRules: [],
+
+		activeSection: 1,	// 1: Pacchetti 2: Statistiche 3: Inspect
+		connectedToController: false
 	},
 	methods: {
 		open(device){
@@ -22,8 +25,6 @@ let rulesDiv = new Vue({
 					) && !rule.deleted)
 				this.labelRules = rules.filter(rule => !this.packetRules.includes(rule) && !rule.deleted)
 			}
-			
-			fillRulesSVG(this.packetRules.concat(this.labelRules))
 		},
 
 		close(){
@@ -42,6 +43,19 @@ let rulesDiv = new Vue({
 				ruleIndex -= this.packetRules.length
 				ruleModal.editRule(this.labelRules[ruleIndex])
 			}
+		},
+
+		switchTab(tabNum){
+			this.activeSection = tabNum
+			if(tabNum == 2 && controllerDiv.controllerSection.connected) this.updateSVG()
+		},
+
+		updateSVG(){
+			fillRulesSVG(this.packetRules.concat(this.labelRules))
+		},
+
+		setConnected(){
+			this.connectedToController = true
 		}
 	},
 
@@ -108,5 +122,6 @@ function fillRulesSVG(rulesData) {
         .attr("x", function (d) { return x(d.num) })
         .attr("y", function (d) { return y(d.stats) })
         .attr("width", x.bandwidth())
-        .attr("height", function (d) { return height - y(d.stats) })
+		.attr("height", function (d) { return height - y(d.stats) })
+		.attr("fill", "var(--main-color)")
 }

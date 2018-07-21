@@ -52,20 +52,26 @@ function isElectron() {
 }
 
 function copyLab(e) {
-    e.preventDefault()
+	e.preventDefault()
+	
     let script = document.getElementById('sh_script').value
-    electron.ipcRenderer.send('script:copy', script)
-    isCopied = true
-    let lStartButton = document.getElementById('lstart').classList.remove("disabledLink")
-    let lCleanButton = document.getElementById('lclean').classList.remove("disabledLink")
+	electron.ipcRenderer.send('script:copy', script, 'script.sh')
+	
+    document.getElementById('lstart').classList.remove("disabledLink")
+    document.getElementById('lclean').classList.remove("disabledLink")
+	isCopied = true
 }
 
 function executeStart(e) {
-    executeGeneric(e, "execute")
+    toggle_submenu(-1)
+	executeGeneric(e, "execute")
+	isRunning = true
 }
 
 function executeClean(e) {
-    executeGeneric(e, "clean")
+    toggle_submenu(-1)
+	executeGeneric(e, "clean")
+	isRunning = false
 }
 
 function executeGeneric(e, command){

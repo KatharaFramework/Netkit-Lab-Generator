@@ -12,7 +12,7 @@ let labelsDiv = new Vue({
 	methods: {
 		createNewLabel() {
 			if (this.newLabel.name && this.newLabel.color){
-				let colorInputEl = this.$el.firstElementChild.firstElementChild
+				let colorInputEl = this.$el.lastElementChild.firstElementChild
 				let nameInputEl = colorInputEl.nextElementSibling
 				if(colorInputEl.validity.valid && nameInputEl.validity.valid &&
 					!this.labels.some(el => el.name == this.newLabel.name)){

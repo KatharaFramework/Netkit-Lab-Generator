@@ -7,7 +7,11 @@ let controllerDiv = new Vue({
 			visible: false,
 			connected: false,
 			buttonText: 'Connetti',
-			ip: ''
+			network: '',
+			disclaimer: {
+				visibility: false,
+				text: ''
+			}
 		},
 		rulesSection: {
 			visible: 0,
@@ -42,13 +46,43 @@ let controllerDiv = new Vue({
 			this.rulesSection.filter = ''
 		},
 
-		connect(){
-			let bottoniDiv = document.getElementById('sdn-vertical-buttons')
-			bottoniDiv.children[0].classList.remove('disabled')
-			bottoniDiv.children[1].classList.remove('disabled')
-		
-			this.controllerSection.connected = true
-			this.controllerSection.buttonText = 'Connected'
+		toggleConnect(){
+			if(!isRunning){
+				this.popDisclaimer('In order to connect to the controller, you have to run the lab first!')
+
+			} else if(this.controllerSection.network != ''){
+				let bottoniDiv = document.getElementById('sdn-vertical-buttons')
+				let controllerName = sdnData.getControllerName()
+
+				if(!this.controllerSection.connected){
+					electron.ipcRenderer.send('sdn:connect', this.controllerSection.network, controllerName)
+
+					setTimeout(() => {
+						bottoniDiv.children[0].classList.remove('disabled')
+						bottoniDiv.children[1].classList.remove('disabled')
+					
+						this.controllerSection.connected = true
+						this.controllerSection.buttonText = 'Connected'
+						rulesDiv.setConnected()
+					}, 3000)
+				}
+				
+				else {
+					bottoniDiv.children[0].classList.add('disabled')
+					bottoniDiv.children[1].classList.add('disabled')
+				
+					this.controllerSection.connected = false
+					this.controllerSection.buttonText = 'Connect'
+
+					electron.ipcRenderer.send('sdn:disconnect', this.controllerSection.network, controllerName)
+				}
+			}
+		},
+
+		popDisclaimer(text){
+			this.controllerSection.disclaimer.text = text
+			this.controllerSection.disclaimer.visibility = true
+			setTimeout(() => this.controllerSection.disclaimer.visibility = false, 5000)
 		},
 
 		filterRulesByDevice() {
@@ -82,7 +116,15 @@ let controllerDiv = new Vue({
 		},
 
 		submit(){
-			this.rulesSection.submittedRules.rules = JSON.parse(JSON.stringify(sdnData.getRules()))
+			this.rulesSection.submittedRules.rules = JSON.parse(JSON.stringify(sdnData.getRules())) // Faccio così per creare una copia dell'oggetto ed evitare che venga modificato
+		},
+
+		exportJSON(){
+			downloadString(JSON.stringify(sdnData.getRules()), 'rules.JSON')
+		},
+
+		importRules(){
+			// TODO
 		}
 	}
 })

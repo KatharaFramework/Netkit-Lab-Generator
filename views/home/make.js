@@ -308,7 +308,7 @@ function makeOVSwitch(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
 			lab.file[machine.name + ".startup"] += "\n" +
-				// "sleep 15\n\n" +		// TODO: Gabriele ha fatto così
+				// "sleep 10\n\n" +		// TODO: Gabriele l'ha messo...
                 "service openvswitch-switch start\n\n" +
                 "ovs-vsctl add-br br0\n" +
                 machine.interfaces.if.map(function(el){
@@ -320,7 +320,7 @@ function makeOVSwitch(netkit, lab) {
 				}).join('\n') +
 				"\n\n" +
 				"ovs-vsctl set bridge br0 protocols=[OpenFlow13]\n" +
-				"ovs-vsctl set-controller br0 tcp:192.168.0.1:6633\n"
+				"ovs-vsctl set-controller br0 tcp:192.168.100.1:6633\n"
         }
     }
 }
@@ -342,13 +342,16 @@ function makeRyuController(netkit, lab) {
 
 function makeStaticRouting(netkit, lab) {
     // generazione networking e routing statico
-	let switchCounter = 0
+	let switchCounter = 2
     for (let machine of netkit) {
         if (machine.name && machine.name != "") {
             for (let interface of machine.interfaces.if) {
-                if (interface.eth.number == 0 && (machine.type == 'switch' || machine.type == 'controller')){
-					interface.ip = "192.168." + (machine.type == 'controller' ? 0 : Math.floor(switchCounter / 254))
-						+ "." + (machine.type == 'controller' ? 1 : (switchCounter++ + 2)) + "/16"
+                if (interface.eth.number == 0){
+					if (machine.type == 'switch'){
+						interface.ip = "192.168.100." + switchCounter++ + "/24"	// TODO: E se non bastano 200+ switch?
+					} else if(machine.type == 'controller'){
+						interface.ip = "192.168.100.1/24"
+					}
                 }
                 //ifconfig eth_ SELFADDRESS/MASK up
                 if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != ""){

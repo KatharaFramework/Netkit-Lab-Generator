@@ -115,6 +115,12 @@ class SDNData {
 		}
 	}
 
+	getControllerName(){
+		for (let machine of this._kataraConfig){
+			if(machine.type == 'controller') return machine.name
+		}
+	}
+
 	/* --------------------------------------------- */
     /* ------------- GETTERS & SETTERS ------------- */
 	/* --------------------------------------------- */
@@ -128,6 +134,7 @@ class SDNData {
     }
 
     getRules(){
-        return this._rules
+		this._rules = this._rules.filter(rule => !rule.deleted)
+		return this._rules
     }
 }

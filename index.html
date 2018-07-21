@@ -46,7 +46,7 @@
 						<a onclick="toggle_submenu(1)">Save &amp; Load</a>
 					</li>
 					<li class="hidden">
-						<a onclick="toggle_submenu(2)">Run on Host</a>
+						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
 					</li>
 				</ul>
 			</nav>
@@ -67,8 +67,7 @@
 			<!-- Sub-menu Save and Load -->
 			<nav id="submenu-1" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
 				<script src="assets/vendor/js/FileSaver.min.js"></script>
-				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"
-				/>
+				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"/>
 				<ul class="nav navbar-nav">
 					<li>
 						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
@@ -94,11 +93,11 @@
 				</ul>
 				<div>
 					<span class="label label-warning">
-						* Requires something to run .sh files, even on Windows (like Git bash, associated with .sh files).
+						* Host must be able to run bash commands
 					</span>
 					<br />
 					<span class="label label-warning">
-						** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
+						** Requires Kathar&aacute; installed on Host and correctly configured.
 					</span>
 				</div>
 			</nav>
@@ -486,7 +485,7 @@
 				</p>
 
 				<!-- Horizontal buttons -->
-				<div id="sdn-horizontal-buttons">
+				<div id="sdn-horizontal-buttons" style="margin-bottom: 15px;">
 					<button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Start simulation</button>
 					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
 					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
@@ -514,27 +513,41 @@
 					
 					<!-- Details (labels details)-->
 					<div id="details" v-show="visible && (newLabel.show || labels.length)">
+						<label-div v-for="label in labels"
+							v-bind:name="label.name" v-bind:key="label.name"
+							v-bind:color="label.color">
+						</label-div>
+
 						<div class="blu-bordered" v-if="newLabel.show">
 							<input type="text" v-model="newLabel.color" pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)' placeholder='color'></input>
 							<input type="text" v-model="newLabel.name" pattern='[A-z0-9]+' placeholder='name'></input>
 							<button v-on:click="createNewLabel()">Add</button>
 							<button v-on:click="hideLabelMaker()">Ignore</button>
 						</div>
-
-						<label-div v-for="label in labels"
-							v-bind:name="label.name" v-bind:key="label.name"
-							v-bind:color="label.color">
-						</label-div>
 					</div>
 					<script src="views/sdn/labelmanaging.js"></script>
 
 					<!-- Details2 (node details)-->
 					<div id="details2" v-show="visible">
 						<a v-on:click="close">X</a>
-						<h3>{{ device }}</h3>
+						<h1>{{ device }}</h1>
+						<div style="text-align: left; font-size: medium;" v-if="connectedToController">
+							<hr style="margin-bottom: 20px">
+							<span class="tab active" v-on:click="switchTab(1)"
+								onclick="this.classList.add('active');this.nextElementSibling.classList.remove('active');this.nextElementSibling.nextElementSibling.classList.remove('active')">
+								 Rules
+							</span>
+							<span class="tab" v-on:click="switchTab(2)"
+								onclick="this.classList.add('active');this.nextElementSibling.classList.remove('active');this.previousElementSibling.classList.remove('active')">
+								 Statistics
+							</span>
+							<span class="tab" v-on:click="switchTab(3)"
+								onclick="this.classList.add('active');this.previousElementSibling.classList.remove('active');this.previousElementSibling.previousElementSibling.classList.remove('active')">
+								 Inspect
+							</span>
+						</div>
 						<hr>
-						<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
-						<div id="rules">
+						<div id="d2-rules" v-if="activeSection==1">
 							<div>
 								<h2>Packet rules</h2>
 								<button class="btn btn-success" v-on:click="popupModal">Create new rule</button>
@@ -546,7 +559,7 @@
 										<th>priority</th>
 										<th>idle timeout</th>
 										<th>hard timeout</th>
-										<th>stats</th>
+										<th v-show="connectedToController">stats</th>
 									</thead>
 									<tbody>
 										<tr v-for="(rule, index) in packetRules"
@@ -570,7 +583,7 @@
 											<td>{{ rule.priority }}</td>
 											<td>{{ rule.idleTimeout }}</td>
 											<td>{{ rule.hardTimeout }}</td>
-											<td>{{ rule.stats }}</td>
+											<td v-show="connectedToController">{{ rule.stats }}</td>
 										</tr>
 									</tbody>
 								</table>
@@ -613,7 +626,19 @@
 								</table>
 							</div>
 						</div>
-						<p class="disclaimer" v-if="!labelRules.length && !packetRules.length">
+						<div v-show="activeSection==2">
+							<button style="float:right"
+								v-if="labelRules.length || packetRules.length"
+								v-on:click="updateSVG">
+								Update
+							</button>
+							<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
+							<!-- Eventualmente altri grafici e statistiche -->
+						</div>
+						<div v-if="activeSection==3">
+							<!-- Qui ci voglio mettere la rappresentazione delle regole realmente installate -->
+						</div>
+						<p style="margin-top: 20px;" class="disclaimer" v-if="!labelRules.length && !packetRules.length">
 							Nessuna regola installata sullo switch {{ device }}
 						</p>
 					</div>
@@ -651,12 +676,18 @@
 							<h3>Controller</h3>
 							<hr>
 							<p>Connect to:
-								<input class="minimal-input" type="text" v-model="controllerSection.ip">
+								<input class="minimal-input" type="text" v-model="controllerSection.network"
+									placeholder="docker-network name" style="width: 160px;margin-left: 10px;"
+									:disabled="controllerSection.connected">
 								<button style="float: right"
 									v-bind:class="[controllerSection.connected ? 'btn-success' : '']"
-									v-on:click="connect">{{ controllerSection.buttonText }}</button>
+									v-on:click="toggleConnect">{{ controllerSection.buttonText }}</button>
 							</p>
-							<div v-if="controllerSection.connected">
+							<p class="disclaimer" v-if="controllerSection.disclaimer.visibility">
+								{{ controllerSection.disclaimer.text }}
+							</p>
+							<div v-if="controllerSection.connected && false">
+								<!-- TODO? -->
 								<hr>
 								<p>Test connection
 									<button style="float: right" class="btn-warning">Test connection</button></p>
@@ -665,6 +696,14 @@
 									<button style="float: right" class="btn-danger">Reset connection</button></p>
 								</p>
 							</div>
+							<p class="disclaimer">
+								Before connecting, be sure all machines have started.
+								<a class="link" onclick="this.parentElement.classList.add('hidden');">click to close</a>
+							</p>
+							<p class="disclaimer">
+								Remember to disconnect before closing the Netkit-Lab-Generator otherwise the network will not be removed from docker.
+								<a class="link" onclick="this.parentElement.classList.add('hidden');">click to close</a>
+							</p>
 						</div>
 						<div v-if="rulesSection.visible">
 							<h3>Rules</h3>
@@ -679,7 +718,14 @@
 								type="text" placeholder="Device name">
 							<textarea v-if="rulesSection.visible==1" v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
 							<textarea v-else-if="rulesSection.visible==2" v-model="rulesSection.submittedRules.representation" cols="30" rows="10" disabled></textarea>
-							<button v-if="rulesSection.visible==1" class="btn btn-warning" style="float: right;">Export JSON</button>
+							<button v-if="rulesSection.visible==1" class="btn btn-warning" style="float: right;"
+								v-on:click="exportJSON">
+								Export JSON
+							</button>
+							<button v-if="rulesSection.visible==1" class="btn btn-default" style="float: right;margin-right: 10px"
+								v-on:click="importRules">
+								Import
+							</button>
 						</div>
 					</div>
 					<script src="views/sdn/controllerinteraction.js"></script>
@@ -824,13 +870,14 @@
 	</div>
 
 	<script>
-		var electron, sdnData, isCopied = false
+		var electron, sdnData, restInterface, isCopied = false, isRunning = false
 
 		window.onload = function () {
 			console.log("  _______          __   __    __  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
 
 			if (isElectron()) {
 				electron = require('electron')
+				restInterface = require('./restInterfacer')
 
 				let thisWin = electron.remote.getCurrentWindow()
 				let sdnDisclaimer = document.querySelector("#sdn .disclaimer")
