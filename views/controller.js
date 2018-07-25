@@ -217,10 +217,6 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
         else $scope.labInfo.toggle = "disable"
     }
 
-    $scope.loadSDN = function(netkitData, labInfoData){
-        loadSDN(JSON.parse($scope.generateConfig(netkitData, labInfoData))[0].netkit)
-    }
-
     $scope.import = function () {
         let fileElement = document.getElementById('file')
         try {

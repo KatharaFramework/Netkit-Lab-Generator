@@ -111,7 +111,9 @@ ipcMain.on('script:clean', function () {
 
 /* --------------------------- SDN --------------------------- */
 
-ipcMain.on('sdn:connect', function (_, networkName, controllerName) {
+// TODO: Rimuovere
+
+/* ipcMain.on('sdn:connect', function (_, networkName, controllerName) {
 	if(_isWindows) throw new Error('TODO')
 
 	networkName = 'netkit_$(id -u)_' + networkName
@@ -143,4 +145,5 @@ ipcMain.on('sdn:disconnect', function (_, networkName, controllerName) {
 	setTimeout(() => {
 		exec(deleteNetworkCommand)
 	}, 2000)
-})
+}) 
+*/

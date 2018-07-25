@@ -91,7 +91,7 @@ hr {
 .navbar-kathara li a:focus {
     background-color: var(--main-color);
     color: white;
-	font-weight: bolder;
+	font-weight: bold;
 }
 
 .navbar-kathara li a {
@@ -123,6 +123,15 @@ hr {
     cursor: not-allowed !important;
     opacity: 0.5;
     text-decoration: none;
+}
+
+@media (max-width: 768px) {
+	nav,
+	.navbar-kathara,
+	.navbar-kathara-secondary {
+		/* TODO: Eventualmente cambiare */
+		display: none;
+	}
 }
 
 /* ------------------------------------------------------ */
