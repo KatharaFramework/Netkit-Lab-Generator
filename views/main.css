@@ -74,7 +74,8 @@ hr {
 
 .navbar-kathara {
     position: fixed;
-    border-radius: 0;
+	border: none;
+	border-radius: 0;
     width: 100%;
 	min-height: 0;
 }
@@ -90,7 +91,7 @@ hr {
 .navbar-kathara li a:focus {
     background-color: var(--main-color);
     color: white;
-	font-weight: bolder;
+	font-weight: bold;
 }
 
 .navbar-kathara li a {
@@ -99,7 +100,7 @@ hr {
 
 .navbar-kathara-secondary {
     z-index: 9995;
-    top: 50px;
+    top: 48px;
 }
 
 .navbar-kathara li a:active,
@@ -191,7 +192,13 @@ button {
 .btn-danger[disabled].focus,
 .btn-danger[disabled]:active,
 .btn-danger[disabled]:focus,
-.btn-danger[disabled]:hover {
+.btn-danger[disabled]:hover,
+.btn-success[disabled],
+.btn-success[disabled].active,
+.btn-success[disabled].focus,
+.btn-success[disabled]:active,
+.btn-success[disabled]:focus,
+.btn-success[disabled]:hover {
     background-color: #9e9e9e;
     border-color: #808080;
     opacity: 0.2 !important;

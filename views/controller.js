@@ -217,10 +217,6 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
         else $scope.labInfo.toggle = "disable"
     }
 
-    $scope.loadSDN = function(netkitData, labInfoData){
-        loadSDN($scope.generateConfig(netkitData, labInfoData))
-    }
-
     $scope.import = function () {
         let fileElement = document.getElementById('file')
         try {
@@ -251,5 +247,4 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
             alert("Error in File Reader: " + err)
         }
     }
-
 })

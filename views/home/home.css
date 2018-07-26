@@ -4,14 +4,8 @@
 
 #right-controls {
     position: fixed;
-    right: 5px;
+    left: 5px;
     top: 55px;
-}
-
-@media (min-height: 820px) {
-	#right-controls {
-		top: 65px;
-	}
 }
 
 #labInfo {
@@ -22,9 +16,7 @@
 
 @media (max-width: 1055px) {
     #right-controls {
-        position: relative;
-        right: 0;
-        top: 0;
+        position: unset;
     }
 
     .xs-floating-right {
@@ -60,6 +52,12 @@
 @media (min-height: 820px) {
     #minimap {
         max-height: 26em;
+    }
+}
+
+@media (min-height: 920px) {
+    #minimap {
+        max-height: 35em;
     }
 }
 
@@ -102,8 +100,8 @@
 }
 
 .mock-disclaimer {
-    width: 40%;
-    height: 2px;
+    width: 80%;
+    height: 4px;
     background-color: var(--disclaimer-color);
     margin: 3px;
 }
@@ -141,7 +139,7 @@
 /* ------------------------------------------------------ */
 
 #home {
-    margin: 0 2em;
+    margin: 0 2em 0 250px;
     max-width: 1000px;
 }
 
@@ -153,9 +151,16 @@
 
 @media (max-width: 1055px) {
     #home {
+		margin: 0 2em;
         width: inherit;
         max-width: 1055px;
     }
+}
+
+@media (min-width: 1520px) {
+	#home {
+		margin: 0 auto;
+	}
 }
 
 /* ------ TABLES ------ */
@@ -198,3 +203,27 @@ span.btn {
 .bash {
     margin: 3em 0;
 }
+
+/* @media (min-width: 1600px) {
+	.bash {
+		position: fixed;
+		right: 15px;
+		top: 10px;
+
+		width: 300px;
+	}
+}
+
+@media (min-width: 1700px) {
+	.bash {
+		right: 65px;
+		width: 350px;
+	}
+}
+
+@media (min-width: 1830px) {
+	.bash {
+		right: 25px;
+		width: 540px;
+	}
+} */

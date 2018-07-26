@@ -34,10 +34,7 @@
 						<a href="#home" onclick="toggle_tab(event, this)">Home</a>
 					</li>
 					<li>
-						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Graph</a>
-					</li>
-					<li>
-						<a href="#sdn" onclick="toggle_tab(event, this)">SDN</a>
+						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Topology</a>
 					</li>
 					<li>
 						<a onclick="toggle_submenu(0)">Download Lab</a>
@@ -45,8 +42,12 @@
 					<li>
 						<a onclick="toggle_submenu(1)">Save &amp; Load</a>
 					</li>
-					<li class="hidden">
-						<a onclick="toggle_submenu(2)">Run on Host</a>
+					<li id="run-on-host" class="hidden">
+						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
+					</li>
+					<li id="connect" class="hidden disabledLink">
+						<a href="#sdn" onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab(event, this)}"
+							style="text-decoration: underline">Connect...</a>
 					</li>
 				</ul>
 			</nav>
@@ -67,8 +68,7 @@
 			<!-- Sub-menu Save and Load -->
 			<nav id="submenu-1" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
 				<script src="assets/vendor/js/FileSaver.min.js"></script>
-				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"
-				/>
+				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"/>
 				<ul class="nav navbar-nav">
 					<li>
 						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
@@ -94,11 +94,11 @@
 				</ul>
 				<div>
 					<span class="label label-warning">
-						* Requires something to run .sh files, even on Windows (like Git bash, associated with .sh files).
+						* Host must be able to run bash commands
 					</span>
 					<br />
 					<span class="label label-warning">
-						** Requires Kathar&aacute; (or eventually Netkit) installed on Host and env configured correctly.
+						** Requires Kathar&aacute; installed on Host and correctly configured.
 					</span>
 				</div>
 			</nav>
@@ -112,6 +112,7 @@
 				<link rel="stylesheet" href="views/home/home.css" />
 				<script src="views/home/model.js"></script>
 				<script src="views/home/make.js"></script>
+
 				<div>
 					<h1>Netkit Lab Generator</h1>
 					<h4>
@@ -218,7 +219,7 @@
 								<div id="{{machine._uid}}" class="anchor-id"></div>
 								<div>
 									<label>Machine {{machine.row}}:</label>
-									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc" required />
+									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc{{machine.row}}" required />
 								</div>
 								<p>
 									<input title="type" type="radio" value="terminal" data-ng-model="machine.type" /> Terminal</p>
@@ -255,11 +256,11 @@
 												<label>Eth{{i.eth.number}}: </label>
 												<input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
 											</div>
-											<div>
+											<div data-ng-show="machine.type!='switch'">
 												<label> IP/Net: </label>
 												<input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
 											</div>
-											<div>
+											<div data-ng-show="machine.type!='switch'">
 												<label> Complete DNS Name: </label>
 												<input type="text" data-ng-model="i.name" class="form-control" placeholder="www.x.y. or ROOT-SERVER." pattern=".*\.$" />
 											</div>
@@ -272,28 +273,30 @@
 							</td>
 
 							<td class="gateways">
-								<p>
-									<span class="btn btn-success" data-ng-click="addGateway(machine)">
-										Add gateway</span>
-									<span class="btn btn-danger" data-ng-click="removeGateway(machine)" data-ng-disabled="machine.gateways.counter<=1">
-										Remove last gw</span>
-								</p>
-								<div data-ng-repeat="gateway in machine.gateways.gw">
-									<div>
-										<label>Route (empty for default gw):</label>
-										<input type="text" data-ng-model="gateway.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+								<div data-ng-show="machine.type!='switch' && machine.type!='controller'">
+									<p>
+										<span class="btn btn-success" data-ng-click="addGateway(machine)">
+											Add gateway</span>
+										<span class="btn btn-danger" data-ng-click="removeGateway(machine)" data-ng-disabled="machine.gateways.counter<=1">
+											Remove last gw</span>
+									</p>
+									<div data-ng-repeat="gateway in machine.gateways.gw">
+										<div>
+											<label>Route (empty for default gw):</label>
+											<input type="text" data-ng-model="gateway.route" class="form-control" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+										</div>
+										<div>
+											<label>GW (empty to generate nothing):</label>
+											<input type="text" data-ng-model="gateway.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
+										</div>
+										<div>
+											<label>Interface:</label>
+											<select title="eth" data-ng-model="gateway.if" class="form-control">
+												<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
+											</select>
+										</div>
+										<hr>
 									</div>
-									<div>
-										<label>GW (empty to generate nothing):</label>
-										<input type="text" data-ng-model="gateway.gw" class="form-control" placeholder="0.0.0.0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
-									</div>
-									<div>
-										<label>Interface:</label>
-										<select title="eth" data-ng-model="gateway.if" class="form-control">
-											<option data-ng-repeat="i in machine.interfaces.if" value="{{i.eth.number}}">eth{{i.eth.number}}</option>
-										</select>
-									</div>
-									<hr>
 								</div>
 							</td>
 
@@ -327,7 +330,8 @@
 								<div data-ng-show="machine.type =='switch'">
 								</div>
 
-								<div data-ng-show="machine.type=='controller'">
+								<div data-ng-show="machine.type=='controller'" style="color: darkgray">
+									(After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar)
 								</div>
 
 								<div data-ng-show="machine.type=='other'">
@@ -468,258 +472,99 @@
 				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
 			</div>
 
-			<!-- SDN-->
+			<!-- CONNECT -->
 			<div id="sdn" class="tab-pane">
 				<link rel="stylesheet" href="views/sdn/sdn.css" />
-				<script src="assets/vendor/js/d3.min.js"></script>
-				<script src="assets/vendor/js/vue.js"></script>
-				<script src="views/sdn/dataclass.js"></script>
-				<script src="views/sdn/helper.js"></script>
-				<script src="views/sdn/simulation.js"></script>
-				<script src="views/sdn/graphinteraction.js"></script>
-				<script src="views/sdn/controllerinteraction.js"></script>
-
-				<p class="disclaimer hidden">Please update the size of the window to fit contents!
-					<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
-				</p>
-
-				<!-- Horizontal buttons -->
-				<div id="sdn-horizontal-buttons">
-					<button class="btn btn-primary" data-ng-click="loadSDN(netkit, labinfo)">Start simulation</button>
-					<button class="btn btn-warning" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
-					<button class="btn btn-warning" style="display:none" onclick="enablePathSelection()">Disable nodes repositioning</button>
-					<button class="btn" style="display:none" onclick="releaseNodes()">Release fixed nodes</button>
-					<button class="btn btn-success" style="display:none" onclick="closeDetailsAndClean();labelsDiv.showLabelMaker()">Create new label</button>
-					<button class="btn btn-success" style="display:none" onclick="applyPath()">Conferma path</button>
-					<button class="btn btn-danger" style="display:none" onclick="discardPath()">Annulla path</button>
-				</div>
-				<div>
-
-					<!-- Vertical buttons -->
-					<div id="sdn-vertical-buttons" class="hidden">
-						<button class="btn btn-success" onclick="submitToController()" disabled>Submit</button>
-						<button class="btn btn-success" onclick="getFromController()" disabled>Update</button>
-						<button class="btn btn-warning" onclick="toggleExternalNetworkVisibility(this)">Hide external network</button>
-						<!-- <button class="btn btn-warning">Scheduler</button> -->
-						<button style="position: relative; top:500px" onclick="openDetails(3,1)" class="btn btn-primary">HOW TO</button>
-						<button style="position: relative; top:500px" onclick="openDetails(3,2)" class="btn btn-success">CONTROLLER</button>
-						<button style="position: relative; top:500px" data-ng-click="loadSDN(netkit, labinfo)" class="btn btn-danger">RELOAD</button>
-					</div>
-
-					<!-- Main graph (unfilled) -->
-					<svg id="sdnGraph" width="800" height="800"></svg>
-					
-					<!-- Details (labels details)-->
-					<div id="details" v-show="visible && (newLabel.show || labels.length)">
-						<div class="blu-bordered" v-if="newLabel.show">
-							<input type="text" v-model="newLabel.color" pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)' placeholder='color'></input>
-							<input type="text" v-model="newLabel.name" pattern='[A-z0-9]+' placeholder='name'></input>
-							<button v-on:click="createNewLabel()">Add</button>
-							<button v-on:click="hideLabelMaker()">Ignore</button>
-						</div>
-
-						<label-div v-for="label in labels"
-							v-bind:name="label.name" v-bind:key="label.name"
-							v-bind:color="label.color">
-						</label-div>
-					</div>
-					<script src="views/sdn/labelmanaging.js"></script>
-
-					<!-- Details2 (node details)-->
-					<div id="details2" v-show="visible">
-						<a v-on:click="close">X</a>
-						<h3>{{ device }}</h3>
+				<div class="schede">
+					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
+						<h1>Connect to controller</h1>
 						<hr>
-						<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
-						<div id="rules">
-							<div>
-								<h2>Packet rules</h2>
-								<button class="btn btn-success" v-on:click="popupModal">Create new rule</button>
-								<table v-if="packetRules.length">
-									<thead>
-										<th>#</th>
-										<th>match</th>
-										<th>action</th>
-										<th>priority</th>
-										<th>idle timeout</th>
-										<th>hard timeout</th>
-										<th>stats</th>
-									</thead>
-									<tbody>
-										<tr v-for="(rule, index) in packetRules">
-											<td>{{ (index + 1) }}</td>
-											<td>
-												<rule-match-action v-for="match in rule.matches"
-													v-bind:name="match.name"
-													v-bind:value="match.value"
-													v-bind:label="match.label">
-												</rule-match-action>
-											</td>
-											<td>
-												<rule-match-action v-for="action in rule.actions"
-													v-bind:name="action.name"
-													v-bind:value="action.value"
-													v-bind:label="action.label">
-												</rule-match-action>
-											</td>
-											<td>{{ rule.priority }}</td>
-											<td>{{ rule.idleTimeout }}</td>
-											<td>{{ rule.hardTimeout }}</td>
-											<td>{{ rule.stats }}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div v-if="labelRules.length">
-								<h2>Label rules</h2>
-								<table>
-									<thead>
-										<th>#</th>
-										<th>match</th>
-										<th>action</th>
-										<th>priority</th>
-										<th>idle timeout</th>
-										<th>hard timeout</th>
-										<th>stats</th>
-									</thead>
-									<tbody>
-										<tr v-for="(rule, index) in labelRules">
-											<td>{{ (packetRules.length + index + 1) }}</td>
-											<td>
-												<rule-match-action v-for="match in rule.matches"
-													v-bind:name="match.name"
-													v-bind:value="match.value"
-													v-bind:label="match.label">
-												</rule-match-action>
-											<td>
-												<rule-match-action v-for="action in rule.actions"
-													v-bind:name="action.name"
-													v-bind:value="action.value"
-													v-bind:label="action.label">
-												</rule-match-action>
-											</td>
-											<td>{{ rule.priority }}</td>
-											<td>{{ rule.idleTimeout }}</td>
-											<td>{{ rule.hardTimeout }}</td>
-											<td>{{ rule.stats }}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<p class="disclaimer" v-if="!labelRules.length && !packetRules.length">
-							Nessuna regola installata sullo switch {{ device }}
-						</p>
-					</div>
-					<script src="views/sdn/rulesmanaging.js"></script>
-
-					<!-- Details3 (other stuffs)-->
-					<div id="details3" style="display: none">
-						<a onclick="closeDetailsAndClean()">X</a>
-						<div>
-							<h3>HOW TO:</h3>
-							<hr> ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... .....
-							..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... .....
-							..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course ..... .....
-							..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so ..... .....
-							..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... .....
-							..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course .....
-							..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... ..... so .....
-							..... ..... ..... because ..... ..... ..... of course ..... ..... ..... ..... ..... ..... ..... ..... ..... and .....
-							..... ..... ..... ..... and ..... ..... ..... ..... so ..... ..... ..... ..... because ..... ..... ..... of course
-							..... ..... ..... ..... ..... ..... ..... ..... ..... and ..... ..... ..... ..... ..... and ..... ..... ..... .....
-							so ..... ..... ..... ..... because ..... ..... ..... of course ..... ..... ..... .....
-						</div>
-						<div>
-							<h3>Controller</h3>
-							<hr>
-							<p>Connect
-								<button onclick="enableControllerButtons()">Connetti</button>
-							</p>
-							<p>Test connection</p>
-							<p>Reset connection</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- RULE MODAL -->
-	<div id="rule-modal" v-bind:class="[visible ? '' : 'ng-hide', 'modal', 'modal-kathara']" v-if="visible">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" v-on:click="close">&times;</button>
-					<h4 class="modal-title">{{ header }}</h4>
-				</div>
-				<div class="modal-body">
-					<div class="half">
-						<h2>Match</h2>
 						<p>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-success" v-on:click="makeNewLine">Add</button>
-							<button v-if="!rule.matches.some(el => el.name=='any')" class="btn btn-danger" v-on:click="removeLastLine">Remove</button>
+							In order to connect to the controller, clik the button below.
+							A new node will be added to the Kathar&aacute; simulated enviroment.
+							This node will act as an intermediary between the host and the controller.
+							It will host a server which will provide an interface for managing the
+							flow tables of the controller. Once created,
+							<a onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')">click here</a>
+							or visit <span style="text-decoration: underline">http://localhost:8080/</span>
+							on your web browser.
+							<p class="disclaimer">Be sure all containers have started before connecting!</p>
 						</p>
-						<div v-for="(match, index) in rule.matches">
-							<select v-model="match.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
-								<option disabled value="noselection">Select...</option>
-								<option v-if="index==0" value="any">Any</option>
-								<option value="MAC source">MAC src</option>
-								<option value="MAC destination">MAC dst</option>
-								<option value="eth type">ETH type</option>
-								<option value="MPLS label">MPLS label</option>
-								<option value="MPLS tc">MPLS TC</option>
-								<option value="vlan id">VLan ID</option>
-								<option value="IP source">IP src</option>
-								<option value="IP destination">IP dst</option>
-								<option value="IP port">IP port</option>
-								<option value="TCP source port">TCP sport</option>
-								<option value="TCP destination port">TCP dport</option>
-								<!-- TODO: eventualmente aggiungerne altri -->
-							</select>
-							<input v-model="match.value" type="text" hidden>
+						<hr>
+						<div style="margin: 10px auto; width: fit-content">
+							<!-- <p>
+								Select a free IP for the new temporary node:
+								<input type="text" class="TODO" placeholder="192.168.100.254"/>
+							</p> -->
+							<button class="btn btn-default" onclick="attachInterfaceToController(this, this.nextElementSibling)">
+								Attach interface
+							</button>
+							<button class="btn btn-danger hidden" onclick="detachInterfaceToController(this, this.previousElementSibling)">
+								Detach
+							</button>
 						</div>
 					</div>
-					<div class="half">
-						<h2>Action</h2>
-						<div>
-							<select v-model="rule.action.name" onchange="setInputPattern(this.value, this.nextElementSibling)">
-								<option disabled value="noselection">Select...</option>
-								<option value="set MPLS label">Set MPLS label</option>
-								<option value="forward to port">Forward to port</option>
-								<option value="send to controller">Send to controller</option>
-								<option value="drop">Drop</option>
-								<option value="process l2">Process (L2)</option>
-								<option value="process l3">Process (L3)</option>
-								<option value="set field">Set field</option>
-								<option value="push header">Push header</option>
-								<option value="pop header">Pop header</option>
-								<!-- TODO: eventualmente aggiungerne altri -->
-							</select>
-							<input v-model="rule.action.value" type="text" hidden>
-						</div>
+					<div>
+						<h1>Connect to controller with command line</h1>
+						<hr>
+						<p>
+							To use a custom image or a custom port for the interface node, you can manually start it with these commands:
+							<ul style="padding-left: 10px">
+								<li>
+									Create and run the image and expose its port 3000 to the host container:
+									<code>docker run -it --privileged=true -p &lt;port&gt;:3000 --name &lt;machine-name&gt; &lt;image-name&gt;</code>
+								</li>
+								<li>
+									Then you need to connect the new node to the Kathar&aacute; network:
+									<code>docker network connect netkit_1000_SDNRESERVED &lt;machine-name&gt;</code>
+								</li>
+								<li>
+									Finally an IPv4 must be assigned to the machine:
+									<code>docker exec &lt;machine-name&gt; ifconfig eth1 &lt;ip&gt; up</code>
+								</li>
+							</ul>
+						</p>
 					</div>
-					<div class="half">
-						<h2>Priority</h2>
-						<input v-model="rule.priority" type="number" min="0">
+					<div>
+						<h1>Set Docker permissions <span style="color: darkgray; font-size: x-large">(optional)</span></h1>
+						<hr>
+						<p>
+							Kathar&aacute; uses docker to create the virtual enviroment. Some docker commands need
+							superuser permissions in order to be executed. If you are useing linux, an easy alternative
+							way to properly configure and launch docker containers is adding current user to
+							the 'docker' group. You can do that by simply running
+							<code>sudo usermod -aG docker $(whoami)</code> in your favourite terminal.
+						</p>
 					</div>
-					<div class="half">
-						<h2>Idle timeout</h2>
-						<input v-model="rule.idleTimeout" type="number" min="0">
+					<div>
+						<h1>Pull the Docker image</h1>
+						<hr>
+						<p>
+							The node which acts as an interface between the external world and the simulated enviroment
+							is a special docker container whose image must be pulled from docker registry or built from source.
+							So, if you have not done that yet, simply run <code>docker pull kathara/netkit_extended</code>
+							in your terminal.
+						</p>
+						<p class="disclaimer">
+							Please make sure you downloaded the image before trying to connect to the controller
+						</p>
 					</div>
-					<div class="half">
-						<h2>Hard timeout</h2>
-						<input v-model="rule.hardTimeout" type="number" min="0">
+					<div>
+						<h1>Build the image from sources</h1>
+						<hr>
+						<p>
+							The default image for the interface node can be found
+							<a href="https://github.com/Pastello/Netkit-SDN-Interface">here</a>.
+							If you want to download and build or modify it on your own, you can run
+							<code>git clone https://github.com/Pastello/Netkit-SDN-Interface &lt;local-directory&gt;</code>
+							then run <code>sh build.sh</code> to build it.
+						</p>
 					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" v-on:click="close">Undo</button>
-					<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
 				</div>
 			</div>
+
 		</div>
 	</div>
-	<script src="views/sdn/rulemodal.js"></script>
 
 	<!-- LSTART MODAL -->
 	<div id="command-modal" class="modal modal-kathara ng-hide">
@@ -733,15 +578,14 @@
 					<p>The command has been issued, please wait for its execution.</p>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-warning" onclick="close_modal('command-modal')">Ok, I understand</button>
+					<button type="button" class="btn btn-warning" onclick="this.disabled = true; close_modal('command-modal')" disabled>Ok, I understand</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		var electron, sdnData
-		var isCopied = false
+		var electron
 
 		window.onload = function () {
 			console.log("  _______          __   __    __  __    \n  \\      \\   _____/  |_|  | _|__|/  |_  \n  /   |   \\_/ __ \\   __\\  |/ /  \\   __\\ \n /    |    \\  ___/|  | |    <|  ||  |   \n \\____|__  /\\___  >__| |__|_ \\__||__|   \n         \\/     \\/          \\/         ");
@@ -749,15 +593,7 @@
 			if (isElectron()) {
 				electron = require('electron')
 
-				let thisWin = electron.remote.getCurrentWindow()
-				let sdnDisclaimer = document.querySelector("#sdn .disclaimer")
-				thisWin.on('resize', function () {
-					if (thisWin.getBounds().height < 950 || thisWin.getBounds().width < 1560) {
-						sdnDisclaimer.classList.remove('hidden')
-					} else sdnDisclaimer.classList.add('hidden')
-				}).emit('resize')
-
-				document.querySelectorAll("#main-nav li").forEach((el) => el.classList.remove("hidden"))
+				document.querySelector("#run-on-host").classList.remove("hidden")
 				document.getElementById('copyLab').addEventListener('click', copyLab)
 				document.getElementById('lstart').addEventListener('click', executeStart)
 				document.getElementById('lclean').addEventListener('click', executeClean)
