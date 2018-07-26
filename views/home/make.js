@@ -328,10 +328,8 @@ function makeOVSwitch(netkit, lab) {
 function makeRyuController(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'controller') {
-			lab.folders.push(machine.name + "/etc/ryu")
-			lab.file[machine.name + "/etc/ryu/custom_app.py"] = ""	// TODO: Riempire il file. Come fare?
 			lab.file[machine.name + ".startup"] += "\n" +
-				"ryu-manager /etc/ryu/custom_app.py\n"
+				"ryu-manager /usr/local/lib/python2.7/dist-packages/ryu/app/simple_switch_rest_13.py"
         }
     }
 }
@@ -348,7 +346,7 @@ function makeStaticRouting(netkit, lab) {
             for (let interface of machine.interfaces.if) {
                 if (interface.eth.number == 0){
 					if (machine.type == 'switch'){
-						interface.ip = "192.168.100." + switchCounter++ + "/24"	// TODO: E se non bastano 200+ switch?
+						interface.ip = "192.168.100." + switchCounter++ + "/24"	// TODO: E se non bastassero 200+ switch?
 					} else if(machine.type == 'controller'){
 						interface.ip = "192.168.100.1/24"
 					}

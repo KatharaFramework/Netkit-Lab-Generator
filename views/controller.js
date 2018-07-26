@@ -247,5 +247,4 @@ app.controller('nc', function ($location, $anchorScroll, $scope) {
             alert("Error in File Reader: " + err)
         }
     }
-
 })

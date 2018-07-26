@@ -111,39 +111,27 @@ ipcMain.on('script:clean', function () {
 
 /* --------------------------- SDN --------------------------- */
 
-// TODO: Rimuovere
-
-/* ipcMain.on('sdn:connect', function (_, networkName, controllerName) {
-	if(_isWindows) throw new Error('TODO')
-
-	networkName = 'netkit_$(id -u)_' + networkName
-	controllerName = 'netkit_$(id -u)_' + controllerName
-	let createNetworkCommand = 'docker network create ' + networkName	// TODO: Servono altri parametri (es. IP range)
-	let connectCommand = 'docker network connect ' + networkName + ' ' + controllerName
-
-	console.log('Creating network (' + createNetworkCommand + ')')
-	exec(createNetworkCommand)
+ipcMain.on('sdn:connect', function () {
+	let prefix = 'netkit_$(id -u)_'
+	let machineName = prefix + 'sdn-interfacenode'
 	
-	console.log('Connecting new network to controller within 2 seconds (' + connectCommand + ')\n')
-	setTimeout(() => {
-		exec(connectCommand)
-	}, 2000)
+	console.log("Creating interface container\n")
+	if(_isWindows) throw new Error('TODO')
+	else {
+		exec('docker start ' + machineName +
+			' || docker run -t --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended')
+		exec('sleep 2 && docker network connect ' + prefix + 'SDNRESERVED ' + machineName)
+		exec('sleep 2 && docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')	// TODO: Trova un modo migliore. Es. potrei modificare le rotte del controller e lasciare invariato l'ip di questo nodo
+	}
 })
 
-ipcMain.on('sdn:disconnect', function (_, networkName, controllerName) {
+ipcMain.on('sdn:disconnect', function () {
+	let prefix = 'netkit_$(id -u)_'
+	let machineName = prefix + 'sdn-interfacenode'
+	
+	console.log("Stopping interface container and removing it\n")
 	if(_isWindows) throw new Error('TODO')
-
-	networkName = 'netkit_$(id -u)_' + networkName
-	controllerName = 'netkit_$(id -u)_' + controllerName
-	let disconnectCommand = 'docker network disconnect ' + networkName + ' ' + controllerName
-	let deleteNetworkCommand = 'docker network rm ' + networkName
-
-	console.log('Disconnecting ' + controllerName + '(' + disconnectCommand + ')')
-	exec(disconnectCommand)
-
-	console.log('Deleting network within 2 seconds (' + deleteNetworkCommand + ')\n')
-	setTimeout(() => {
-		exec(deleteNetworkCommand)
-	}, 2000)
-}) 
-*/
+	else {
+		exec('docker container rm -f ' + machineName)
+	}
+})

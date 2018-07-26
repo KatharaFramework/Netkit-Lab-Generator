@@ -44,7 +44,7 @@ function toggle_submenu(number, total = 3) {
 }
 
 function close_modal(id) {
-    document.getElementById(id).classList.add("ng-hide")
+	document.getElementById(id).classList.add("ng-hide")
 }
 
 function isElectron() {
@@ -56,29 +56,77 @@ function copyLab(e) {
 	
     let script = document.getElementById('sh_script').value
 	electron.ipcRenderer.send('script:copy', script, 'script.sh')
-	
+
     document.getElementById('lstart').classList.remove("disabledLink")
-    document.getElementById('lclean').classList.remove("disabledLink")
-	isCopied = true
+	document.getElementById('lclean').classList.remove("disabledLink")
+	
+	let hasController = false, hasSwitch = false
+	for(let machineType of document.querySelectorAll('#netkit tr p input[data-ng-model="machine.type"]:checked')){
+		if(machineType.value == 'controller'){
+			hasController = true
+		} else if (machineType.value == 'switch'){
+			hasSwitch = true
+		}
+		
+		if(hasController && hasSwitch){
+			document.getElementById('connect').classList.remove("hidden")
+			break
+		}
+	}
 }
 
 function executeStart(e) {
-    toggle_submenu(-1)
-	executeGeneric(e, "execute")
-	isRunning = true
+	if(!document.getElementById('lstart').classList.contains('disabledLink')){
+		toggle_submenu(-1)
+		executeGeneric(e, "execute")
+		let connectButton = document.getElementById('connect')
+		if(!connectButton.classList.contains('hidden'))
+			connectButton.classList.remove("disabledLink")
+	}
 }
 
 function executeClean(e) {
-    toggle_submenu(-1)
-	executeGeneric(e, "clean")
-	isRunning = false
+	if(!document.getElementById('lclean').classList.contains('disabledLink')){
+		toggle_submenu(-1)
+		executeGeneric(e, "clean")
+		document.getElementById('connect').classList.add("disabledLink")
+	}
 }
 
 function executeGeneric(e, command){
     e.preventDefault()
-    if (isCopied) {
-        let modal = document.getElementById("command-modal")
-        modal.classList.remove("ng-hide")
-        electron.ipcRenderer.send('script:' + command)
-    }
+	let modal = document.getElementById("command-modal")
+	modal.classList.remove("ng-hide")
+	setTimeout(
+		() => document.querySelector('#command-modal .modal-footer button').disabled = false,
+		2000
+	)
+	electron.ipcRenderer.send('script:' + command)
+}
+
+function attachInterfaceToController(attachButton, detachButton){
+	electron.ipcRenderer.send('sdn:connect')
+	attachButton.innerText = '...'
+
+	setTimeout(function() {
+		attachButton.classList.remove('btn-default')
+		attachButton.classList.add('btn-success')
+		attachButton.innerText = 'Attached'
+
+		detachButton.classList.remove('hidden')
+	}, 3000)
+}
+
+function detachInterfaceToController(detachButton, attachButton){
+	electron.ipcRenderer.send('sdn:disconnect')
+	detachButton.innerText = '...'
+
+	setTimeout(function() {
+		detachButton.classList.add('hidden')
+		detachButton.innerText = 'Detach'
+
+		attachButton.innerText = 'Attach interface'
+		attachButton.classList.remove('btn-success')
+		attachButton.classList.add('btn-default')
+	}, 3000)
 }

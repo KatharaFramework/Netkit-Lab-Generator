@@ -125,15 +125,6 @@ hr {
     text-decoration: none;
 }
 
-@media (max-width: 768px) {
-	nav,
-	.navbar-kathara,
-	.navbar-kathara-secondary {
-		/* TODO: Eventualmente cambiare */
-		display: none;
-	}
-}
-
 /* ------------------------------------------------------ */
 /* ----------------------- INPUTS ----------------------- */
 /* ------------------------------------------------------ */
