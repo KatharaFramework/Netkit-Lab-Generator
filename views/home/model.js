@@ -37,7 +37,9 @@ var backbone = {
     "other": {
         "image": "",
         "files": [], "fileCounter": 0
-    },
+	},
+	"ryu": {
+	},
     "routing": {
         "rip": {
             "en": false,

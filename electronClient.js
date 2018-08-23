@@ -11,7 +11,7 @@ const fs = require('fs')
 process.env.NODE_ENV = 'production'
 
 app.on('ready', function () {
-	let mainWindow = new BrowserWindow({ width: 1060, height: 750, minWidth: 800, minHeight: 730 })
+	let mainWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 })
 
 	mainWindow.loadURL(url.format({
 		pathname: path.join(__dirname, 'index.html'),
@@ -110,19 +110,21 @@ ipcMain.on('script:clean', function () {
 })
 
 /* --------------------------- SDN --------------------------- */
+// TODO: Anziché usare i comandi docker si potrebbe usare il comando vstart
+// TODO: Controllare che funzioni anche su windows
+
 
 ipcMain.on('sdn:connect', function () {
 	let prefix = 'netkit_$(id -u)_'
 	let machineName = prefix + 'sdn-interfacenode'
 	
-	console.log("Creating interface container\n")
-	if(_isWindows) throw new Error('TODO')
-	else {
-		exec('docker start ' + machineName +
-			' || docker run -t --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended')
-		exec('sleep 2 && docker network connect ' + prefix + 'SDNRESERVED ' + machineName)
-		exec('sleep 2 && docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')	// TODO: Trova un modo migliore. Es. potrei modificare le rotte del controller e lasciare invariato l'ip di questo nodo
-	}
+	console.log("Starting interface container\n")
+	exec(
+		'docker start ' + machineName +
+		' || docker run -t --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended'
+	)
+	exec('sleep 1 && docker network connect ' + prefix + 'SDNRESERVED ' + machineName)
+	exec('sleep 3 && docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')
 })
 
 ipcMain.on('sdn:disconnect', function () {
@@ -130,8 +132,5 @@ ipcMain.on('sdn:disconnect', function () {
 	let machineName = prefix + 'sdn-interfacenode'
 	
 	console.log("Stopping interface container and removing it\n")
-	if(_isWindows) throw new Error('TODO')
-	else {
-		exec('docker container rm -f ' + machineName)
-	}
+	exec('docker container rm -f ' + machineName)
 })

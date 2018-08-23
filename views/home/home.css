@@ -23,7 +23,7 @@
         z-index: 20;
         opacity: 1;
         position: fixed;
-        top: 5em;
+        top: 50px;
         right: 5px;
         background-color: white;
 	}
@@ -47,6 +47,12 @@
     overflow-x: hidden;
 
     user-select: none;
+}
+
+@media (max-height: 700px){
+	#labInfo tr:nth-child(4) {
+		display: none;
+	}
 }
 
 @media (min-height: 820px) {
