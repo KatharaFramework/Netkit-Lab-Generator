@@ -308,7 +308,6 @@ function makeOVSwitch(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
 			lab.file[machine.name + ".startup"] += "\n" +
-				// "sleep 10\n\n" +		// TODO: Gabriele l'ha messo...
                 "service openvswitch-switch start\n\n" +
                 "ovs-vsctl add-br br0\n" +
                 machine.interfaces.if.map(function(el){
@@ -328,8 +327,25 @@ function makeOVSwitch(netkit, lab) {
 function makeRyuController(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'controller') {
-			lab.file[machine.name + ".startup"] += "\n" +
-				"ryu-manager /usr/local/lib/python2.7/dist-packages/ryu/app/simple_switch_rest_13.py"
+			if(machine.ryu &&
+				(machine.ryu.simple || machine.ryu.rest ||
+				machine.ryu.stp || machine.ryu.custom)){
+					let basepath = '/usr/local/lib/python2.7/dist-packages/ryu/app/'	// TODO: Controlla che sia corretto il path
+					let filename = machine.name + ".startup"
+					lab.file[filename] += "\nryu-manager "
+					if(machine.ryu.simple)
+						lab.file[filename] += basepath + 'simple_switch_13.py '	// TODO: Controlla che siano corretti i nomi dei file
+					if(machine.ryu.rest)
+						lab.file[filename] += basepath + 'ofctl_rest.py '
+					if(machine.ryu.stp)
+						lab.file[filename] += basepath + 'simple_switch_stp_13.py '
+					if(machine.ryu.custom){
+						let files = machine.ryu.custom.split(' ')
+						for(let file of files){
+							lab.file[filename] += basepath + file + ' '
+						}
+					}
+				}
         }
     }
 }

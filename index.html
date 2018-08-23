@@ -330,8 +330,30 @@
 								<div data-ng-show="machine.type =='switch'">
 								</div>
 
-								<div data-ng-show="machine.type=='controller'" style="color: darkgray">
-									(After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar)
+								<div data-ng-show="machine.type=='controller'">
+									<p style="color: darkgray">
+										(After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar)
+									</p>
+									<hr>
+									<p>Ryu startup applications:</p>
+									<p>
+										<input data-ng-model="machine.ryu.simple"
+											type="checkbox" >Simple switch
+									</p>
+									<p>
+										<input data-ng-model="machine.ryu.stp"
+											type="checkbox" >Simple switch with spanning tree protocol
+									</p>
+									<p>
+										<input data-ng-model="machine.ryu.rest"
+											type="checkbox" >OpenFlow REST Controller
+									</p>
+									<p>
+										Other: 
+										<input data-ng-model="machine.ryu.custom"
+											type="text" placeholder="&lt;app-name&gt;.py [&lt;app-name&gt;.py ...]"
+											style="background-image: none; width: 210px; padding: 1px 10px;">
+									</p>
 								</div>
 
 								<div data-ng-show="machine.type=='other'">
@@ -480,12 +502,13 @@
 						<h1>Connect to controller</h1>
 						<hr>
 						<p>
-							In order to connect to the controller, clik the button below.
+							In order to connect to the controller, be sure that a <b>REST controller</b>
+							is running, then clik the button below.
 							A new node will be added to the Kathar&aacute; simulated enviroment.
 							This node will act as an intermediary between the host and the controller.
 							It will host a server which will provide an interface for managing the
 							flow tables of the controller. Once created,
-							<a onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')">click here</a>
+							<a onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')" target="_blank">click here</a>
 							or visit <span style="text-decoration: underline">http://localhost:8080/</span>
 							on your web browser.
 							<p class="disclaimer">Be sure all containers have started before connecting!</p>
@@ -505,14 +528,38 @@
 						</div>
 					</div>
 					<div>
-						<h1>Connect to controller with command line</h1>
+						<h1>Pull the Docker image</h1>
+						<hr>
+						<p>
+							The node which acts as an interface between the external world and the simulated enviroment
+							is a special docker container whose image must be pulled from docker registry or built from source.
+							So, if you have not done that yet, simply run <code>docker pull kathara/netkit_extended</code>
+							in your terminal.
+						</p>
+						<p class="disclaimer">
+							Please make sure you downloaded the image before trying to connect to the controller
+						</p>
+					</div>
+					<div>
+						<h1>Build the image from sources <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
+						<hr>
+						<p>
+							The default image for the interface node can be found
+							<a href="https://github.com/Pastello/Netkit-SDN-Interface">here</a>.
+							If you want to download and build or modify it on your own, you can run
+							<code>git clone https://github.com/Pastello/Netkit-SDN-Interface &lt;local-directory&gt;</code>
+							then run <code>sh build.sh</code> to build it.
+						</p>
+					</div>
+					<div>
+						<h1>Connect to controller with command line <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
 						<hr>
 						<p>
 							To use a custom image or a custom port for the interface node, you can manually start it with these commands:
 							<ul style="padding-left: 10px">
 								<li>
-									Create and run the image and expose its port 3000 to the host container:
-									<code>docker run -it --privileged=true -p &lt;port&gt;:3000 --name &lt;machine-name&gt; &lt;image-name&gt;</code>
+									Create and run the container and expose its port 3000 to the host container:
+									<code>docker run -it --privileged=true -p &lt;port&gt;:3000 --name &lt;machine-name&gt; kathara/netkit_extended</code>
 								</li>
 								<li>
 									Then you need to connect the new node to the Kathar&aacute; network:
@@ -534,30 +581,6 @@
 							way to properly configure and launch docker containers is adding current user to
 							the 'docker' group. You can do that by simply running
 							<code>sudo usermod -aG docker $(whoami)</code> in your favourite terminal.
-						</p>
-					</div>
-					<div>
-						<h1>Pull the Docker image</h1>
-						<hr>
-						<p>
-							The node which acts as an interface between the external world and the simulated enviroment
-							is a special docker container whose image must be pulled from docker registry or built from source.
-							So, if you have not done that yet, simply run <code>docker pull kathara/netkit_extended</code>
-							in your terminal.
-						</p>
-						<p class="disclaimer">
-							Please make sure you downloaded the image before trying to connect to the controller
-						</p>
-					</div>
-					<div>
-						<h1>Build the image from sources</h1>
-						<hr>
-						<p>
-							The default image for the interface node can be found
-							<a href="https://github.com/Pastello/Netkit-SDN-Interface">here</a>.
-							If you want to download and build or modify it on your own, you can run
-							<code>git clone https://github.com/Pastello/Netkit-SDN-Interface &lt;local-directory&gt;</code>
-							then run <code>sh build.sh</code> to build it.
 						</p>
 					</div>
 				</div>
