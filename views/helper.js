@@ -78,7 +78,9 @@ function copyLab(e) {
 function executeStart(e) {
 	if(!document.getElementById('lstart').classList.contains('disabledLink')){
 		toggle_submenu(-1)
+		
 		executeGeneric(e, "execute")
+
 		let connectButton = document.getElementById('connect')
 		if(!connectButton.classList.contains('hidden'))
 			connectButton.classList.remove("disabledLink")
@@ -88,6 +90,8 @@ function executeStart(e) {
 function executeClean(e) {
 	if(!document.getElementById('lclean').classList.contains('disabledLink')){
 		toggle_submenu(-1)
+		toggle_tab(null, document.querySelector('[href="#home"]'))
+
 		executeGeneric(e, "clean")
 		document.getElementById('connect').classList.add("disabledLink")
 	}
