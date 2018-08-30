@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron')
 const path = require('path')
-const exec = require('child_process').exec
+const { exec } = require('child_process')
 const url = require('url')
 const fs = require('fs')
 
@@ -118,18 +118,21 @@ ipcMain.on('sdn:connect', function () {
 	let prefix = 'netkit_$(id -u)_'
 	let machineName = prefix + 'sdn-interfacenode'
 	
-	console.log("Starting interface container\n")
-	exec(
-		'docker start ' + machineName +
-		' || docker run -t --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended'
+	console.log("Starting interface container")
+	// TODO: E se l'avessi già lanciato ma non l'avessi rimosso?
+	exec('docker run -d --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended',
+		function(){
+			console.log("Connecting interface container\n")
+			exec('docker network connect ' + prefix + 'SDNRESERVED ' + machineName, function(_, _, stderr){
+				if(stderr) console.log(stderr)
+				exec('docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')
+			})
+		}
 	)
-	exec('sleep 1 && docker network connect ' + prefix + 'SDNRESERVED ' + machineName)
-	exec('sleep 3 && docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')
 })
 
 ipcMain.on('sdn:disconnect', function () {
-	let prefix = 'netkit_$(id -u)_'
-	let machineName = prefix + 'sdn-interfacenode'
+	let machineName = 'netkit_$(id -u)_sdn-interfacenode'
 	
 	console.log("Stopping interface container and removing it\n")
 	exec('docker container rm -f ' + machineName)
