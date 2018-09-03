@@ -331,22 +331,22 @@
 								</div>
 
 								<div data-ng-show="machine.type=='controller'">
-									<p style="color: darkgray">
-										(After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar)
-									</p>
-									<hr>
 									<p>Ryu startup applications:</p>
 									<p>
 										<input data-ng-model="machine.ryu.simple"
-											type="checkbox" >Simple switch
+											type="checkbox"> Simple switch
 									</p>
 									<p>
 										<input data-ng-model="machine.ryu.stp"
-											type="checkbox" >Simple switch with spanning tree protocol
+											type="checkbox"> Simple switch with spanning tree protocol
 									</p>
 									<p>
 										<input data-ng-model="machine.ryu.rest"
-											type="checkbox" >OpenFlow REST Controller
+											type="checkbox"> OpenFlow REST Controller
+									</p>
+									<p>
+										<input data-ng-model="machine.ryu.topology"
+											type="checkbox"> REST topology
 									</p>
 									<p>
 										Other: 
@@ -358,6 +358,11 @@
 									<p>
 										<input type="checkbox" data-ng-model="machine.ryu.observelinks">
 										Observe links
+									</p>
+									<hr>
+									<p style="color: darkgray">
+										After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar.
+										Be sure that you incuded REST topology and OpenFlow REST Controller options.
 									</p>
 								</div>
 

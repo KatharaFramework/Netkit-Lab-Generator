@@ -175,6 +175,11 @@
     margin-top: 2em;
 }
 
+#netkit th,
+#netkit td {
+    max-width: 300px;
+}
+
 #netkit tr {
     text-align: left;
     vertical-align: 0;
