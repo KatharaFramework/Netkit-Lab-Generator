@@ -136,7 +136,6 @@ function makeNameserver(netkit, lab) {
                 }
             }
         }
-        //console.log(authority)
         //entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
         for (let machine of netkit) {
             if (machine.name && machine.name != "") {
@@ -307,18 +306,19 @@ function makeRouter(netkit, lab) {
 function makeOVSwitch(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
-			lab.file[machine.name + ".startup"] += "\n" +
-                "service openvswitch-switch start\n\n" +
+			lab.file[machine.name + ".startup"] +=
+                "\nservice openvswitch-switch start\n" +
                 "ovs-vsctl add-br br0\n" +
+
                 machine.interfaces.if.map(function(el){
 					if (el.eth.number != 0) return "ovs-vsctl add-port br0 eth" + el.eth.number
-				}).join('\n') +
-				"\n" +
-				machine.interfaces.if.map(function(el){
-					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " up"
-				}).join('\n') +
-				"\n\n" +
-				"ovs-vsctl set bridge br0 protocols=[OpenFlow13]\n" +
+				}).join('\n') + "\n" +
+                
+                machine.interfaces.if.map(function(el){
+					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " down"
+				}).join('\n') + "\n" +
+                
+				"\novs-vsctl set bridge br0 protocols=[OpenFlow13]\n" +
 				"ovs-vsctl set-controller br0 tcp:192.168.100.1:6633\n"
         }
     }
@@ -330,16 +330,20 @@ function makeRyuController(netkit, lab) {
 			if(machine.ryu &&
 				(machine.ryu.simple || machine.ryu.rest ||
 				machine.ryu.stp || machine.ryu.custom)){
-					let ryu_basepath = '/usr/local/lib/python2.7/dist-packages/ryu/app/'	// TODO: Controlla che sia corretto il path
-					let filename = machine.name + ".startup"
-					lab.file[filename] += "\nryu-manager "
-					if(machine.ryu.observelinks) lab.file[filename] += '--observe-links '
+					let ryu_basepath = '/usr/local/lib/python2.7/dist-packages/ryu/app/'
+                    let filename = machine.name + ".startup"
+                    
+                    lab.file[filename] += "\nryu-manager "
+                    if(machine.ryu.observelinks)
+                        lab.file[filename] += '--observe-links '
 					if(machine.ryu.simple)
-						lab.file[filename] += ryu_basepath + 'simple_switch_13.py '	// TODO: Controlla che siano corretti i nomi dei file
+						lab.file[filename] += ryu_basepath + 'simple_switch_13.py '
 					if(machine.ryu.rest)
 						lab.file[filename] += ryu_basepath + 'ofctl_rest.py '
 					if(machine.ryu.stp)
-						lab.file[filename] += ryu_basepath + 'simple_switch_stp_13.py '
+                        lab.file[filename] += ryu_basepath + 'simple_switch_stp_13.py '
+                    if(machine.ryu.topology)
+                        lab.file[filename] += ryu_basepath + 'rest_topology.py'
 					if(machine.ryu.custom){
 						let files = machine.ryu.custom.split(' ')
 						for(let file of files){

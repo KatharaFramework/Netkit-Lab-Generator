@@ -47,6 +47,7 @@ var backbone = {
 		simple: false,
 		stp: false,
 		rest: true,
+		topology: true,
 		custom: "",
 		observelinks: true
 	},
