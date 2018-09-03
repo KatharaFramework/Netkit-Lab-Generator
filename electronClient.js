@@ -14,7 +14,7 @@ app.on('ready', function () {
 	let mainWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 })
 
 	mainWindow.loadURL(url.format({
-		pathname: path.join(__dirname, 'index.html'),
+		pathname: path.join(__dirname, '/src/index.html'),
 		protocol: 'file:',
 		slashes: true
 	}))
