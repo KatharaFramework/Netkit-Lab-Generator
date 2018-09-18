@@ -108,8 +108,11 @@ function executeGeneric(e, command){
 	electron.ipcRenderer.send('script:' + command)
 }
 
-function attachInterfaceToController(attachButton, detachButton){
-	electron.ipcRenderer.send('sdn:connect')
+function attachInterfaceToController(attachButton, detachButton, customIP){
+	if(!customIP) customIP = '192.168.100.254'
+	console.log(customIP) // TODO: Cattura il customIP da index.html
+
+	electron.ipcRenderer.send('sdn:connect')	// TODO: Utilizza customIP
 	attachButton.innerText = '...'
 
 	setTimeout(function() {

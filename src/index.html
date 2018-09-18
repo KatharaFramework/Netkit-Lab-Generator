@@ -359,6 +359,10 @@
 										<input type="checkbox" data-ng-model="machine.ryu.observelinks">
 										Observe links
 									</p>
+									<p>
+										<input type="checkbox" data-ng-model="machine.ryu.installlldp">
+										Use LLDP
+									</p>
 									<hr>
 									<p style="color: darkgray">
 										After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar.
@@ -509,6 +513,7 @@
 				<link rel="stylesheet" href="css/connetti.css" />
 				<div class="schede">
 					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
+						<!-- TODO: Scomponi in due schede più piccole: una per lanciare la macchina, l'altra per connetersi -->
 						<h1>Connect to controller</h1>
 						<hr>
 						<p>
@@ -525,10 +530,10 @@
 						</p>
 						<hr>
 						<div style="margin: 10px auto; width: fit-content">
-							<!-- <p>
-								Select a free IP for the new temporary node:
-								<input type="text" class="TODO" placeholder="192.168.100.254"/>
-							</p> -->
+							<!-- TODO:
+								<p style="margin: 5px 0">Select a free IP for the new temporary node, or leave blank:</p>
+								<input style="margin: 0 auto 10px; padding: 1px; text-align: center; display: block;" type="text" placeholder="192.168.100.254"/>
+							-->
 							<button class="btn btn-default" onclick="attachInterfaceToController(this, this.nextElementSibling)">
 								Attach interface
 							</button>
