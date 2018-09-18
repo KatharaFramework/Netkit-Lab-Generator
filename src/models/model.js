@@ -49,7 +49,8 @@ var backbone = {
 		rest: true,
 		topology: true,
 		custom: "",
-		observelinks: true
+		observelinks: true,
+		installlldp: true,
 	},
 	routing: {
 		rip: {

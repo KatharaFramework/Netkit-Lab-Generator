@@ -336,6 +336,8 @@ function makeRyuController(netkit, lab) {
                     lab.file[filename] += "\nryu-manager "
                     if(machine.ryu.observelinks)
                         lab.file[filename] += '--observe-links '
+                    if(machine.ryu.installlldp)
+                        lab.file[filename] += '--install-lldp-flow '
 					if(machine.ryu.simple)
 						lab.file[filename] += ryu_basepath + 'simple_switch_13.py '
 					if(machine.ryu.rest)
