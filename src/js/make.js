@@ -307,15 +307,15 @@ function makeOVSwitch(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
 			lab.file[machine.name + ".startup"] +=
+				machine.interfaces.if.map(function(el){
+					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " down"
+				}).join('\n') + "\n" +
+			
                 "\nservice openvswitch-switch start\n" +
                 "ovs-vsctl add-br br0\n" +
 
                 machine.interfaces.if.map(function(el){
 					if (el.eth.number != 0) return "ovs-vsctl add-port br0 eth" + el.eth.number
-				}).join('\n') + "\n" +
-                
-                machine.interfaces.if.map(function(el){
-					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " down"
 				}).join('\n') + "\n" +
                 
 				"\novs-vsctl set bridge br0 protocols=[OpenFlow13]\n" +
@@ -336,8 +336,6 @@ function makeRyuController(netkit, lab) {
                     lab.file[filename] += "\nryu-manager "
                     if(machine.ryu.observelinks)
                         lab.file[filename] += '--observe-links '
-                    if(machine.ryu.installlldp)
-                        lab.file[filename] += '--install-lldp-flow '
 					if(machine.ryu.simple)
 						lab.file[filename] += ryu_basepath + 'simple_switch_13.py '
 					if(machine.ryu.rest)
