@@ -331,7 +331,7 @@
 								</div>
 
 								<div data-ng-show="machine.type=='controller'">
-									<p>Ryu startup applications:</p>
+									<label>Ryu startup applications:</label>
 									<p>
 										<input data-ng-model="machine.ryu.simple"
 											type="checkbox"> Simple switch
@@ -359,10 +359,12 @@
 										<input type="checkbox" data-ng-model="machine.ryu.observelinks">
 										Observe links
 									</p>
-									<p>
-										<input type="checkbox" data-ng-model="machine.ryu.installlldp">
-										Use LLDP
-									</p>
+									<!-- TODO: Non credo che serva perché i pacchetti LLDP vengono già mandati automaticamente al controller
+										<p>
+											<input type="checkbox" data-ng-model="machine.ryu.installlldp">
+											Use LLDP
+										</p>
+									-->
 									<hr>
 									<p style="color: darkgray">
 										After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar.
@@ -513,8 +515,7 @@
 				<link rel="stylesheet" href="css/connetti.css" />
 				<div class="schede">
 					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
-						<!-- TODO: Scomponi in due schede più piccole: una per lanciare la macchina, l'altra per connetersi -->
-						<h1>Connect to controller</h1>
+						<h1>Create an interface to the Kathar&aacute; virtual network</h1>
 						<hr>
 						<p>
 							In order to connect to the controller, be sure that a <b>REST controller</b>
@@ -522,11 +523,8 @@
 							A new node will be added to the Kathar&aacute; simulated enviroment.
 							This node will act as an intermediary between the host and the controller.
 							It will host a server which will provide an interface for managing the
-							flow tables of the controller. Once created,
-							<a onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')" target="_blank">click here</a>
-							or visit <span style="text-decoration: underline">http://localhost:8080/</span>
-							on your web browser.
-							<p class="disclaimer">Be sure all containers have started before connecting!</p>
+							flow tables of the controller.
+							<p class="disclaimer">Be sure all containers have started before creating the interface!</p>
 						</p>
 						<hr>
 						<div style="margin: 10px auto; width: fit-content">
@@ -540,6 +538,24 @@
 							<button class="btn btn-danger hidden" onclick="detachInterfaceToController(this, this.previousElementSibling)">
 								Detach
 							</button>
+						</div>
+					</div>
+					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
+						<h1>Connect to controller</h1>
+						<hr>
+						<p>
+							Once you created the interface, connect to it!
+						</p>
+						<div>
+							<a class="btn btn-default"
+								style="display: block"
+								onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')"
+								target="_blank">
+								Connect
+							</a>
+							<span style="color: darkgray">
+								You can also navigate to <span style="text-decoration: underline">http://localhost:8080/</span> on your browser
+							</span>
 						</div>
 					</div>
 					<div>
@@ -567,7 +583,7 @@
 						</p>
 					</div>
 					<div>
-						<h1>Connect to controller with command line <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
+						<h1>Connect to controller via command line <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
 						<hr>
 						<p>
 							To use a custom image or a custom port for the interface node, you can manually start it with these commands:
