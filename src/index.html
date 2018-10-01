@@ -85,13 +85,10 @@
 			<nav id="submenu-2" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide container-fluid">
 				<ul class="nav navbar-nav">
 					<li>
-						<a id="copyLab">Copy lab on Host *</a>
+						<a id="lstart">Start lab on Host **</a>
 					</li>
 					<li>
-						<a id="lstart" class="disabledLink">Run LStart on Host **</a>
-					</li>
-					<li>
-						<a id="lclean" class="disabledLink">Run LClean on Host **</a>
+						<a id="lclean">Clean lab on Host **</a>
 					</li>
 				</ul>
 				<div>
@@ -650,7 +647,6 @@
 				electron = require('electron')
 
 				document.querySelector("#run-on-host").classList.remove("hidden")
-				document.getElementById('copyLab').addEventListener('click', copyLab)
 				document.getElementById('lstart').addEventListener('click', executeStart)
 				document.getElementById('lclean').addEventListener('click', executeClean)
 			}

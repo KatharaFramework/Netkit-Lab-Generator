@@ -51,15 +51,12 @@ function isElectron() {
     return window && window.process && window.process.type
 }
 
-function copyLab(e) {
-	e.preventDefault()
-	
-    let script = document.getElementById('sh_script').value
+function copy(){
+	let script = document.getElementById('sh_script').value
 	electron.ipcRenderer.send('script:copy', script, 'script.sh')
+}
 
-    document.getElementById('lstart').classList.remove("disabledLink")
-	document.getElementById('lclean').classList.remove("disabledLink")
-	
+function isSDNLab(){
 	let hasController = false, hasSwitch = false
 	for(let machineType of document.querySelectorAll('#netkit tr p input[data-ng-model="machine.type"]:checked')){
 		if(machineType.value == 'controller'){
@@ -68,14 +65,17 @@ function copyLab(e) {
 			hasSwitch = true
 		}
 		
-		if(hasController && hasSwitch){
-			document.getElementById('connect').classList.remove("hidden")
-			break
-		}
+		if(hasController && hasSwitch) return true
 	}
 }
 
 function executeStart(e) {
+	e.preventDefault()
+
+	copy()
+
+	if(isSDNLab()) document.getElementById('connect').classList.remove("hidden")
+
 	if(!document.getElementById('lstart').classList.contains('disabledLink')){
 		toggle_submenu(-1)
 		
