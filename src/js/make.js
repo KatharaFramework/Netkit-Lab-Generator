@@ -51,6 +51,12 @@ function makeLabConfFile(netkit, lab) {
 /* ------------------ STARTUP FILES ------------------ */
 /* --------------------------------------------------- */
 
+// TODO: Metti a fattor comune:
+/*
+	for (let machine of netkit) {
+        if (machine.name && machine.name != "" && .....
+*/
+
 function makeTerminal(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'terminal' && machine.pc.dns && machine.pc.dns != "-") {
@@ -308,7 +314,7 @@ function makeOVSwitch(netkit, lab) {
         if (machine.name && machine.name != "" && machine.type == 'switch') {
 			lab.file[machine.name + ".startup"] +=
 				machine.interfaces.if.map(function(el){
-					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " down"
+					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " 0"
 				}).join('\n') + "\n" +
 			
                 "\nservice openvswitch-switch start\n" +
@@ -327,30 +333,30 @@ function makeOVSwitch(netkit, lab) {
 function makeRyuController(netkit, lab) {
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'controller') {
-			if(machine.ryu &&
-				(machine.ryu.simple || machine.ryu.rest ||
-				machine.ryu.stp || machine.ryu.custom)){
-					let ryu_basepath = '/usr/local/lib/python2.7/dist-packages/ryu/app/'
-                    let filename = machine.name + ".startup"
-                    
-                    lab.file[filename] += "\nryu-manager "
-                    if(machine.ryu.observelinks)
-                        lab.file[filename] += '--observe-links '
-					if(machine.ryu.simple)
-						lab.file[filename] += ryu_basepath + 'simple_switch_13.py '
-					if(machine.ryu.rest)
-						lab.file[filename] += ryu_basepath + 'ofctl_rest.py '
-					if(machine.ryu.stp)
-                        lab.file[filename] += ryu_basepath + 'simple_switch_stp_13.py '
-                    if(machine.ryu.topology)
-                        lab.file[filename] += ryu_basepath + 'rest_topology.py'
-					if(machine.ryu.custom){
-						let files = machine.ryu.custom.split(' ')
-						for(let file of files){
-							lab.file[filename] += ryu_basepath + file + ' '
-						}
-					}
+			let filename = machine.name + ".startup"
+			// Modifico il MAC a cui inoltrare i pacchetti LLDP perché in Katharà quello attuale non funziona
+			lab.file[filename] += "\nsed -i -e 's/01:80:c2:00:00:0e/ff:ff:ff:ff:ff:ff/g' /usr/local/lib/python2.7/dist-packages/ryu/lib/packet/lldp.py\n"
+
+			// Avvio le app Ryu
+			let ryuAppPrefix = 'ryu.app.'
+			
+			lab.file[filename] += '\nryu-manager '
+			if(machine.ryu.observelinks)
+				lab.file[filename] += '--observe-links '
+			if(machine.ryu.simple)
+				lab.file[filename] += ryuAppPrefix + 'simple_switch_13 '
+			if(machine.ryu.rest)
+				lab.file[filename] += ryuAppPrefix + 'ofctl_rest '
+			if(machine.ryu.stp)
+				lab.file[filename] += ryuAppPrefix + 'simple_switch_stp_13 '
+			if(machine.ryu.topology)
+				lab.file[filename] += ryuAppPrefix + 'rest_topology '
+			if(machine.ryu.custom){
+				let apps = machine.ryu.custom.split(' ')
+				for(let app of apps){
+					lab.file[filename] += ryuAppPrefix + app + ' '
 				}
+			}
         }
     }
 }
