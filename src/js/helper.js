@@ -51,7 +51,7 @@ function isElectron() {
     return window && window.process && window.process.type
 }
 
-function copy(){
+function copyLab(){
 	let script = document.getElementById('sh_script').value
 	electron.ipcRenderer.send('script:copy', script, 'script.sh')
 }
@@ -72,7 +72,7 @@ function isSDNLab(){
 function executeStart(e) {
 	e.preventDefault()
 
-	copy()
+	copyLab()
 
 	if(isSDNLab()) document.getElementById('connect').classList.remove("hidden")
 
@@ -108,11 +108,10 @@ function executeGeneric(e, command){
 	electron.ipcRenderer.send('script:' + command)
 }
 
-function attachInterfaceToController(attachButton, detachButton, customIP){
-	if(!customIP) customIP = '192.168.100.254'
-	console.log(customIP) // TODO: Cattura il customIP da index.html
+function attachInterfaceToController(attachButton, detachButton, customIPInput){
+	customIPInput.style.display = 'none'
 
-	electron.ipcRenderer.send('sdn:connect')	// TODO: Utilizza customIP
+	electron.ipcRenderer.send('sdn:connect', customIPInput.value)
 	attachButton.innerText = '...'
 
 	setTimeout(function() {
@@ -124,7 +123,7 @@ function attachInterfaceToController(attachButton, detachButton, customIP){
 	}, 3000)
 }
 
-function detachInterfaceToController(detachButton, attachButton){
+function detachInterfaceToController(detachButton, attachButton, customIPInput){
 	electron.ipcRenderer.send('sdn:disconnect')
 	detachButton.innerText = '...'
 
@@ -135,5 +134,7 @@ function detachInterfaceToController(detachButton, attachButton){
 		attachButton.innerText = 'Attach interface'
 		attachButton.classList.remove('btn-success')
 		attachButton.classList.add('btn-default')
+
+		customIPInput.style.display = ''
 	}, 3000)
 }

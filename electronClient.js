@@ -66,20 +66,19 @@ ipcMain.on('script:clean', function () {
 
 /* --------------------------- SDN --------------------------- */
 // TODO: Controllare che funzioni anche su windows
-// TODO: Anziché usare i comandi docker si potrebbe usare il comando vstart
 
-ipcMain.on('sdn:connect', function () {
+ipcMain.on('sdn:connect', function (_, ip) {
 	let prefix = 'netkit_$(id -u)_'
 	let machineName = prefix + 'sdn-interfacenode'
 	
 	console.log("Starting interface container")
-	// TODO: E se l'avessi già lanciato ma non l'avessi rimosso?
+	// TODO: E se l'avessi già lanciato ma non l'avessi rimosso? Credo che non si possono avere due macchine con lo stesso nome => Nessun problema
 	exec('docker run -d --privileged=true -p 8080:3000 --name ' + machineName + ' kathara/netkit_extended',
 		function(){
 			console.log("Connecting interface container\n")
 			exec('docker network connect ' + prefix + 'SDNRESERVED ' + machineName, function(_, _, stderr){
 				if(stderr) console.log(stderr)
-				exec('docker exec ' + machineName + ' ifconfig eth1 192.168.100.254 up')
+				exec('docker exec ' + machineName + ' ifconfig eth1 ' + ip + ' up')
 			})
 		}
 	)
