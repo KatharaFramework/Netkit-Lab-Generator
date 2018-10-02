@@ -358,12 +358,6 @@
 										<input type="checkbox" data-ng-model="machine.ryu.observelinks">
 										Observe links
 									</p>
-									<!-- TODO: Non credo che serva perché i pacchetti LLDP vengono già mandati automaticamente al controller
-										<p>
-											<input type="checkbox" data-ng-model="machine.ryu.installlldp">
-											Use LLDP
-										</p>
-									-->
 									<hr>
 									<p style="color: darkgray">
 										After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar.
@@ -527,14 +521,16 @@
 						</p>
 						<hr>
 						<div style="margin: 10px auto; width: fit-content">
-							<!-- TODO:
-								<p style="margin: 5px 0">Select a free IP for the new temporary node, or leave blank:</p>
-								<input style="margin: 0 auto 10px; padding: 1px; text-align: center; display: block;" type="text" placeholder="192.168.100.254"/>
-							-->
-							<button class="btn btn-default" onclick="attachInterfaceToController(this, this.nextElementSibling)">
+							<p style="margin: 5px 0">Select an IP address for the new temporary node</p>
+							<input style="width: 130px"
+								type="text" value="192.168.100.254"
+								pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$)"/>
+							<button class="btn btn-default"
+								onclick="attachInterfaceToController(this, this.nextElementSibling, this.previousElementSibling)">
 								Attach interface
 							</button>
-							<button class="btn btn-danger hidden" onclick="detachInterfaceToController(this, this.previousElementSibling)">
+							<button class="btn btn-danger hidden"
+								onclick="detachInterfaceToController(this, this.previousElementSibling, this.previousElementSibling.previousElementSibling)">
 								Detach
 							</button>
 						</div>

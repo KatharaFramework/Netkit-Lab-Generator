@@ -449,7 +449,7 @@ function makeBgpConf(router, lab) {
 }
 
 function makeFilesStructure(netkit, labInfo) {
-    var lab = []		// <------ EHHHH????????????    TODO: sistemare (se ho tempo/voglia di ricontrollare bene tutto)
+    var lab = []		// <------ EHHHH????????????    TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo/voglia di ricontrollare bene tutto)
     lab.folders = []
     lab.file = []
     lab["warning"] = 0
