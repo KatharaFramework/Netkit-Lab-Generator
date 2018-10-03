@@ -97,6 +97,8 @@ function generate_nodes_edges(lab) {
 	let nodes = []
 	let edges = []
 
+	let pendingDomainNodes = []
+
 	for (let m in lab) {
 		let machine = lab[m]
 		if (machine.name == "") continue
@@ -163,7 +165,6 @@ function generate_nodes_edges(lab) {
 				}
 			}
 		}
-
 		//for each interface of the machine
 		for (let interface of machine.interfaces.if) {
 			let domain_name = interface.eth.domain
@@ -182,12 +183,15 @@ function generate_nodes_edges(lab) {
 			// domain should have a child node with the ip description
 			// so edge for that and the eth
 			if (!containsNodeWithID(domain_id, nodes)) {
-				nodes.push({
-						id: domain_id,
-						label: domain_name,
-						group: 'domain',
-						value: 5
-					})
+				let domainNode = {
+					id: domain_id,
+					label: domain_name,
+					group: 'domain',
+					value: 5
+				}
+				if(machine.type == 'switch') pendingDomainNodes.push(domainNode)
+				else nodes.push(domainNode)
+
 				if(interface.ip){
 					nodes.push({
 						id: "iplabel-" + domain_name + "-domain_ip",
@@ -231,6 +235,9 @@ function generate_nodes_edges(lab) {
 			}
 		}
 	}
+	
+	pendingDomainNodes.forEach(domainNode => { if(!containsNodeWithID(domainNode.id, nodes)) nodes.push(domainNode)})
+
 	return { nodes, edges }
 }
 
