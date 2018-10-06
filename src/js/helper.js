@@ -93,7 +93,10 @@ function executeClean(e) {
 		toggle_tab(null, document.querySelector('[href="#home"]'))
 
 		executeGeneric(e, "clean")
-		document.getElementById('connect').classList.add("disabledLink")
+		if(!document.getElementById('connect').classList.contains("disabledLink")){
+			document.getElementById('connect').classList.add("disabledLink")
+			detachInterfaceToController()
+		}
 	}
 }
 
@@ -124,6 +127,13 @@ function attachInterfaceToController(attachButton, detachButton, customIPInput){
 }
 
 function detachInterfaceToController(detachButton, attachButton, customIPInput){
+	if(!attachButton || !customIPInput || !detachButton){
+		let schedaAttachDetach = document.querySelector('#sdn .schede').firstElementChild.lastElementChild
+		customIPInput = schedaAttachDetach.firstElementChild.nextElementSibling
+		attachButton = customIPInput.nextElementSibling
+		detachButton = attachButton.nextElementSibling
+	}
+
 	electron.ipcRenderer.send('sdn:disconnect')
 	detachButton.innerText = '...'
 
