@@ -331,34 +331,41 @@ function makeOVSwitch(netkit, lab) {
 }
 
 function makeRyuController(netkit, lab) {
+	let isSDN = false
     for (let machine of netkit) {
         if (machine.name && machine.name != "" && machine.type == 'controller') {
-			let filename = machine.name + ".startup"
-			// Modifico il MAC a cui inoltrare i pacchetti LLDP perché in Katharà quello attuale non funziona
-			lab.file[filename] += "\nsed -i -e 's/01:80:c2:00:00:0e/ff:ff:ff:ff:ff:ff/g' /usr/local/lib/python2.7/dist-packages/ryu/lib/packet/lldp.py\n"
+			isSDN = true
 
-			// Avvio le app Ryu
+			let filename = machine.name + ".startup"
 			let ryuAppPrefix = 'ryu.app.'
 			
+			// Modifico il MAC a cui inoltrare i pacchetti LLDP perché in Katharà quello attuale non funziona
+			if(machine.ryu.topology)
+				lab.file[filename] += "\nsed -i -e 's/01:80:c2:00:00:0e/ff:ff:ff:ff:ff:ff/g' /usr/local/lib/python2.7/dist-packages/ryu/lib/packet/lldp.py\n"
+			
+			// Avvio le app Ryu
 			lab.file[filename] += '\nryu-manager '
-			if(machine.ryu.observelinks)
-				lab.file[filename] += '--observe-links '
-			if(machine.ryu.simple)
-				lab.file[filename] += ryuAppPrefix + 'simple_switch_13 '
-			if(machine.ryu.rest)
-				lab.file[filename] += ryuAppPrefix + 'ofctl_rest '
+			if(machine.ryu.topology)
+				lab.file[filename] += '--observe-links ' + ryuAppPrefix + 'rest_topology '
 			if(machine.ryu.stp)
 				lab.file[filename] += ryuAppPrefix + 'simple_switch_stp_13 '
-			if(machine.ryu.topology)
-				lab.file[filename] += ryuAppPrefix + 'rest_topology '
+			if(machine.ryu.rest)
+				lab.file[filename] += ryuAppPrefix + 'ofctl_rest '
 			if(machine.ryu.custom){
 				let apps = machine.ryu.custom.split(' ')
 				for(let app of apps){
 					lab.file[filename] += ryuAppPrefix + app + ' '
 				}
 			}
+
+			if(!(machine.ryu.topology || machine.ryu.stp || machine.ryu.custom || machine.ryu.rest)){
+				lab.file[filename] += ryuAppPrefix + 'simple_switch_13'
+			}
         }
-    }
+	}
+	
+	if(isSDN) document.getElementById('connect').classList.remove('hidden')
+	else document.getElementById('connect').classList.add('hidden')
 }
 
 /* --------------------------------------------------- */

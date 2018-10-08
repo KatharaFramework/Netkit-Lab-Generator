@@ -332,16 +332,12 @@
 								<div data-ng-show="machine.type=='controller'">
 									<label>Ryu startup applications:</label>
 									<p>
-										<input data-ng-model="machine.ryu.simple"
-											type="checkbox"> Simple switch
-									</p>
-									<p>
 										<input data-ng-model="machine.ryu.stp"
-											type="checkbox"> Simple switch with spanning tree protocol
+											type="checkbox"> Spanning tree protocol
 									</p>
 									<p>
 										<input data-ng-model="machine.ryu.rest"
-											type="checkbox"> OpenFlow REST Controller
+											type="checkbox"> REST Controller
 									</p>
 									<p>
 										<input data-ng-model="machine.ryu.topology"
@@ -350,18 +346,13 @@
 									<p>
 										Other (must be in ryu.app folder): 
 										<input data-ng-model="machine.ryu.custom"
-											type="text" placeholder="rest_topology ofctl_rest"
-											style="background-image: none; width: 200px; padding: 1px 5px; margin: 5px 0;">
-									</p>
-									<hr>
-									<p>
-										<input type="checkbox" data-ng-model="machine.ryu.observelinks">
-										Observe links
+											type="text" placeholder="app1 app2 ..."
+											style="background-image: none; width: 220px; padding: 1px 5px; margin: 5px 0;">
 									</p>
 									<hr>
 									<p style="color: darkgray">
-										After the lab starts, you will be able to connect to this controller through a dedicated button in the navigation bar.
-										Be sure that you incuded REST topology and OpenFlow REST Controller options.
+										After the lab starts, you will be able to connect to this controller
+										<strong>only if you checked the two REST options.</strong>
 									</p>
 								</div>
 

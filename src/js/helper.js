@@ -56,33 +56,19 @@ function copyLab(){
 	electron.ipcRenderer.send('script:copy', script, 'script.sh')
 }
 
-function isSDNLab(){
-	let hasController = false, hasSwitch = false
-	for(let machineType of document.querySelectorAll('#netkit tr p input[data-ng-model="machine.type"]:checked')){
-		if(machineType.value == 'controller'){
-			hasController = true
-		} else if (machineType.value == 'switch'){
-			hasSwitch = true
-		}
-		
-		if(hasController && hasSwitch) return true
-	}
-}
-
 function executeStart(e) {
 	e.preventDefault()
 
-	copyLab()
-
-	if(isSDNLab()) document.getElementById('connect').classList.remove("hidden")
-
 	if(!document.getElementById('lstart').classList.contains('disabledLink')){
-		toggle_submenu(-1)
-		
-		executeGeneric(e, "execute")
-
 		let connectButton = document.getElementById('connect')
-		if(!connectButton.classList.contains('hidden'))
+		
+		copyLab()
+		toggle_submenu(-1)
+		executeGeneric(e, "execute")
+		
+		if(!connectButton.classList.contains('hidden') 
+			&& document.querySelector('#netkit input[data-ng-model="machine.ryu.rest"]').checked
+			&& document.querySelector('#netkit input[data-ng-model="machine.ryu.topology"]').checked)
 			connectButton.classList.remove("disabledLink")
 	}
 }
@@ -112,18 +98,20 @@ function executeGeneric(e, command){
 }
 
 function attachInterfaceToController(attachButton, detachButton, customIPInput){
-	customIPInput.style.display = 'none'
-
-	electron.ipcRenderer.send('sdn:connect', customIPInput.value)
-	attachButton.innerText = '...'
-
-	setTimeout(function() {
-		attachButton.classList.remove('btn-default')
-		attachButton.classList.add('btn-success')
-		attachButton.innerText = 'Attached'
-
-		detachButton.classList.remove('hidden')
-	}, 3000)
+	if(!attachButton.classList.contains('btn-success') && attachButton.innerText != '...'){
+		customIPInput.style.display = 'none'
+	
+		electron.ipcRenderer.send('sdn:connect', customIPInput.value)
+		attachButton.innerText = '...'
+	
+		setTimeout(function() {
+			attachButton.classList.remove('btn-default')
+			attachButton.classList.add('btn-success')
+			attachButton.innerText = 'Attached'
+	
+			detachButton.classList.remove('hidden')
+		}, 3000)
+	}
 }
 
 function detachInterfaceToController(detachButton, attachButton, customIPInput){
@@ -134,17 +122,19 @@ function detachInterfaceToController(detachButton, attachButton, customIPInput){
 		detachButton = attachButton.nextElementSibling
 	}
 
-	electron.ipcRenderer.send('sdn:disconnect')
-	detachButton.innerText = '...'
-
-	setTimeout(function() {
-		detachButton.classList.add('hidden')
-		detachButton.innerText = 'Detach'
-
-		attachButton.innerText = 'Attach interface'
-		attachButton.classList.remove('btn-success')
-		attachButton.classList.add('btn-default')
-
-		customIPInput.style.display = ''
-	}, 3000)
+	if(!detachButton.classList.contains('hidden') && detachButton.innerText != '...'){
+		electron.ipcRenderer.send('sdn:disconnect')
+		detachButton.innerText = '...'
+	
+		setTimeout(function() {
+			detachButton.classList.add('hidden')
+			detachButton.innerText = 'Detach'
+	
+			attachButton.innerText = 'Attach interface'
+			attachButton.classList.remove('btn-success')
+			attachButton.classList.add('btn-default')
+	
+			customIPInput.style.display = ''
+		}, 3000)
+	}
 }
