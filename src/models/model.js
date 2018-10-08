@@ -44,12 +44,10 @@ var backbone = {
 		fileCounter: 0
 	},
 	ryu: {
-		simple: false,
 		stp: false,
 		rest: true,
 		topology: true,
-		custom: "",
-		observelinks: true
+		custom: ""
 	},
 	routing: {
 		rip: {
