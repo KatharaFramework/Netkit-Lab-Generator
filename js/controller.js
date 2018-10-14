@@ -180,7 +180,7 @@ app.controller('nc', function($location, $anchorScroll, $scope) {
 
     $scope.makeDownload = function(text, filename) {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, filename);
+        saveAs(blob, filename, true);
     };
 
     $scope.generateScript = function(nk, li) {
