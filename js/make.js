@@ -465,16 +465,20 @@ function makeScript(lab){
     text += 'cd "$(dirname "$0")/lab"\n';
     text += "\n";
     for(var folderName in lab["folder"]){
-        text += "mkdir -p " + folderName + "\n";
+        if(folderName!=""){
+            text += "mkdir -p " + folderName + "\n";
+        }
     }
     for(var fileName in lab["file"]){
         text += "touch " + fileName + "\n";
         var lines = lab["file"][fileName].split("\n");
         for(var lineIndex in lines) {
-            text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
+            if(lines[lineIndex] != ""){
+                text += "echo '" + lines[lineIndex] + "' >> " + fileName + "\n";
+            }
         }
     }
-    text += "rm \"$0\"\n";
+    text += "rm \"../$0\"\n";
 
     return text;
 }
