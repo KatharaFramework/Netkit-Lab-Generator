@@ -339,10 +339,6 @@ function makeRyuController(netkit, lab) {
 			let filename = machine.name + ".startup"
 			let ryuAppPrefix = 'ryu.app.'
 			
-			// Modifico il MAC a cui inoltrare i pacchetti LLDP perché in Katharà quello attuale non funziona
-			if(machine.ryu.topology)
-				lab.file[filename] += "\nsed -i -e 's/01:80:c2:00:00:0e/ff:ff:ff:ff:ff:ff/g' /usr/local/lib/python2.7/dist-packages/ryu/lib/packet/lldp.py\n"
-			
 			// Avvio le app Ryu
 			lab.file[filename] += '\nryu-manager '
 			if(machine.ryu.topology)
@@ -456,7 +452,7 @@ function makeBgpConf(router, lab) {
 }
 
 function makeFilesStructure(netkit, labInfo) {
-    var lab = []		// <------ EHHHH????????????    TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo/voglia di ricontrollare bene tutto)
+    var lab = []		// TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo/voglia di ricontrollare bene tutto)
     lab.folders = []
     lab.file = []
     lab["warning"] = 0

@@ -110,7 +110,7 @@ function attachInterfaceToController(attachButton, detachButton, customIPInput){
 			attachButton.innerText = 'Attached'
 	
 			detachButton.classList.remove('hidden')
-		}, 3000)
+		}, 2000)
 	}
 }
 
@@ -135,6 +135,6 @@ function detachInterfaceToController(detachButton, attachButton, customIPInput){
 			attachButton.classList.add('btn-default')
 	
 			customIPInput.style.display = ''
-		}, 3000)
+		}, 2000)
 	}
 }
