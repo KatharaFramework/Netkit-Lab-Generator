@@ -83,21 +83,21 @@
 
 			<!-- Sub-menu Run Lab -->
 			<nav id="submenu-2" class="navbar navbar-primary navbar-kathara navbar-kathara-secondary ng-hide container-fluid">
-				<ul class="nav navbar-nav">
+				<ul class="nav navbar-nav" style="margin-right: 10px">
 					<li>
-						<a id="lstart">Start lab on Host **</a>
+						<a id="lstart">Start lab on Host</a>
 					</li>
 					<li>
-						<a id="lclean">Clean lab on Host **</a>
+						<a id="lclean">Clean lab on Host</a>
 					</li>
 				</ul>
-				<div>
+				<div style="margin-top: 2px">
 					<span class="label label-warning">
-						* Host must be able to run bash commands
+						Host must be able to run bash commands
 					</span>
 					<br />
-					<span class="label label-warning">
-						** Requires Kathar&aacute; installed on Host and correctly configured.
+					<span class="label label-warning" style="margin-left: 5px">
+						Requires Kathar&aacute; installed on Host and correctly configured.
 					</span>
 				</div>
 			</nav>
@@ -513,7 +513,8 @@
 						<hr>
 						<div style="margin: 10px auto; width: fit-content">
 							<p style="margin: 5px 0">Select an IP address for the new temporary node</p>
-							<input style="width: 130px"
+							<input style="width: 130px; color: var(--main-color); border-bottom: 1px solid; margin: 0 10px;"
+								class="btn"
 								type="text" value="192.168.100.254"
 								pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$)"/>
 							<button class="btn btn-default"
@@ -526,7 +527,7 @@
 							</button>
 						</div>
 					</div>
-					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
+					<div style="transform: scale(1.1); margin: 30px; opacity: 1; max-height: 380px">
 						<h1>Connect to controller</h1>
 						<hr>
 						<p>
