@@ -455,8 +455,8 @@ function makeFilesStructure(netkit, labInfo) {
     var lab = []		// TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo/voglia di ricontrollare bene tutto)
     lab.folders = []
     lab.file = []
-    lab["warning"] = 0
-    lab["error"] = 0
+    lab.warning = 0
+    lab.error = 0
 
     makeLabInfo(labInfo, lab)
 
@@ -488,18 +488,18 @@ function makeScript(lab) {
         + "\n"
 
     for (let folderName of lab.folders) {
-        text += "mkdir -p " + folderName + "\n"
+        if(folderName != "") text += "mkdir -p " + folderName + "\n"
     }
 
     for (let fileName in lab.file) {
         text += "touch " + fileName + "\n"
         let lines = lab.file[fileName].split("\n")
         for (let line of lines) {
-            text += "echo '" + line + "' >> " + fileName + "\n"
+            if(line != "") text += "echo '" + line + "' >> " + fileName + "\n"
         }
     }
 
-    text += "rm \"$0\"\n"
+    text += "rm \"../$0\"\n"
     return text
 }
 
