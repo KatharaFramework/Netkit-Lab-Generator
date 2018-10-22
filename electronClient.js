@@ -17,7 +17,7 @@ app.on('ready', function () {
 		slashes: true
 	}))
 
-	// Comment this line if you need to access Developer Tools
+	// Comment this line if you need to access Developer Tools with ctr+shift+i
 	// mainWindow.setMenu(null)
 
 	mainWindow.on('closed', function () {
@@ -32,8 +32,6 @@ app.on('ready', function () {
 let _baseFolder = app.getPath('userData'), _isWindows = /^win/.test(process.platform)
 
 function _runKatharaCommand(command){
-	// Oss. Non l'ho chiamato runNetkit... perché Netkit non include in $NETKIT_HOME la cartella bin. Qui è sottintesa
-	// E quindi secondo me tutta la repository si dovrebbe rinominare... E' stata pensata per Kathara...
 	let prefix = _isWindows ? 'start cmd /c \"%NETKIT_HOME%\\' : '$NETKIT_HOME/'
 	exec(prefix + command + (_isWindows ? '"' : ''))
 }
