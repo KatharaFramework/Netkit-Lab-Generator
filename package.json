@@ -2,11 +2,12 @@
   "name": "katharagui",
   "version": "1.1.0",
   "description": "Desktop UI for Kathara",
+  "repository": "https://github.com/KatharaFramework/Netkit-Lab-Generator.git",
   "scripts": {
     "start": "electron electronClient.js",
-    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"KatharaGUI\"",
-    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/icon.png --prune=true --out=release-builds"
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --icon=src/assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"KatharaGUI\"",
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=src/assets/icons/png/icon.png --prune=true --out=release-builds"
   },
   "author": "Gaetano Bonofiglio",
   "license": "GPL-3.0",
