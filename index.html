@@ -7,10 +7,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="author" content="Lykon, Lollo, Neeja" />
 	<title>Netkit Lab Generator</title>
-	<link rel="stylesheet" href="vendor/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="src/vendor/css/bootstrap.min.css" />
 	<link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjUlEQVQ4ja2RsW7aQByHP87ns2Mj180YlQeIOrBU4nmKisQ7IPECDCwMTHkIxIY6MdKFocrGGzTCjm2dzz6lA9gNahQpaX/TXyd99/3vd/CP6ex2u6/H4/HuHayN4/hbZ7PZ6H6/71VV9SbadV32+/2TNMZ4VVUxHo//XG3tX0Ce59T1EwDX1x9YLpcYYzoSoCxLAKbTKdvtlsPh0IJJklAUBdY6APi+z+Nj2jKiGQDm8zmDwYCbm08kSUKSJKSpJssMAN1uhFJXuK6iEQuAuq6x1jIajVitVtzf/2Q4HHJ7+xmtNb7v0+1GCOGgVIDv+9R1DYB8/t7FYkEQBFhrmc1mWOtcgEI4CCGQUrVdSQCtNXmeE8cxRVGcWw4JwyuUCk4m6QLgeQFZ9oDW+nRelmVbSFmWGGPOZX28sHpe0G4qhEPDyedfZYzBWovrhigVIKV7Ab4U2awShiFpmp7tDvALKRVZ9tBam3jeadZaIxtoMpm8anopaZoioyj6sV6vv7yZBnq93vf3cP83vwGLvrOpZ8u5AwAAAABJRU5ErkJggg=="
 	/>
-	<script src="js/helper.js"></script>
+	<script src="src/js/helper.js"></script>
 </head>
 
 <body>
@@ -22,9 +22,9 @@
 
 	<!-- MAIN-->
 	<div data-ng-app="napp" data-ng-controller="nc">
-		<link rel="stylesheet" href="css/main.css" />
-		<script src="vendor/js/angular.min.js"></script>
-		<script src="js/controller.js"></script>
+		<link rel="stylesheet" href="src/css/main.css" />
+		<script src="src/vendor/js/angular.min.js"></script>
+		<script src="src/js/controller.js"></script>
 
 		<!-- NAVBAR-->
 		<div>
@@ -56,7 +56,7 @@
 
 			<!-- Sub-menu Download Lab -->
 			<nav id="submenu-0" class="navbar navbar-primary navbar-kathara container-fluid navbar-kathara-secondary ng-hide">
-				<script src="vendor/js/jszip.min.js"></script>
+				<script src="src/vendor/js/jszip.min.js"></script>
 				<ul class="nav navbar-nav">
 					<li>
 						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')" onclick="toggle_submenu(-1)">Download .sh file</a>
@@ -69,7 +69,7 @@
 
 			<!-- Sub-menu Save and Load -->
 			<nav id="submenu-1" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
-				<script src="vendor/js/FileSaver.min.js"></script>
+				<script src="src/vendor/js/FileSaver.min.js"></script>
 				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"/>
 				<ul class="nav navbar-nav">
 					<li>
@@ -108,9 +108,9 @@
 
 			<!-- HOME -->
 			<div id="home" class="tab-pane active">
-				<link rel="stylesheet" href="css/home.css" />
-				<script src="models/model.js"></script>
-				<script src="js/make.js"></script>
+				<link rel="stylesheet" href="src/css/home.css" />
+				<script src="src/models/model.js"></script>
+				<script src="src/js/make.js"></script>
 
 				<div>
 					<h1>Netkit Lab Generator</h1>
@@ -481,16 +481,16 @@
 
 			<!-- GRAPH -->
 			<div id="graph" class="tab-pane">
-				<script src="vendor/js/vis.js"></script>
-				<script src="models/draw.js"></script>
-				<script src="js/make_draw_model.js"></script>
+				<script src="src/vendor/js/vis.js"></script>
+				<script src="src/models/draw.js"></script>
+				<script src="src/js/make_draw_model.js"></script>
 				<button style="margin-bottom: 15px" class="btn btn-primary" data-ng-click="makeGraph(netkit)">Reload</button>
 				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
 			</div>
 
 			<!-- CONNECT -->
 			<div id="sdn" class="tab-pane">
-				<link rel="stylesheet" href="css/connetti.css" />
+				<link rel="stylesheet" href="src/css/connetti.css" />
 				<div class="schede">
 					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
 						<h1>Create an interface to the Kathar&aacute; virtual network</h1>
