@@ -15,7 +15,7 @@ function toggle_tab(e, selectedTab) {
     let currentTab = document.getElementById(href)
     currentTab.classList.add("active")
     
-    let rightControls = document.getElementById("right-controls")
+    let rightControls = document.getElementById("left-controls")
     if (href == "home") {
         rightControls.classList.remove("ng-hide")
     } else {
