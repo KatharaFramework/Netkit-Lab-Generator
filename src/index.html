@@ -137,8 +137,8 @@
 					</p>
 				</div>
 
-				<!-- RIGHT MENU -->
-				<div id="right-controls">
+				<!-- LEFT MENU -->
+				<div id="left-controls">
 					<table id="labInfo">
 						<tbody>
 							<tr>
@@ -169,32 +169,6 @@
 								<td>
 									<p class="btn btn-success" data-ng-click="addMachine()">Add machine</p>
 									<p class="btn btn-danger" data-ng-click="removeMachine()" data-ng-disabled="counter<=1">Remove last machine</p>
-								</td>
-							</tr>
-
-							<tr>
-								<td>
-									<label>Preview: </label>
-									<div id="minimap">
-										<div id="minimap-body" ng-style="{ 'transform': 'scale(1, ' + minimap_transform + ')' }">
-
-											<span id="mock-main-menu" class="mock mock-main-menu"></span>
-
-											<div class="mock mock-preview-text">Netkit Lab Generator</div>
-											<div class="mock mock-preview-text">The authors of this application do not take any responsibility for any malfunction. Remember to manually check
-												the final configuration for exams and production.</div>
-											<span class="mock mock-disclaimer"></span>
-
-											<span id="mock-main-menu" class="mock mock-main-menu"></span>
-											<div data-ng-repeat="machine in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
-											 data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]">
-												<span class="mock-id">{{$index+1}}</span>{{machine.name}}</div>
-
-											<div class="mock mock-preview-text">Bash file preview:</div>
-											<span class="mock mock-preview-bash"></span>
-
-										</div>
-									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -481,6 +455,26 @@
 				<div class="bash">
 					<h3>Bash file preview:</h3>
 					<textarea id="sh_script" title="script" rows="15" readonly>{{ generateScript(netkit, labInfo) }}</textarea>
+				</div>
+	
+				<!-- MINIMAP -->
+				<div id="minimap">
+					<label style="font-size: x-large;">Preview</label>
+					<div id="minimap-body">
+						<span id="mock-main-menu" class="mock mock-main-menu"></span>
+						<div class="mock mock-preview-text">Netkit Lab Generator</div>
+						<div class="mock mock-preview-text">The authors of this application do not take any responsibility for any malfunction. Remember to manually check
+							the final configuration for exams and production.</div>
+						<span class="mock mock-disclaimer"></span>
+		
+						<div data-ng-repeat="machine in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
+							data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]">
+							<span class="mock-id">{{$index+1}}</span>{{machine.name}}</div>
+		
+						<div class="mock mock-preview-text">Bash file preview:</div>
+						<span class="mock mock-preview-bash"></span>
+		
+					</div>
 				</div>
 
 			</div>
