@@ -143,6 +143,7 @@
 						<tbody>
 							<tr>
 								<th>Lab informations</th>
+								<div id="labInfo_anchor" class="anchor-id"></div>
 							</tr>
 
 							<tr>
@@ -462,18 +463,23 @@
 					<label style="font-size: x-large;">Preview</label>
 					<div id="minimap-body">
 						<span id="mock-main-menu" class="mock mock-main-menu"></span>
-						<div class="mock mock-preview-text">Netkit Lab Generator</div>
-						<div class="mock mock-preview-text">The authors of this application do not take any responsibility for any malfunction. Remember to manually check
-							the final configuration for exams and production.</div>
+						<div class="mock mock-preview-text">
+							Netkit Lab Generator
+						</div>
+						<div class="mock mock-preview-text">
+							The authors of this application do not take any responsibility for any malfunction.
+							Remember to manually check the final configuration for exams and production.
+						</div>
 						<span class="mock mock-disclaimer"></span>
-		
-						<div data-ng-repeat="machine in netkit track by $index" class="btn btn-default mock mock-machine" ng:class="{true:'mock-machine', false:''}[$index==0]"
-							data-ng-click="scrollTo($event, machine._uid)" ng-style="compensationScale[$index]">
+						<div class="btn btn-default mock mock-labinfo"
+							data-ng-click="scrollTo($event, 'labInfo_anchor')">
+						</div>
+						<div data-ng-repeat="machine in netkit track by $index"
+							class="btn btn-default mock mock-machine"
+							data-ng-click="scrollTo($event, machine._uid)">
 							<span class="mock-id">{{$index+1}}</span>{{machine.name}}</div>
-		
-						<div class="mock mock-preview-text">Bash file preview:</div>
+							<div class="mock mock-preview-text">Bash file preview:</div>
 						<span class="mock mock-preview-bash"></span>
-		
 					</div>
 				</div>
 
