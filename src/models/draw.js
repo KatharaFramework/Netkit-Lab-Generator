@@ -13,7 +13,7 @@ const LENGTH_MAIN = 350,
     BLUE = "#2B7CE9",
     BLACK = '#2B1B17'
 
-const DIR = "src/images/"
+const DIR = "src/static/images/"
 
 // Called when the Visualization API is loaded.
 function draw(nodes, edges) {

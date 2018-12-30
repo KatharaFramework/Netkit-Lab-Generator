@@ -2,7 +2,7 @@ function lastElem(arr) {
     return arr[arr.length - 1]
 }
 
-function toggle_tab(e, selectedTab) {
+function toggle_tab(_, selectedTab) {
     toggle_submenu(-1)
     for (let elem of document.querySelectorAll(".tab-pane")) {
         elem.classList.remove("active")
