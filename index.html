@@ -30,20 +30,20 @@
 				style="-webkit-app-region: drag"
 				class="navbar navbar-primary container-fluid navbar-kathara navbar-kathara-primary">
 				<ul class="nav navbar-nav">
-					<li>
+					<li class="active">
 						<a href="#home" onclick="toggle_tab(event, this)">Home</a>
 					</li>
 					<li>
 						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Topology</a>
 					</li>
 					<li>
-						<a onclick="toggle_submenu(0)">Download Lab</a>
+						<a onclick="toggle_submenu(0, this)">Download Lab</a>
 					</li>
 					<li>
-						<a onclick="toggle_submenu(1)">Save &amp; Load</a>
+						<a onclick="toggle_submenu(1, this)">Save &amp; Load</a>
 					</li>
 					<li id="run-on-host" class="hidden">
-						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
+						<a onclick="toggle_submenu(2, this)" style="text-decoration: underline">Run on Host</a>
 					</li>
 					<li id="connect" class="hidden disabledLink">
 						<a href="#sdn" onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab(event, this)}"

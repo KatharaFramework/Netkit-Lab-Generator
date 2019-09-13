@@ -10,6 +10,8 @@ function toggle_tab(_, clickedNavTab) {
 	for (let elem of document.querySelectorAll(".tab-label")) {
 		elem.classList.remove("active")
 	}
+
+	_toggle_active(clickedNavTab)
 	
 	let href = clickedNavTab.getAttribute("href").replace("#", '')
 	
@@ -24,10 +26,10 @@ function toggle_tab(_, clickedNavTab) {
 	}
 }
 
-function toggle_submenu(number, total = 3) {
+function toggle_submenu(number, clickedElement) {
 	let mock_main_menu = document.getElementById("mock-main-menu")
 	let hidden = false
-	for (let i = 0; i < total; i++) {
+	for (let i = 0; i < 3; i++) {
 		let current_submenu = document.getElementById("submenu-" + i)
 		if (i == number) {
 			current_submenu.classList.toggle("ng-hide")
@@ -39,9 +41,27 @@ function toggle_submenu(number, total = 3) {
 
 	if (hidden || number == -1) {
 		mock_main_menu.classList.remove("mock-submenu")
+		if(clickedElement) clickedElement.parentElement.classList.remove('active')
 	} else {
 		mock_main_menu.classList.add("mock-submenu")
+
+		_toggle_active(clickedElement, false)
 	}
+}
+
+/**
+ * Toglie la classe 'active' a tutti i fratelli e la aggiunge all'elemento stesso
+ * 
+ * @param {*} element - elemento che deve avere la classe active
+ */
+function _toggle_active(element, removeFromSiblings = true){
+	if(removeFromSiblings) {
+		for(let sibling of element.parentElement.parentElement.children) {
+			sibling.classList.remove('active')
+		}
+	}
+
+	element.parentElement.classList.add('active')
 }
 
 function close_modal(id) {
