@@ -46,8 +46,9 @@
 						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
 					</li>
 					<li id="connect" class="hidden disabledLink">
-						<a onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab('sdn')}"
-							style="text-decoration: underline">Connect...</a>
+						<a onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab('sdn')}">
+							Connect...
+						</a>
 					</li>
 				</ul>
 			</nav>
@@ -511,8 +512,8 @@
 						<hr>
 						<div style="margin: 10px auto; width: fit-content">
 							<p style="margin: 5px 0">Select an IP address for the new temporary node</p>
-							<input style="width: 130px; color: var(--main-color); border-bottom: 1px solid; margin: 0 10px;"
-								class="btn"
+							<input style="width: 130px; color: var(--main-color);  margin: 0 10px; text-align: center; font-size: 120%;
+								border-bottom: 1px solid; border-left: none; border-right: none; border-top: none;"
 								type="text" value="192.168.100.254"
 								pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$)"/>
 							<button class="btn btn-default"

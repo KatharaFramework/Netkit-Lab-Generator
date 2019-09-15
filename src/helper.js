@@ -24,7 +24,7 @@ function toggle_tab(href) {
 
 	if (href == "home") _toggleActive(0)
 	if (href == "graph") _toggleActive(1)
-	if (href == "sdn") _toggleActive(2)
+	if (href == "sdn") _toggleActive(5)
 }
 
 function _toggleActive (offset){
