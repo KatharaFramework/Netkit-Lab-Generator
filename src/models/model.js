@@ -4,7 +4,7 @@ var labInfo = {
 	author: "",
 	email: "",
 	web: ""
-}
+};
 
 var backbone = {
 	name: "",
@@ -82,4 +82,4 @@ var backbone = {
 			free: ""
 		}
 	}
-}
+};
