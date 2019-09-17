@@ -360,7 +360,7 @@ function makeRyuController(netkit, lab) {
 		}
 	}
 
-	if (isSDN) document.getElementById("connect").classList.remove("hidden");
+	if (isElectron() && isSDN) document.getElementById("connect").classList.remove("hidden");
 	else document.getElementById("connect").classList.add("hidden");
 }
 
