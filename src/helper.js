@@ -24,7 +24,7 @@ function toggle_tab(href) {
 
 	if (href == "home") _toggleActive(0);
 	if (href == "graph") _toggleActive(1);
-	if (href == "sdn") _toggleActive(5);
+	/*if (href == "sdn") _toggleActive(5);*/
 }
 
 function _toggleActive (offset){
@@ -77,16 +77,16 @@ function executeStart(e) {
 	e.preventDefault();
 
 	if(!document.getElementById("lstart").classList.contains("disabledLink")){
-		let connectButton = document.getElementById("connect");
+		/*let connectButton = document.getElementById("connect");*/
 		
 		copyLab();
 		toggle_submenu(-1);
 		_executeGeneric(e, "execute");
 
-		if (!connectButton.classList.contains("hidden")
+		/*if (!connectButton.classList.contains("hidden")
 			&& document.querySelector("#netkit input[data-ng-model=\"machine.ryu.rest\"]").checked
 			&& document.querySelector("#netkit input[data-ng-model=\"machine.ryu.topology\"]").checked)
-			connectButton.classList.remove("disabledLink");
+			connectButton.classList.remove("disabledLink");*/
 	}
 }
 
@@ -96,10 +96,10 @@ function executeClean(e) {
 		toggle_tab("home");
 
 		_executeGeneric(e, "clean");
-		if (!document.getElementById("connect").classList.contains("disabledLink")) {
+		/*if (!document.getElementById("connect").classList.contains("disabledLink")) {
 			document.getElementById("connect").classList.add("disabledLink");
 			detachInterfaceToController();
-		}
+		}*/
 	}
 }
 
@@ -114,7 +114,7 @@ function _executeGeneric(e, command) {
 	electron.ipcRenderer.send("script:" + command);
 }
 
-function attachInterfaceToController(attachButton, detachButton, customIPInput){
+/*function attachInterfaceToController(attachButton, detachButton, customIPInput){
 	if(!attachButton.classList.contains("btn-success") && attachButton.innerText != "..."){
 		customIPInput.style.display = "none";
 	
@@ -154,4 +154,4 @@ function detachInterfaceToController(detachButton, attachButton, customIPInput){
 			customIPInput.style.display = "";
 		}, 2000);
 	}
-}
+}*/

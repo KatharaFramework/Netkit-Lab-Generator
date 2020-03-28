@@ -65,7 +65,7 @@ ipcMain.on("script:clean", function () {
 	_runKatharaCommand("lclean -d \"" + pathTemp + "\"");
 });
 
-/* --------------------------- SDN --------------------------- */
+/* --------------------------- SDN --------------------------- *//*
 // TODO: Controllare che funzioni anche su windows
 
 ipcMain.on("sdn:connect", function (_, ip) {
@@ -90,4 +90,4 @@ ipcMain.on("sdn:disconnect", function () {
 	
 	console.log("Stopping interface container and removing it\n");
 	exec("docker container rm -f " + machineName);
-});
+});*/

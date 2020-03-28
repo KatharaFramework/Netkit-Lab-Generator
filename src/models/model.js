@@ -43,12 +43,12 @@ var backbone = {
 		files: [],
 		fileCounter: 0
 	},
-	ryu: {
+	/*ryu: {
 		stp: false,
 		rest: true,
 		topology: true,
 		custom: ""
-	},
+	},*/
 	routing: {
 		rip: {
 			en: false,

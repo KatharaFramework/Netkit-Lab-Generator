@@ -187,13 +187,13 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		}
 	};
 
-	$scope.toggleOVSwitchSelection = function (netkitData, thisType){
+	/*$scope.toggleOVSwitchSelection = function (netkitData, thisType){
 		return netkitData.some(machine => machine.type == "controller") && thisType != "controller";
 	};
 
 	$scope.toggleControllerSelection = function (netkitData, thisType){
 		return !netkitData.some(machine => machine.type == "controller") || thisType == "controller";
-	};
+	};*/
 
 	$scope.toggleGraphUpdate = function () {
 		if ($scope.labInfo.toggle == "disable") {
