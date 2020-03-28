@@ -484,22 +484,21 @@ function makeScript(lab) {
 		+ "\n"
 		+ "rm -rf \"$(dirname \"$0\")/lab\"\n"
 		+ "mkdir \"$(dirname \"$0\")/lab\"\n"
-		+ "cd \"$(dirname \"$0\")/lab\"\n"
-		+ "\n";
+		+ "cd \"$(dirname \"$0\")/lab\"\n";
 
 	for (let folderName of lab.folders) {
 		if (folderName != "") text += "mkdir -p " + folderName + "\n";
 	}
 
 	for (let fileName in lab.file) {
-		text += "touch " + fileName + "\n";
+		text += "\ntouch " + fileName + "\n";
 		let lines = lab.file[fileName].split("\n");
 		for (let line of lines) {
 			if (line != "") text += "echo '" + line + "' >> " + fileName + "\n";
 		}
 	}
 
-	text += "rm \"../$0\"\n";
+	text += "\nrm \"../$0\"\n";
 	return text;
 }
 
