@@ -27,7 +27,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		$scope.counter++;
 		var p = JSON.clone(backbone);
 		p.row = $scope.counter;
-		p._uid = Math.floor((Math.random() * 1000000000000000) + 1);
+		p._uid = Math.floor((Math.random() * (1000**5)) + 1);
 		$scope.netkit.push(p);
 
 		changed = true;

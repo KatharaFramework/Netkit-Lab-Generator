@@ -192,7 +192,8 @@
 								<div id="{{machine._uid}}" class="anchor-id"></div>
 								<div>
 									<label>Machine {{machine.row}}:</label>
-									<input type="text" data-ng-model="machine.name" class="form-control" placeholder="pc{{machine.row}}" required />
+									<input type="text" data-ng-model="machine.name" class="form-control"
+										placeholder="pc{{machine.row}}" pattern="[A-z0-9]+" required />
 								</div>
 								<p>
 									<input title="type" type="radio" value="terminal" data-ng-model="machine.type" /> Terminal</p>

@@ -452,7 +452,13 @@ function makeBgpConf(router, lab) {
 }
 
 function makeFilesStructure(netkit, labInfo) {
-	var lab = [];		// TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo/voglia di ricontrollare bene tutto)
+	let isAllValidNames = netkit
+		.map(machine => machine.name && /[A-z0-9]+/i.test(machine.name))
+		.reduce((prev, curr, ind) => ind == 0 ? curr : (prev && curr))	// Tutti i nomi devono aver soddisfatto la regex
+	if(!isAllValidNames)
+		return { folders: [], file: [] }
+
+	var lab = [];		// TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo di ricontrollare bene tutto)
 	lab.folders = [];
 	lab.file = [];
 	lab.warning = 0;
