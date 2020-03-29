@@ -21,6 +21,7 @@ Now supports network topology preview (requires a modern browser or the Electrum
    * Gaetano Bonofiglio (Kidel)
    * Veronica Iovinella (Neeja)
    * Lorenzo Ariemma (lorenzo93)
+   * Lorenzo Mignone (Pastello)
 
 ### Links
 
