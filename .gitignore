@@ -1,6 +1,7 @@
 release-builds/
-tmp/lab/
+
 node_modules/
+tmp/
 
 .vscode
 
