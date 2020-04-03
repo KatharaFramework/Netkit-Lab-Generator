@@ -2,8 +2,9 @@ function lastElem(arr) {
 	return arr[arr.length - 1]
 }
 
-function toggle_tab(_, clickedNavTab) {
+function toggle_tab(href) {
 	toggle_submenu(-1)
+
 	for (let elem of document.querySelectorAll(".tab-pane")) {
 		elem.classList.remove("active")
 	}
@@ -11,10 +12,6 @@ function toggle_tab(_, clickedNavTab) {
 		elem.classList.remove("active")
 	}
 
-	_toggle_active(clickedNavTab)
-	
-	let href = clickedNavTab.getAttribute("href").replace("#", '')
-	
 	let currentTab = document.getElementById(href)
 	currentTab.classList.add("active")
 	
@@ -24,44 +21,43 @@ function toggle_tab(_, clickedNavTab) {
 	} else {
 		rightControls.classList.add("ng-hide")
 	}
+
+	if (href == "home") _toggleActive(0)
+	if (href == "graph") _toggleActive(1)
+	if (href == "sdn") _toggleActive(2)
 }
 
-function toggle_submenu(number, clickedElement) {
-	let mock_main_menu = document.getElementById("mock-main-menu")
+function _toggleActive (offset){
+	let li = document.querySelectorAll('#main-nav > ul.navbar-nav > li')
+	for(let i = 0; i < li.length; i++) {
+		if(i === offset) li[i].classList.add('active')
+		else li[i].classList.remove('active')
+	}
+}
+
+function toggle_submenu(number) {
 	let hidden = false
 	for (let i = 0; i < 3; i++) {
-		let current_submenu = document.getElementById("submenu-" + i)
 		if (i == number) {
+			let current_submenu = document.getElementById("submenu-" + i)
 			current_submenu.classList.toggle("ng-hide")
-			if(current_submenu.classList.contains("ng-hide")) hidden = true
+			document.querySelectorAll('#main-nav > ul.navbar-nav > li')[2+i].classList.add('active')
+			if(current_submenu.classList.contains("ng-hide")) {
+				document.querySelectorAll('#main-nav > ul.navbar-nav > li')[2+i].classList.remove('active')
+				hidden = true
+			}
 		} else {
-			current_submenu.classList.add("ng-hide")
+			document.querySelectorAll('#main-nav > ul.navbar-nav > li')[2+i].classList.remove('active')
+			document.getElementById("submenu-" + i).classList.add("ng-hide")
 		}
 	}
-
+	
+	let mockMainMenu = document.getElementById("mock-main-menu")
 	if (hidden || number == -1) {
-		mock_main_menu.classList.remove("mock-submenu")
-		if(clickedElement) clickedElement.parentElement.classList.remove('active')
+		mockMainMenu.classList.remove("mock-submenu")
 	} else {
-		mock_main_menu.classList.add("mock-submenu")
-
-		_toggle_active(clickedElement, false)
+		mockMainMenu.classList.add("mock-submenu")
 	}
-}
-
-/**
- * Toglie la classe 'active' a tutti i fratelli e la aggiunge all'elemento stesso
- * 
- * @param {*} element - elemento che deve avere la classe active
- */
-function _toggle_active(element, removeFromSiblings = true){
-	if(removeFromSiblings) {
-		for(let sibling of element.parentElement.parentElement.children) {
-			sibling.classList.remove('active')
-		}
-	}
-
-	element.parentElement.classList.add('active')
 }
 
 function close_modal(id) {
@@ -97,7 +93,7 @@ function executeStart(e) {
 function executeClean(e) {
 	if(!document.getElementById('lclean').classList.contains('disabledLink')){
 		toggle_submenu(-1)
-		toggle_tab(null, document.querySelector('[href="#home"]'))
+		toggle_tab("home")
 
 		executeGeneric(e, "clean")
 		if(!document.getElementById('connect').classList.contains("disabledLink")){

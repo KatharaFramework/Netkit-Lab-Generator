@@ -31,22 +31,22 @@
 				class="navbar navbar-primary container-fluid navbar-kathara navbar-kathara-primary">
 				<ul class="nav navbar-nav">
 					<li class="active">
-						<a href="#home" onclick="toggle_tab(event, this)">Home</a>
+						<a onclick="toggle_tab('home')">Home</a>
 					</li>
 					<li>
-						<a href="#graph" data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab(event, this)">Topology</a>
+						<a data-ng-click="makeGraphIfChanged(netkit)" onclick="toggle_tab('graph')">Topology</a>
 					</li>
 					<li>
-						<a onclick="toggle_submenu(0, this)">Download Lab</a>
+						<a onclick="toggle_submenu(0)">Download Lab</a>
 					</li>
 					<li>
-						<a onclick="toggle_submenu(1, this)">Save &amp; Load</a>
+						<a onclick="toggle_submenu(1)">Save &amp; Load</a>
 					</li>
 					<li id="run-on-host" class="hidden">
-						<a onclick="toggle_submenu(2, this)" style="text-decoration: underline">Run on Host</a>
+						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
 					</li>
 					<li id="connect" class="hidden disabledLink">
-						<a href="#sdn" onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab(event, this)}"
+						<a onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab('sdn')}"
 							style="text-decoration: underline">Connect...</a>
 					</li>
 				</ul>
