@@ -82,7 +82,7 @@ function makeWebserver(netkit, lab) {
 function makeOther(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
-			lab.file["lab.conf"] += machine.name + "[image]=" + machine.other.image + "\n";
+			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
 			for (let file of machine.other.files) {
 				lab.file["/etc/scripts/" + file.name] = file.contents;
 			}
@@ -312,7 +312,7 @@ function makeRouter(netkit, lab) {
 function makeOVSwitch(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "switch") {
-			lab.file["lab.conf"] += machine.name + "[image]=kathara/sdn\n";
+			lab.file["lab.conf"] += machine.name + '[image]="kathara/sdn"\n';
 			lab.file[machine.name + ".startup"] +=
 				machine.interfaces.if.map(function (el) {
 					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " 0";
@@ -335,7 +335,7 @@ function makeRyuController(netkit, lab) {
 	let isSDN = false;
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "controller") {
-			lab.file["lab.conf"] += machine.name + "[image]=kathara/sdn\n";
+			lab.file["lab.conf"] += machine.name + '[image]="kathara/sdn"\n';
 			isSDN = true;
 
 			let filename = machine.name + ".startup";
