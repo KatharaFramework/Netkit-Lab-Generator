@@ -29,7 +29,7 @@ app.on("ready", function () {
 /* ---------------------------------------------------------- */
 
 let _baseFolder = app.getPath("userData");
-// let _isWindows = /^win/.test(process.platform);
+
 let _isWindows = false; // TODO: Sviluppare e testare anche su Windows
 
 function _runKatharaCommand(command){
@@ -62,30 +62,3 @@ ipcMain.on("script:clean", function () {
 	console.log("Running LClean on " + pathTemp);
 	_runKatharaCommand("kathara lclean -d \"" + pathTemp + "\"");
 });
-
-/* --------------------------- SDN --------------------------- *//*
-// TODO: Controllare che funzioni anche su windows
-
-ipcMain.on("sdn:connect", function (_, ip) {
-	let prefix = "netkit_$(id -u)_";
-	let machineName = prefix + "sdn-interfacenode";
-	
-	console.log("Starting interface container");
-	// TODO: E se l'avessi già lanciato ma non l'avessi rimosso? Credo che non si possono avere due macchine con lo stesso nome => Nessun problema
-	exec("docker run -d --privileged=true -p 8080:3000 --name " + machineName + " kathara/netkit_extended",
-		function(){
-			console.log("Connecting interface container\n");
-			exec("docker network connect " + prefix + "SDNRESERVED " + machineName, function(_, _, stderr){
-				if(stderr) console.log(stderr);
-				exec("docker exec " + machineName + " ifconfig eth1 " + ip + " up");
-			});
-		}
-	);
-});
-
-ipcMain.on("sdn:disconnect", function () {
-	let machineName = "netkit_$(id -u)_sdn-interfacenode";
-	
-	console.log("Stopping interface container and removing it\n");
-	exec("docker container rm -f " + machineName);
-});*/

@@ -36,10 +36,10 @@ function makeLabConfFile(netkit, lab) {
 		lab.file["lab.conf"] = "";
 	for (let machine of netkit) {
 		for (let interface of machine.interfaces.if) {
-			/*if (interface.eth.number == 0 && (machine.type == "controller" || machine.type == "switch")) {
+			if (interface.eth.number == 0 && (machine.type == "controller" || machine.type == "switch")) {
 				interface.eth.domain = "SDNRESERVED";
 				lab.file["lab.conf"] += machine.name + "[0]=" + "SDNRESERVED\n";
-			} else*/ if (interface.eth.domain && interface.eth.domain != "") {
+			} else if (interface.eth.domain && interface.eth.domain != "") {
 				lab.file["lab.conf"] += machine.name + "[" + interface.eth.number + "]=" + interface.eth.domain + "\n";
 			}
 		}
@@ -309,9 +309,10 @@ function makeRouter(netkit, lab) {
 	}
 }
 
-/*function makeOVSwitch(netkit, lab) {
+function makeOVSwitch(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "switch") {
+			lab.file["lab.conf"] += machine.name + "[image]=kathara/sdn\n";
 			lab.file[machine.name + ".startup"] +=
 				machine.interfaces.if.map(function (el) {
 					if (el.eth.number != 0) return "ifconfig eth" + el.eth.number + " 0";
@@ -334,6 +335,7 @@ function makeRyuController(netkit, lab) {
 	let isSDN = false;
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "controller") {
+			lab.file["lab.conf"] += machine.name + "[image]=kathara/sdn\n";
 			isSDN = true;
 
 			let filename = machine.name + ".startup";
@@ -362,7 +364,7 @@ function makeRyuController(netkit, lab) {
 
 	if (isElectron() && isSDN) document.getElementById("connect").classList.remove("hidden");
 	else document.getElementById("connect").classList.add("hidden");
-}*/
+}
 
 /* --------------------------------------------------- */
 /* ------------------ AUX FUNCTIONS ------------------ */
@@ -475,8 +477,8 @@ function makeFilesStructure(netkit, labInfo) {
 	makeWebserver(netkit, lab);
 	makeNameserver(netkit, lab);
 	makeOther(netkit, lab);
-	/*makeOVSwitch(netkit, lab);
-	makeRyuController(netkit, lab);*/
+	makeOVSwitch(netkit, lab);
+	makeRyuController(netkit, lab);
 
 	if (labInfo.toggle == "disable")
 		makeGraph(netkit);

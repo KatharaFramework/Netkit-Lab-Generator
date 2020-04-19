@@ -243,6 +243,5 @@ function generate_nodes_edges(lab) {
 
 function makeGraph(netkit) {
 	var graph = generate_nodes_edges(netkit);
-	//console.log(graph);
 	draw(graph.nodes, graph.edges);
 }

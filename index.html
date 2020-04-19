@@ -45,11 +45,11 @@
 					<li id="run-on-host" class="hidden">
 						<a onclick="toggle_submenu(2)" style="text-decoration: underline">Run on Host</a>
 					</li>
-					<!--<li id="connect" class="hidden disabledLink">
+					<li id="connect" class="hidden disabledLink">
 						<a onclick="if(!this.parentElement.classList.contains('disabledLink')){toggle_tab('sdn')}">
-							Connect...
+							SDN
 						</a>
-					</li>-->
+					</li>
 				</ul>
 			</nav>
 
@@ -144,7 +144,6 @@
 								<th>Lab informations</th>
 								<div id="labInfo_anchor" class="anchor-id"></div>
 							</tr>
-
 							<tr>
 								<td>
 									<label>Description:
@@ -164,7 +163,6 @@
 									</label>
 								</td>
 							</tr>
-
 							<tr class="xs-floating-right">
 								<td>
 									<p class="btn btn-success" data-ng-click="addMachine()">Add machine</p>
@@ -203,10 +201,10 @@
 									<input title="type" type="radio" value="ns" data-ng-model="machine.type" /> Name Server</p>
 								<p>
 									<input title="type" type="radio" value="ws" data-ng-model="machine.type" /> Web Server</p>
-								<!--<p data-ng-show="toggleOVSwitchSelection(netkit, this.machine.type)">
+								<p data-ng-show="toggleOVSwitchSelection(netkit, this.machine.type)">
 									<input title="type" type="radio" value="switch" data-ng-model="machine.type" /> Open vSwitch</p>
 								<p data-ng-show="toggleControllerSelection(netkit, this.machine.type)">
-									<input title="type" type="radio" value="controller" data-ng-model="machine.type" /> OpenFlow Ryu controller</p>-->
+									<input title="type" type="radio" value="controller" data-ng-model="machine.type" /> OpenFlow Ryu controller</p>
 								<p>
 									<input title="type" type="radio" value="other" data-ng-model="machine.type" /> Other</p>
 								<div data-ng-show="machine.type == 'other'">
@@ -301,7 +299,7 @@
 									<strong>userdir</strong> module?
 								</div>
 
-								<!--<div data-ng-show="machine.type =='switch'">
+								<div data-ng-show="machine.type =='switch'">
 								</div>
 
 								<div data-ng-show="machine.type=='controller'">
@@ -319,17 +317,13 @@
 											type="checkbox"> REST topology
 									</p>
 									<p>
-										Other (must be in ryu.app folder): 
+										Other (<a href="https://github.com/osrg/ryu/tree/master/ryu/app" target="_blank">default apps</a>): 
 										<input data-ng-model="machine.ryu.custom"
 											type="text" placeholder="app1 app2 ..."
 											style="background-image: none; width: 220px; padding: 1px 5px; margin: 5px 0;">
 									</p>
 									<hr>
-									<p style="color: darkgray">
-										After the lab starts, you will be able to connect to this controller
-										<strong>only if you checked the two REST options.</strong>
-									</p>
-								</div>-->
+								</div>
 
 								<div data-ng-show="machine.type=='other'">
 									<p class="btn btn-success" data-ng-click="addFile(machine)">Add file</p>
@@ -346,11 +340,11 @@
 										</div>
 									</div>
 								</div>
+
 								<div data-ng-show="machine.type=='router'">
 									<label>Dynamic routing: </label>
 									<p>
 										<input title="en" type="checkbox" value="router" data-ng-model="machine.routing.rip.en" /> rip</p>
-
 									<div data-ng-show="machine.routing.rip.en">
 										<span class="btn btn-success" data-ng-click="addRipNetwork(machine)">Add Network</span>
 										<span class="btn btn-danger" data-ng-click="removeRipNetwork(machine)" data-ng-disabled="machine.routing.rip.network.length<=1">Remove Network</span>
@@ -367,7 +361,6 @@
 											<input type="text" placeholder="0.0.0.0/0" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" class="form-control"
 											 data-ng-model="machine.routing.rip.route[$index]" />
 										</div>
-
 										<div>
 											<input title="redistributeo" type="checkbox" value="1" data-ng-model="machine.routing.rip.ospf" /> redistribute ospf</div>
 										<div>
@@ -378,10 +371,8 @@
 										<textarea title="free" rows="3" class="form-control" data-ng-model="machine.routing.rip.free"></textarea>
 										<hr>
 									</div>
-
 									<p>
 										<input title="en" type="checkbox" value="ns" data-ng-model="machine.routing.ospf.en" /> ospf</p>
-
 									<div data-ng-show="machine.routing.ospf.en">
 										<span class="btn btn-success" data-ng-click="addOspfNetwork(machine)">Add Network</span>
 										<span class="btn btn-danger" data-ng-click="removeOspfNetwork(machine)" data-ng-disabled="machine.routing.ospf.network.length<=1">Remove Newtork</span>
@@ -398,7 +389,6 @@
 											</div>
 											<input title="stub" type="checkbox" value="1" data-ng-model="machine.routing.ospf.stub[$index]" /> stub?
 										</div>
-
 										<div>
 											<input title="redistributer" type="checkbox" value="1" data-ng-model="machine.routing.ospf.rip" /> redistribute rip</div>
 										<div>
@@ -490,122 +480,19 @@
 				<script src="src/static/vendor/js/vis.js"></script>
 				<script src="src/models/draw.js"></script>
 				<script src="src/make_draw_model.js"></script>
-				<button style="margin-bottom: 15px" class="btn btn-primary" data-ng-click="makeGraph(netkit)">Reload</button>
 				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
+				<button class="btn btn-danger" data-ng-click="makeGraph(netkit)">Reset</button>
 			</div>
 
-			<!-- CONNECT --><!--
+			<!-- CONNECT -->
 			<div id="sdn" class="tab-pane">
-				<link rel="stylesheet" href="src/style/connetti.css" />
-				<div class="schede">
-					<div style="transform: scale(1.1); margin: 30px; opacity: 1">
-						<h1>Create an interface to the Kathar&aacute; virtual network</h1>
-						<hr>
-						<p>
-							In order to connect to the controller, be sure that a <b>REST controller</b>
-							is running, then clik the button below.
-							A new node will be added to the Kathar&aacute; simulated enviroment.
-							This node will act as an intermediary between the host and the controller.
-							It will host a server which will provide an interface for managing the
-							flow tables of the controller.
-							<p class="disclaimer">Be sure all containers have started before creating the interface!</p>
-						</p>
-						<hr>
-						<div style="margin: 10px auto; width: fit-content">
-							<p style="margin: 5px 0">Select an IP address for the new temporary node</p>
-							<input style="width: 130px; color: var(--main-color);  margin: 0 10px; text-align: center; font-size: 120%;
-								border-bottom: 1px solid; border-left: none; border-right: none; border-top: none;"
-								type="text" value="192.168.100.254"
-								pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$)"/>
-							<button class="btn btn-default"
-								onclick="attachInterfaceToController(this, this.nextElementSibling, this.previousElementSibling)">
-								Attach interface
-							</button>
-							<button class="btn btn-danger hidden"
-								onclick="detachInterfaceToController(this, this.previousElementSibling, this.previousElementSibling.previousElementSibling)">
-								Detach
-							</button>
-						</div>
-					</div>
-					<div style="transform: scale(1.1); margin: 30px; opacity: 1; max-height: 380px">
-						<h1>Connect to controller</h1>
-						<hr>
-						<p>
-							Once you created the interface, connect to it!
-						</p>
-						<div>
-							<a class="btn btn-default"
-								style="display: block"
-								onclick="electron.shell.openExternal('http://localhost:8080/index.html?ip=192.168.100.1:8080')"
-								target="_blank">
-								Connect
-							</a>
-							<span style="color: darkgray">
-								You can also navigate to <span style="text-decoration: underline">http://localhost:8080/</span> on your browser
-							</span>
-						</div>
-					</div>
-					<div>
-						<h1>Pull the Docker image</h1>
-						<hr>
-						<p>
-							The node which acts as an interface between the external world and the simulated enviroment
-							is a special docker container whose image must be pulled from docker registry or built from source.
-							So, if you have not done that yet, simply run <code>docker pull kathara/netkit_extended</code>
-							in your terminal.
-						</p>
-						<p class="disclaimer">
-							Please make sure you downloaded the image before trying to connect to the controller
-						</p>
-					</div>
-					<div>
-						<h1>Build the image from sources <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
-						<hr>
-						<p>
-							The default image for the interface node can be found
-							<a href="https://github.com/Pastello/Netkit-SDN-Interface" target="_blank">here</a>.
-							If you want to download and build or modify it on your own, you can run
-							<code>git clone https://github.com/Pastello/Netkit-SDN-Interface &lt;local-directory&gt;</code>
-							then run <code>build.sh</code> to build it.
-						</p>
-					</div>
-					<div>
-						<h1>Create the interface via command line <span style="color: darkgray; font-size: x-large">(alternative)</span></h1>
-						<hr>
-						<p>
-							You can manually start the interface node with these commands:
-							<ul style="padding-left: 10px">
-								<li>
-									Create and run the container and expose its port 3000 to the host container:
-									<code>docker run -it --privileged=true -p &lt;port&gt;:3000 --name &lt;machine-name&gt; kathara/netkit_extended</code>
-								</li>
-								<li>
-									Then you need to connect the new node to the Kathar&aacute; network:
-									<code>docker network connect netkit_1000_SDNRESERVED &lt;machine-name&gt;</code>
-								</li>
-								<li>
-									Finally an IPv4 must be assigned to the machine:
-									<code>docker exec &lt;machine-name&gt; ifconfig eth1 &lt;ip&gt; up</code>
-								</li>
-							</ul>
-						</p>
-					</div>
-					<div>
-						<h1>Set Docker permissions <span style="color: darkgray; font-size: x-large">(optional)</span></h1>
-						<hr>
-						<p>
-							Kathar&aacute; uses docker to create the virtual enviroment. Some docker commands need
-							superuser permissions in order to be executed. If you are useing linux, an easy alternative
-							way to properly configure and launch docker containers is adding current user to
-							the 'docker' group. You can do that by simply running
-							<code>sudo usermod -aG docker $(whoami)</code> in your favourite terminal.
-						</p>
-					</div>
-				</div>
+				........
+				........
+				........
 			</div>
 
 		</div>
-	</div> -->
+	</div> 
 
 	<!-- LSTART MODAL -->
 	<div id="command-modal" class="modal modal-kathara ng-hide">

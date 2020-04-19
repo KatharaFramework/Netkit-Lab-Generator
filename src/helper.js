@@ -24,7 +24,7 @@ function toggle_tab(href) {
 
 	if (href == "home") _toggleActive(0);
 	if (href == "graph") _toggleActive(1);
-	/*if (href == "sdn") _toggleActive(5);*/
+	if (href == "sdn") _toggleActive(5);
 }
 
 function _toggleActive (offset){
@@ -77,16 +77,16 @@ function executeStart(e) {
 	e.preventDefault();
 
 	if(!document.getElementById("lstart").classList.contains("disabledLink")){
-		/*let connectButton = document.getElementById("connect");*/
+		let sdnTabButton = document.getElementById("connect");
 		
 		copyLab();
 		toggle_submenu(-1);
 		_executeGeneric(e, "execute");
 
-		/*if (!connectButton.classList.contains("hidden")
+		if (!sdnTabButton.classList.contains("hidden")
 			&& document.querySelector("#netkit input[data-ng-model=\"machine.ryu.rest\"]").checked
 			&& document.querySelector("#netkit input[data-ng-model=\"machine.ryu.topology\"]").checked)
-			connectButton.classList.remove("disabledLink");*/
+			sdnTabButton.classList.remove("disabledLink");
 	}
 }
 
@@ -96,10 +96,10 @@ function executeClean(e) {
 		toggle_tab("home");
 
 		_executeGeneric(e, "clean");
-		/*if (!document.getElementById("connect").classList.contains("disabledLink")) {
+		if (!document.getElementById("connect").classList.contains("disabledLink")) {
 			document.getElementById("connect").classList.add("disabledLink");
 			detachInterfaceToController();
-		}*/
+		}
 	}
 }
 
@@ -113,45 +113,3 @@ function _executeGeneric(e, command) {
 	);
 	electron.ipcRenderer.send("script:" + command);
 }
-
-/*function attachInterfaceToController(attachButton, detachButton, customIPInput){
-	if(!attachButton.classList.contains("btn-success") && attachButton.innerText != "..."){
-		customIPInput.style.display = "none";
-	
-		electron.ipcRenderer.send("sdn:connect", customIPInput.value);
-		attachButton.innerText = "...";
-	
-		setTimeout(function() {
-			attachButton.classList.remove("btn-default");
-			attachButton.classList.add("btn-success");
-			attachButton.innerText = "Attached";
-	
-			detachButton.classList.remove("hidden");
-		}, 2000);
-	}
-}
-
-function detachInterfaceToController(detachButton, attachButton, customIPInput){
-	if(!attachButton || !customIPInput || !detachButton){
-		let schedaAttachDetach = document.querySelector("#sdn .schede").firstElementChild.lastElementChild;
-		customIPInput = schedaAttachDetach.firstElementChild.nextElementSibling;
-		attachButton = customIPInput.nextElementSibling;
-		detachButton = attachButton.nextElementSibling;
-	}
-
-	if(!detachButton.classList.contains("hidden") && detachButton.innerText != "..."){
-		electron.ipcRenderer.send("sdn:disconnect");
-		detachButton.innerText = "...";
-	
-		setTimeout(function() {
-			detachButton.classList.add("hidden");
-			detachButton.innerText = "Detach";
-	
-			attachButton.innerText = "Attach interface";
-			attachButton.classList.remove("btn-success");
-			attachButton.classList.add("btn-default");
-	
-			customIPInput.style.display = "";
-		}, 2000);
-	}
-}*/

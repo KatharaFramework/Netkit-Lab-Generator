@@ -57,14 +57,14 @@ function draw(nodes, edges) {
 				shape: "image",
 				value: 8
 			},
-			/*"switch": {
+			"switch": {
 				image: DIR + "switch.png",
 				shape: "image",
 			},
 			"controller": {
 				image: DIR + "controller.png",
 				shape: "image",
-			},*/
+			},
 			"other": {
 				image: DIR + "other.png",
 				shape: "image",
