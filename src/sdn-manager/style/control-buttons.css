@@ -6,10 +6,10 @@
 	width: 200px;
 	padding: 10px;
 	margin: 10px 0 0 10px;
-	
+
 	overflow: hidden;
 	text-overflow: ellipsis;
-	
+
 	background-color: #033333;
 	box-shadow: 3px 0px 5px darkgray;
 	border-radius: 5px;

@@ -43,10 +43,10 @@ const controllerAndRulesSection = new Vue({
 
 		close() {
 			this.visible = false;
-			
+
 			this.howtoVisibility = false;
 			this.controllerSection.visible = false;
-			
+
 			this.rulesSection.visible = 0;
 			this.rulesSection.filter = "";
 		},
@@ -131,7 +131,7 @@ const controllerAndRulesSection = new Vue({
 					if(this.controllerSection.request.method == "POST"){
 						params = JSON.parse(this.controllerSection.request.params);
 					} else params = {};
-					
+
 					this.controllerSection.output = "Request sent...";
 					myhttp.makeRequest(
 						this.controllerSection.request.method,
@@ -139,12 +139,12 @@ const controllerAndRulesSection = new Vue({
 						params,
 						(response) => { this._setHTTPResponse(response); }
 					);
-		
+
 					this._addToHistory();
 
 					this.controllerSection.request.path = "";
 					this.controllerSection.request.params = "";
-					
+
 				} catch (err) {
 					this.controllerSection.output = "Error while parsing parameteres";
 				}
@@ -182,9 +182,9 @@ const controllerAndRulesSection = new Vue({
 				method: this.controllerSection.request.method,
 				path: this.controllerSection.request.path
 			};
-			
+
 			this.controllerSection.history.unshift(historyElement);
-			
+
 			if(this.controllerSection.history.length > 5)
 				this.controllerSection.history.pop();
 		}

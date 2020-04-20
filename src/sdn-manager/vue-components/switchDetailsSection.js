@@ -25,7 +25,7 @@ const switchDetailsSection = new Vue({
 			this.close();
 			this.visible = true;
 			this.device = device;
-			
+
 			let rules = sdnData.getSwitchRules(device);
 			if(rules){
 				this.packetRules = rules.filter(rule =>
@@ -108,24 +108,24 @@ const switchDetailsSection = new Vue({
 			let padding = 45;
 			let width = svg.attr("width") - padding;
 			let height = svg.attr("height") - padding;
-		
+
 			let counter = 1;
 			let data = this.packetRules.concat(this.labelRules).map(function(el){ return { num: counter++, stats: el.stats };}).slice(1);
-		
+
 			let x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
 				y = d3.scaleLinear().rangeRound([height, 0]);
-			
+
 			let g = svg.append("g")
 				.attr("transform", "translate(20, 5)");
-		
+
 			x.domain(data.map(function (d) { return d.num; }));
 			y.domain([0, d3.max(data, function (d) { return d.stats; })]);
-		
+
 			g.append("g")
 				.attr("class", "x-axis")
 				.attr("transform", "translate(0," + (height + 5) + ")")
 				.call(d3.axisBottom(x));
-		
+
 			g.append("g")
 				.attr("class", "y-axis")
 				.call(d3.axisLeft(y).ticks(10))
@@ -135,7 +135,7 @@ const switchDetailsSection = new Vue({
 				.attr("dy", "0.71em")
 				.attr("text-anchor", "end")
 				.text("stats");
-		
+
 			g.selectAll(".bar")
 				.data(data)
 				.enter().append("rect")
@@ -162,7 +162,7 @@ const switchDetailsSection = new Vue({
 			let responsePromise = (action == "stats/table") ?
 				ryuActions.getTablesFilteredNotEmpty(this.device)
 				: ryuActions.getFromSwitchCustom(this.device, action);
-			
+
 			responsePromise.then(response => {this.responseTextareaContent = JSON.stringify(response, null, 4);});
 		}
 	},

@@ -2,7 +2,7 @@ const sdnData = new (class SDNData {
 	constructor() {
 		this._katharaConfig = null;
 		this.simulation = null;
-		
+
 		this._path = {
 			steps: [],
 			pendingStep: null,
@@ -70,7 +70,7 @@ const sdnData = new (class SDNData {
 	/* ----------------------------------------------- */
 	/* -------------------- RULES -------------------- */
 	/* ----------------------------------------------- */
-	
+
 	/**
 	 * Crea una nuova regola e la memorizza.
 	 * Il numero di parametri di questo metodo non è stabilito, ma in base al loro numero
@@ -94,7 +94,7 @@ const sdnData = new (class SDNData {
 	}
 
 	/* ------------------- IMPORT ------------------- */
-	
+
 	importRules(rules){
 		for (let rule of rules){
 			let newRule = this.createAndSaveRule(rule.device, rule.matches, rule.actions, rule.priority, rule.table, rule.idleTimeout, rule.hardTimeout);
@@ -105,7 +105,7 @@ const sdnData = new (class SDNData {
 	/* ------------------------------------------------ */
 	/* ------------------ CONTROLLER ------------------ */
 	/* ------------------- (& rules) ------------------- */
-	
+
 	submitAllRules() {
 		if(confirm("Every new/edited rule is going to be installed in the controller. Would you like to procede?")){
 			this.getRules().forEach(rule => {
@@ -125,12 +125,12 @@ const sdnData = new (class SDNData {
 			});
 		}
 	}
-	
+
 	retrieveRulesOnTheSwitch(switchName){
 		ryuActions.getSwitchRules(switchName).then(rules => {
 			let simulatedRules = rules.map(rule =>
 				ruleUtils.simulatedRules.makeSimulatedRuleFromOpenFlowOne(switchName, rule));
-			
+
 			let mergedRules = ruleUtils.simulatedRules.mergeMPLSRulesWithDifferentProtocolMatch(simulatedRules);
 			mergedRules.forEach(newRule => this.storeRule(newRule));
 		});

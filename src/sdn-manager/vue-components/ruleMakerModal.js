@@ -135,7 +135,7 @@ const ruleModal = new Vue({
 			},
 			template:
 				"<div>" +
-	
+
 					"<select v-model=\"content\" v-if=\"['MPLS label', 'set MPLS label'].includes(selection)\" " +
 				// In questi casi vengono mostrate tutte le label
 						"@change=\"$emit('input', content)\" class=\"answer-selection\">" +
@@ -143,7 +143,7 @@ const ruleModal = new Vue({
 							"{{ label.name }}" +
 						"</option>" +
 					"</select>" +
-	
+
 					"<select v-model=\"content\" v-else-if=\"['source port', 'forward to port'].includes(selection)\" " +
 				// In questi casi vengono mostrate tutte le interfacce
 						"@change=\"$emit('input', content)\" class=\"answer-selection\">" +
@@ -152,22 +152,22 @@ const ruleModal = new Vue({
 							"eth{{ interface.number }}" +
 						"</option>" +
 					"</select>" +
-	
+
 					"<input v-model=\"content\" v-else-if=\"['MAC source', 'MAC destination'].includes(selection)\" " +
 				// In questi casi viene mostrato un input che ha come pattern un indirizzo MAC
 						"type=\"text\" @change=\"$emit('input', content)\" " +
 						"pattern=\"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$\">" +
-	
+
 					"<input v-model=\"content\" v-else-if=\"['IPv4 source', 'IPv4 destination'].includes(selection)\" " +
 				// In questi casi viene mostrato un input che ha come pattern un indirizzo IPv4
 						"type=\"text\" @change=\"$emit('input', content)\" " +
 						"pattern=\"^(^$)|(((^|\.)((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){4}(/[0-9]+)?$)\">" +
-	
+
 					"<input v-model=\"content\" v-else-if=\"['TCP source port', 'TCP destination port'].includes(selection)\" " +
 				// In questi casi viene mostrato un input che ha come pattern una porta TCP
 						"type=\"text\" @change=\"$emit('input', content)\" " +
 						"min=\"0\" max=\"65534\">" +
-			
+
 				/* ---------------------------------------------------------------------------------------------- */
 				/*		'<input v-model="content" v-else-if="[\'ethertype\'].includes(selection)"' +
 			/*		// In questi casi viene mostrato un input numerico (vincolato da min e max di ethertype)
@@ -185,20 +185,20 @@ const ruleModal = new Vue({
 				/**/		"<option value=\"LLDP\">LLDP</option>" +
 				/**/	"</select>" +
 				/* ---------------------------------------------------------------------------------------------- */
-			
+
 					"<input v-model=\"content\" v-else-if=\"['send to table'].includes(selection)\" " +
 						"type=\"number\" @change=\"$emit('input', content)\" " +
 						"min=\"0\" max=\"252\" >" +
-	
+
 					"<input v-model=\"content\" v-else-if=\"['set field'].includes(selection)\" " +
 				// In questo caso viene mostrato un testo con un vincolo sul pattern
 						"type=\"text\" @change=\"$emit('input', content)\" " +
 						"pattern=\".+:.+\">" +
-	
+
 					"<input v-model=\"content\" v-else-if=\"!['any', 'noselection', 'send to controller', 'drop', 'pop MPLS label'].includes(selection)\" " +
 				// In tutti i casi, tranne quelli indicati, viene mostrato un campo testuale libero
 						"type=\"text\" @change=\"$emit('input', content)\" >" +
-	
+
 				"</div>"
 		}
 	}

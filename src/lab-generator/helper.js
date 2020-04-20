@@ -14,7 +14,7 @@ function toggle_tab(href) {
 
 	let currentTab = document.getElementById(href);
 	currentTab.classList.add("active");
-	
+
 	let rightControls = document.getElementById("left-controls");
 	if (href == "home") {
 		rightControls.classList.remove("ng-hide");
@@ -51,7 +51,7 @@ function toggle_submenu(number) {
 			document.getElementById("submenu-" + i).classList.add("ng-hide");
 		}
 	}
-	
+
 	let mockMainMenu = document.getElementById("mock-main-menu");
 	if (hidden || number == -1) {
 		mockMainMenu.classList.remove("mock-submenu");
@@ -78,7 +78,7 @@ function executeStart(e) {
 
 	if(!document.getElementById("lstart").classList.contains("disabledLink")){
 		let sdnTabButton = document.getElementById("connect");
-		
+
 		copyLab();
 		toggle_submenu(-1);
 		_executeGeneric(e, "execute");

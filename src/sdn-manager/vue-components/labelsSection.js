@@ -85,13 +85,13 @@ const labelsSection = new Vue({
 
 		_addRuleToActiveLabelList_and_addLabeltoRule(rule, isStart, isEnd){
 			let labelComponent = this._findActiveLabelComponent();
-			
+
 			let label = this.labels.find(label => label.name == labelComponent.name);
 
 			// AutoTag
 			if(isStart) rule.actions.unshift({ name: "set MPLS label", value: label.name, label });
 			else rule.matches.push({ name: "MPLS label", value: label.name, label });
-			
+
 			// AutoUnTag
 			if(isEnd) rule.actions.unshift({ name: "pop MPLS label", value: label.name, label });
 
@@ -139,7 +139,7 @@ const labelsSection = new Vue({
 				"<button v-bind:class=\"{ 'btn-success': buttons.edit.active }\" " +
 					"v-on:click=\"toggleEdit()\">{{ buttons.edit.text }}</button>" +
 				"<button v-on:click=\"toggleExpand()\">{{ buttons.show.text }}</button>" +
-	
+
 				"<table v-show=\"buttons.show.active\" style=\"margin-top: 15px; width: 100%; max-width: 378px\">" +
 					"<thead>" +
 						"<th>device</th>" +
@@ -164,26 +164,26 @@ const labelsSection = new Vue({
 			/* --------------------------------------------------------- */
 			/* ------------------------ BUTTONS ------------------------ */
 			/* --------------------------------------------------------- */
-	
+
 			toggleEdit(forceDisable) {
 				if(this.buttons.edit.active || forceDisable){
 					this.buttons.edit.active = false;
 					this.buttons.edit.text = "Edit...";
 					this.toggleRemove(true);
-					
+
 					discardPath();
 					disableDragging();
 				} else {
 					this.$parent.setAllEditButtonsDisabled();
-	
+
 					this.buttons.edit.active = true;
 					this.buttons.edit.text = "EDITING";
 					this.toggleExpand(true);
-	
+
 					enablePathSelection();
 				}
 			},
-			
+
 			toggleRemove(forceDisable) {
 				if(this.buttons.remove.active || forceDisable){
 					this.buttons.remove.active = false;
@@ -193,7 +193,7 @@ const labelsSection = new Vue({
 					this.buttons.remove.text = "REMOVING";
 				}
 			},
-			
+
 			toggleExpand(forceShow) {
 				if(this.buttons.show.active && !forceShow){
 					this.buttons.show.active = false;
@@ -203,20 +203,20 @@ const labelsSection = new Vue({
 					this.buttons.show.text = "Hide";
 				}
 			},
-	
+
 			/* --------------------------------------------------------- */
 			/* ------------------------- RULES ------------------------- */
 			/* --------------------------------------------------------- */
-	
+
 			highlightChildrenOnGraph(){
 				this.$children.forEach(el => el.highlightMeOnGraph());
 			},
-	
+
 			unhighlightChildrenOnGraph(){
 				this.$children.forEach(el => el.unhighlightMeOnGraph());
 			}
 		},
-	
+
 		components: {"label-rule": {
 			props: ["device", "matches", "actions"],
 			data: function(){
@@ -259,7 +259,7 @@ const labelsSection = new Vue({
 					rule.deleted = true;
 					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1);
 				},
-		
+
 				highlightMeOnGraph(){
 					highlightSegmentOnGraph(
 						this.device,
@@ -267,7 +267,7 @@ const labelsSection = new Vue({
 						this.actions.find(action => action.name == "forward to port").value
 					);
 				},
-		
+
 				unhighlightMeOnGraph(){
 					if(!sdnData.pathHasAtLeastOneStep())
 						removeNodesSelection();

@@ -172,11 +172,11 @@ span.btn {
 	position: absolute;
 	right: 10px;
 	top: 10px;
-	
+
 	border: 1px solid darkgray;
 	padding: 10px;
 	height: 750px;
-	
+
 	background-color: white;
 	box-shadow: 0 0 5px darkgray;
 }

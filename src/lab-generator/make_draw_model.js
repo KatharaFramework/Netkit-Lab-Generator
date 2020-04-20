@@ -169,7 +169,7 @@ function generate_nodes_edges(lab) {
 		for (let interface of machine.interfaces.if) {
 			let domain_name = interface.eth.domain;
 			if (!domain_name || domain_name == "") continue;
-			
+
 			let if_name = "eth" + interface.eth.number;
 			let domain_id = "domain-" + domain_name;
 			let app_to = "iplabel-" + domain_name + "-domain_ip";
@@ -178,7 +178,7 @@ function generate_nodes_edges(lab) {
 				domain_ip = get_network_from_ip_net(interface.ip);
 				if_ip = get_eth_ip_difference(domain_ip, interface.ip);
 			} 
-			
+
 			// the domain is a new node. beware of duplicates.
 			// domain should have a child node with the ip description
 			// so edge for that and the eth
@@ -235,7 +235,7 @@ function generate_nodes_edges(lab) {
 			}
 		}
 	}
-	
+
 	pendingDomainNodes.forEach(domainNode => { if(!containsNodeWithID(domainNode.id, nodes)) nodes.push(domainNode);});
 
 	return { nodes, edges };

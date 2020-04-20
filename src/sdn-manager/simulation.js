@@ -9,24 +9,24 @@ function loadSDN(forceStart) {
 				// Preparo i dati
 				let simulationData = makeNodesAndEdges(machinesConfig);
 				sdnData.set(machinesConfig);
-				
+
 				// Preparo l'interfaccia
 				hide(document.getElementById("connect"));
 				resetButtons();
 
 				// Avvio la simulazione
 				startSimulation(simulationData);
-				
+
 			}
 		});
 	} else if (confirm("Are you sure? All labels and rules will be lost")) {
 		// Resetto i dati e ricarico la simulazione
 		for (let svg of document.getElementsByTagName("svg")) svg.innerHTML = "";
-		
+
 		labelsSection.reset();
 		switchDetailsSection.close();
 		controllerAndRulesSection.close();
-		
+
 		loadSDN(true);
 	}
 }
@@ -40,7 +40,7 @@ function makeNodesAndEdges(machines){
 		if(machine.type != "controller"){
 			let node = { id: machine.name, type: machine.type };
 			data.nodes.push(node);
-			
+
 			// Scorro le interfacce
 			machine.interfaces.if.forEach(function (interfaccia) {
 				let nomeDominio = interfaccia.eth.domain;
@@ -68,7 +68,7 @@ function findEdgeNetworks(data) {
 	// Divido le reti in base al loro tipo:
 	// - edge = comunica con qualche macchinario non-sdn;
 	// - external = non fa parte della sottorete sdn.
-	
+
 	data.nodes.forEach(function (node) {
 		if (node.type == "network") {
 			let isInternal = false;
@@ -165,13 +165,13 @@ function startSimulation(data) {
 
 	// Avvio la simulazione
 	sdnData.setSimulation(simulation);
-	
+
 	// Classifico i link in base ai nodi che esso collega
 	linksGroup.attr("class", function (d) { return d.target.type + " " + d.source.type; }); // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
 
 	// Aggiungo l'interazione al click ai nodi
 	d3.selectAll("g.nodes circle.switch").on("click", d => switchDetailsSection.open(d.id));
-	
+
 	// Aggiungo al nodo HTML che rappresenta l'SVG alcune definizioni: non le metto direttamente nell'HTML per semplicita nel processo di reset del grafico
 	appendMarkersDefinitions(svg);
 }
