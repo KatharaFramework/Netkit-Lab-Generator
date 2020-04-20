@@ -1,0 +1,233 @@
+:root {
+	--main-color: #337ab7;
+	--secondary-color: #5b8fbd;
+	--disclaimer-color: rgba(255, 0, 0, .2);
+}
+
+html, body, #main {
+	height: 100%
+}
+
+.browserupgrade {
+	margin: 0.2em 0;
+	background: #ffff00;
+	color: black;
+	padding: 0.2em 0;
+}
+
+.hidden {
+	display: none;
+}
+
+.tab-pane {
+	margin: 1em;
+}
+
+.disclaimer {
+	text-align: center;
+	padding: 10px;
+	background-color: var(--disclaimer-color);
+	border-radius: 1em;
+	margin: 1em;
+}
+
+hr {
+	margin: 10px 0;
+}
+
+/* ------------------------------------------------------- */
+/* ----------------------- CONNECT ----------------------- */
+/* ------------------------------------------------------- */
+
+#connect {
+	padding: 20%;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: white;
+	z-index: 10;
+}
+
+/* ------------------------------------------------------ */
+/* ----------------------- MODAL ----------------------- */
+/* ------------------------------------------------------ */
+
+.modal-kathara {
+	display: block;
+	z-index: 9999;
+	background: rgba(189, 189, 189, 0.5);
+}
+
+.modal-kathara .modal-title {
+	text-align: left;
+}
+
+.modal-kathara .modal-footer {
+	margin: 5px 0;
+	border: 0 !important;
+	padding: 10px;
+	clear: both;
+	text-align: right;
+}
+
+/* ------------------------------------------------------ */
+/* ----------------------- INPUTS ----------------------- */
+/* ------------------------------------------------------ */
+
+.form-control {
+	border-radius: 0;
+	padding: 2px 6px;
+	margin-top: -2px;
+	margin-bottom: 2px;
+	height: 26px;
+}
+
+textarea {
+	width: 100%;
+	font-size: 14px;
+	color: #555;
+	padding: 1em;
+	border: 1px solid lightgray;
+}
+
+textarea,
+textarea:disabled {
+	background-color: #fafafa;
+}
+
+a {
+	cursor: pointer;
+}
+
+input {
+	background-position: right center;
+	background-repeat: no-repeat;
+	font-weight: normal;
+}
+
+/* ----------- BUTTONS ----------- */
+
+button {
+	color: initial;
+	font-weight: normal;
+}
+
+.btn {
+	margin: 2px 0;
+	border-radius: 0;
+	font-weight: bold;
+}
+
+.btn-danger[disabled],
+.btn-danger[disabled].active,
+.btn-danger[disabled].focus,
+.btn-danger[disabled]:active,
+.btn-danger[disabled]:focus,
+.btn-danger[disabled]:hover,
+.btn-success[disabled],
+.btn-success[disabled].active,
+.btn-success[disabled].focus,
+.btn-success[disabled]:active,
+.btn-success[disabled]:focus,
+.btn-success[disabled]:hover {
+	background-color: #9e9e9e;
+	border-color: #808080;
+	opacity: 0.2 !important;
+}
+
+td, th {
+	border: 1px solid lightgray;
+	padding: 10px;
+}
+
+th {
+	color: white;
+	background-color: var(--main-color);
+}
+
+label {
+	margin-bottom: .3em;
+}
+
+p.btn,
+span.btn {
+	width: 100%;
+	padding: 2% 4%;
+}
+
+/* -------------------------------------------- */
+
+#button-controls,
+#main-contents,
+#sdnGraph {
+	display: inline-block;
+	vertical-align: top;
+}
+
+/* ----------- DETAILS COMMON ----------- */
+
+#labelsSection,
+#switchDetailsSection,
+#controllerAndRulesSection {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	
+	border: 1px solid darkgray;
+	padding: 10px;
+	height: 750px;
+	
+	background-color: white;
+	box-shadow: 0 0 5px darkgray;
+}
+
+@media (min-width: 1450px), (min-height: 900px) {
+	.disclaimer:first-child{
+		display: none;
+	}
+}
+
+@media (min-width: 1570px) {
+	#labelsSection,
+	#controllerAndRulesSection {
+		right: 100px;
+	}
+}
+
+@media (min-width: 1750px) {
+	#labelsSection,
+	#controllerAndRulesSection {
+		right: 200px;
+	}
+
+	#switchDetailsSection {
+		right: 100px;
+	}
+}
+
+#sdnGraph {
+	background-image: url("../../static/images/background.png");
+}
+
+.tab {
+	cursor: pointer;
+	padding: 5px;
+}
+
+.tab.active {
+	border-bottom: 2px solid lightblue;
+}
+
+#switchDetailsSection td input[type=number] {
+	max-width: 50px;
+	margin: 0;
+	border: none;
+}
+
+#switchDetailsSection > a,
+#controllerAndRulesSection > a {
+	font-size: large;
+	float: right;
+	color: red;
+	margin-bottom: 5px;
+}

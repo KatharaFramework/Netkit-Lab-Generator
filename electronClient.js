@@ -8,21 +8,39 @@ const fs = require("fs");
 /* -------------------------- SETUP -------------------------- */
 /* ----------------------------------------------------------- */
 
-app.on("ready", function () {
-	let mainWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 });
+let mainWindow, sdnManagerWindow
+
+function startMainWindow(){
+	mainWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 });
 
 	mainWindow.loadURL(url.format({
-		pathname: path.join(__dirname, "/index.html"),
+		pathname: path.join(__dirname, "index.html"),
 		protocol: "file:",
 		slashes: true
 	}));
 
 	mainWindow.on("closed", function () {
-		app.quit();
+		mainWindow = null;
+		if(sdnManagerWindow == null) app.quit();
 	});
+}
 
-	console.log()
-});
+function startSDNManagerWindow(){
+	sdnManagerWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 });
+
+	sdnManagerWindow.loadURL(url.format({
+		pathname: path.join(__dirname, "src/sdn-manager", "index.html"),
+		protocol: "file:",
+		slashes: true
+	}));
+
+	sdnManagerWindow.on("closed", function () {
+		sdnManagerWindow = null;
+		if(mainWindow == null) app.quit();
+	});
+}
+
+app.on("ready", startMainWindow);
 
 /* ---------------------------------------------------------- */
 /* ------------------------- EVENTS ------------------------- */
@@ -30,12 +48,11 @@ app.on("ready", function () {
 
 let _baseFolder = app.getPath("userData");
 
-let _isWindows = false; // TODO: Sviluppare e testare anche su Windows
-
 function _runKatharaCommand(command){
-	let prefix = _isWindows ? "start cmd /c \"%NETKIT_HOME%\\" : "";
-	exec(prefix + command + (_isWindows ? "\"" : ""), (stderr) => { console.error(stderr) });
+	exec(command, (stderr) => { console.error(stderr) });
 }
+
+ipcMain.on("sdn:start", startSDNManagerWindow);
 
 /* ------------------------- SCRIPT ------------------------- */
 
@@ -46,7 +63,7 @@ ipcMain.on("script:copy", function (_, script, filename) {
 	fs.writeFileSync(pathTemp, script)
 	
 	console.log("Running " + pathTemp);
-	exec((_isWindows ? "\"" : "bash \"") + pathTemp + "\"");
+	exec("bash \"" + pathTemp + "\"");
 });
 
 ipcMain.on("script:execute", function () {

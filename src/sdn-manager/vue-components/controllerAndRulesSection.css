@@ -1,0 +1,36 @@
+#controllerAndRulesSection {
+	width: 400px;
+	overflow-y: hidden;
+}
+
+#controllerAndRulesSection h3 {
+    margin-top: 10px;
+}
+
+#controllerAndRulesSection input {
+	background: none;
+    border: 1px solid darkgray;
+    padding: 3px 10px;
+	width: 150px;
+	margin: 3px;
+}
+
+#controllerAndRulesSection button {
+	margin-bottom: 0;
+}
+
+#d3-rules textarea:disabled {
+	height: 600px;
+}
+
+#controllerAndRulesSection .minimal-input,
+.minimal-input {
+	border: 0px;
+	border-bottom: 2px solid lightblue;
+	text-align: right;
+	background-color: white;
+}
+
+#d3-controller textarea {
+	height: 300px;
+}

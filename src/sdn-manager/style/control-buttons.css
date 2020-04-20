@@ -1,0 +1,38 @@
+/* ----------------- */
+/* ---- COMANDI ---- */
+/* ----------------- */
+
+#button-controls {
+	width: 200px;
+	padding: 10px;
+	margin: 10px 0 0 10px;
+	
+	overflow: hidden;
+	text-overflow: ellipsis;
+	
+	background-color: #033333;
+	box-shadow: 3px 0px 5px darkgray;
+	border-radius: 5px;
+}
+
+#button-controls button {
+	display: block;
+	width: 100%;
+	font-size: medium;
+
+	color: #eee;
+	background-color: #3e6668;
+
+	border: 1px solid white;
+	margin: 6px 0;
+	padding: 3px 10px;
+	border-radius: 5px;
+}
+
+#button-controls button:disabled,
+#button-controls button[disabled=""],
+#button-controls button[disabled=""]:hover {
+	text-decoration: none;
+	cursor: not-allowed;
+	opacity: .2;
+}

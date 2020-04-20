@@ -1,0 +1,81 @@
+#labelsSection {
+    width: 400px;
+	overflow: auto;
+}
+
+.blu-bordered {
+	margin-bottom: 10px;
+	border: 1px solid black;
+	padding: 10px;
+
+	position: relative;
+	top: -10px;
+	left: -10px;
+	width: 398px;
+
+	background-color: var(--secondary-color);
+}
+
+.colorTag {
+    display: inline-block;
+    width: 30px;
+    height: 15px;
+    margin-right: 10px;
+}
+
+.blu-bordered > input,
+.blu-bordered > button {
+	margin: 0 10px 0 0;
+    padding-left: 10px;
+
+    max-width: 30%;
+	border: 1px solid black;
+}
+
+#labelsSection input:valid {
+    background-image: none;
+}
+
+#labelsSection button {
+    float: right;
+    margin: 0;
+    margin-left: 5px;
+}
+
+#labelsSection button:hover {
+	background-color: #bbb;
+}
+
+#labelsSection span.hint {
+	color: orange;
+	float: right;
+	font-size: 1.5em;
+	position: relative;
+}
+
+#labelsSection span.hint::before {
+	position: absolute;
+	bottom: 100%;
+	font-size: smaller;
+	background-color: darkgray;
+	border-radius: 5px;
+	padding: 10px;
+	width: 150px;
+	color: white;
+	border: 2px solid black;
+	transform: scale(0);
+}
+
+#labelsSection span.hint:hover::before {
+	transform: scale(1);
+}
+
+#labelsSection span.hint-match::before {
+	left: -30px;
+	content: 'Other matches are defined';
+}
+
+#labelsSection span.hint-action::before {
+	left: -130px;
+	content: 'Other actions are defined';
+}

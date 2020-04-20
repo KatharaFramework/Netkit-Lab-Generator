@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Netkit SDN interface</title>
+	<meta name="author" content="Pastello" />
+
+	<!-- Style -->
+	<link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="style/global.css" />
+
+	<!-- Frameworks -->
+	<script src="../static/vendor/js/d3.min.js"></script>
+	<script src="../static/vendor/js/vue.js"></script>
+
+	<!-- My modules -->
+	<script src="dataclass.js"></script>
+	<script src="helper.js"></script>
+	<script src="simulation.js"></script>
+	<script src="myhttp.js"></script>
+
+	<script src="rules-utils/ruleUtils.js"></script>
+	<script src="rules-utils/rulesMapper.js"></script>
+	<script src="ryuActions.js"></script>
+</head>
+
+<body>
+	
+	<!-- CONNECTION PAGE -->
+	<div id="connect">
+		<p style="font-size: x-large">
+			Connect to:
+			<input placeholder="name of docker container"
+				style="margin: 0 20px; width: 250px"
+				type="text" class="minimal-input"
+				onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13)
+					this.nextElementSibling.click()">
+			<button
+				class="btn btn-default"
+				style="display: inline;"
+				onclick="loadSDN(true)">
+				Connect
+			</button>
+		</p>
+		<hr>
+		<p>Please insert the adress of Ryu REST server (usually &lt;controller's-ip&gt;:8080)</p>
+	</div>
+
+	<!-- MAIN -->
+	<div id="main" style="width: 905px">
+		<!-- Horizontal buttons -->
+		<link rel="stylesheet" href="style/control-buttons.css" />
+		<div id="button-controls">
+			<button id="b4" style="background-color: green"
+				onclick="controllerAndRulesSection.close();switchDetailsSection.close();labelsSection.showLabelMaker()">
+				Create new label
+			</button>
+			<hr>
+			<button id="b1" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
+			<button id="b2"
+				style="display:none; box-shadow: 0 0 7px 2px orange"
+				onclick="enablePathSelection()">
+				Disable nodes repositioning
+				<!-- TODO: Valuta se aggiungere/sostituire questo bottone e il
+					precedente con una singola checkbox (es. spuntata = permetti
+					riposizionamento; senza spunta = permetti selezione path)
+				-->
+			</button>
+			<button id="b3" onclick="releaseNodes()" disabled>Release fixed nodes</button>
+			<hr>
+			<button id="b5" style="background-color: green" onclick="applyPath()" disabled>Install flow</button>
+			<button id="b6" style="background-color: red" onclick="discardPath()" disabled>Discard flow</button>
+			<hr>
+			<button id="b7" onclick="sdnData.submitAllRules()">Submit changes</button>
+			<button id="b8" onclick="ryuActions.updateStatisticsAll(); alert('TODO')">Update statistics</button>
+			<hr>
+			<button id="b10" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
+			<button id="b11" onclick="controllerAndRulesSection.open(3)">SHOW RULES</button>
+			<button id="b12" onclick="controllerAndRulesSection.open(2)">CONTROLLER</button>
+			<button id="b13" style="background-color: red"
+				onclick="loadSDN(true)">
+				RELOAD
+			</button>
+		</div>
+
+		<!-- CONTENTS -->
+		<div id="main-contents" style="width: 690px;">
+			<p style="position: fixed; top: 10px; left: 50px;" class="disclaimer">Please update the size of the window to fit contents!
+				<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
+			</p>
+
+			<!-- Main graph (unfilled) -->
+			<link rel="stylesheet" href="style/simulation.css" />
+			<svg id="sdnGraph" width="900" style="display: none" height="800"></svg>
+
+			<!-- LABELS SECTION -->
+			<link rel="stylesheet" href="vue-components/labelsSection.css" />
+			<div id="labelsSection">
+				<label-div v-for="label in labels" v-bind:name="label.name" v-bind:key="label.name" v-bind:color="label.color">
+				</label-div>
+
+				<div class="blu-bordered" v-if="newLabel.show">
+					<input v-model="newLabel.color" type="text"
+						pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)'
+						placeholder='color'>
+					<input v-model="newLabel.name" type="text"
+						pattern='[A-z0-9]+' placeholder='name'
+						onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13) this.nextElementSibling.click()">
+					<button v-on:click="createNewLabel()">Add</button>
+					<button v-on:click="hideLabelMaker()">Ignore</button>
+				</div>
+
+				<p v-if="!labels.length && !newLabel.show"
+					style="color: darkgray; font-size: large; margin: 100px auto; text-align: center;">
+					No label defined yet
+				</p>
+			</div>
+			<script src="vue-components/labelsSection.js"></script>
+
+			<!-- SWITCH DETAILS -->
+			<link rel="stylesheet" href="vue-components/switchDetailsSection.css" />
+			<div id="switchDetailsSection" v-show="visible">
+				<a v-on:click="close">X</a>
+				<h1>{{ device }}</h1>
+				<hr style="margin-bottom: 20px">
+				<p style="font-size: medium; text-align: left;">
+					<span v-on:click="switchTab(1)"
+						v-bind:class="[ (activeSection == 1) ? 'tab active' : 'tab']">
+						Rules
+					</span>
+					<span v-on:click="switchTab(2)"
+						v-bind:class="[ (activeSection == 2) ? 'tab active' : 'tab']"
+						v-show="columnsVisibility.statistics">
+						Statistics
+					</span>
+					<span v-on:click="switchTab(3)"
+						v-bind:class="[ (activeSection == 3) ? 'tab active' : 'tab']">
+						Inspect
+					</span>
+					<button style="color: var(--main-color); margin-left: 220px;" class="btn btn-default"
+						onclick="document.getElementById('b8').click()"
+						v-show="columnsVisibility.statistics">
+						Update statistics
+					</button>
+				</p>
+				<hr>
+				<div id="d2-rules" v-if="activeSection==1">
+					<div>
+						<button class="btn btn-success" v-on:click="popupModal()">Create new rule</button>
+						<h2>Packet rules</h2>
+						<table v-if="packetRules.length" style="margin-top: 15px">
+							<thead>
+								<th>#</th>
+								<th>match</th>
+								<th>action</th>
+								<th v-show="columnsVisibility.tableId">table id</th>
+								<th>priority</th>
+								<th v-show="columnsVisibility.idleTimeout">idle timeout</th>
+								<th v-show="columnsVisibility.hardTimeout">hard timeout</th>
+								<th v-show="columnsVisibility.statistics">stats</th>
+								<th style="background-color: purple">status</th>
+							</thead>
+							<tbody>
+								<tr v-for="(rule, index) in packetRules"
+									v-on:click="popupModal(index, 'packetRules')"
+									v-bind:style="{
+										textDecoration: (rule.deleted ? 'line-through' : 'none'),
+										borderLeft: '5px solid ' +
+											(rule.submitted ?
+												(!rule.edited && !rule.deleted ? 'lightgreen' : 'yellow')
+												: (rule.deleted ? 'lightgreen' : 'coral')
+											)
+									}" >
+									<td>{{ (index + 1) }}</td>
+									<td>
+										<rule-element
+											v-for="match in rule.matches"
+											v-bind:name="match.name"
+											v-bind:value="match.value"
+											v-bind:label="match.label">
+										</rule-element>
+									</td>
+									<td>
+										<rule-element
+											v-for="action in rule.actions"
+											v-bind:name="action.name"
+											v-bind:value="action.value"
+											v-bind:label="action.label">
+										</rule-element>
+									</td>
+									<td v-show="columnsVisibility.tableId">{{ rule.table }}</td>
+									<td>{{ rule.priority }}</td>
+									<td v-show="columnsVisibility.idleTimeout">{{ rule.idleTimeout }}</td>
+									<td v-show="columnsVisibility.hardTimeout">{{ rule.hardTimeout }}</td>
+									<td v-show="columnsVisibility.statistics">{{ rule.stats }}</td>
+									<td>
+										{{ rule.submitted ? 'submitted' : 'not-submitted' }}
+										<button v-if="!rule.submitted && !rule.deleted"
+											v-on:click.stop="submitRule(rule)" >
+											submit
+										</button>
+										<button v-if="rule.submitted && rule.deleted"
+											v-on:click.stop="removeSubmittedRule(rule)">
+											remove
+										</button>
+										<button v-if="rule.submitted && rule.edited"
+											v-on:click.stop="updateRule(rule)">
+											update
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div v-if="labelRules.length">
+						<h2>Label rules</h2>
+						<table>
+							<thead>
+								<th>#</th>
+								<th>match</th>
+								<th>action</th>
+								<th v-show="columnsVisibility.tableId">table id</th>
+								<th>priority</th>
+								<th v-show="columnsVisibility.idleTimeout">idle timeout</th>
+								<th v-show="columnsVisibility.hardTimeout">hard timeout</th>
+								<th v-show="columnsVisibility.statistics">stats</th>
+								<th style="background-color: purple">status</th>
+							</thead>
+							<tbody>
+								<tr v-for="(rule, index) in labelRules"
+									v-on:mouseenter="highlightRuleOnGraph(index)" v-on:mouseleave="unhighlightRuleOnGraph"
+									v-on:click="popupModal(index, 'labelRules')"
+									v-bind:style="{
+										textDecoration: (rule.deleted ? 'line-through' : 'none'),
+										borderLeft: '5px solid ' +
+											(rule.submitted ?
+												(!rule.edited && !rule.deleted ? 'lightgreen' : 'yellow')
+												: (rule.deleted ? 'lightgreen' : 'coral')
+											)
+									}" >
+									<td>{{ (packetRules.length + index + 1) }}</td>
+									<td>
+										<rule-element
+											v-for="match in rule.matches"
+											v-bind:name="match.name"
+											v-bind:value="match.value"
+											v-bind:label="match.label">
+										</rule-element>
+									</td>
+									<td>
+										<rule-element
+											v-for="action in rule.actions"
+											v-bind:name="action.name"
+											v-bind:value="action.value"
+											v-bind:label="action.label">
+										</rule-element>
+									</td>
+									<td v-show="columnsVisibility.tableId">{{ rule.table }}</td>
+									<td>{{ rule.priority }}</td>
+									<td v-show="columnsVisibility.idleTimeout">{{ rule.idleTimeout }}</td>
+									<td v-show="columnsVisibility.hardTimeout">{{ rule.hardTimeout }}</td>
+									<td v-show="columnsVisibility.statistics">{{ rule.stats }}</td>
+									<td>
+										{{ rule.submitted ? 'submitted' : 'not-submitted' }}
+										<button v-if="!rule.submitted && !rule.deleted"
+											v-on:click.stop="submitRule(rule)">
+											submit
+										</button>
+										<button v-if="rule.submitted && rule.deleted"
+											v-on:click.stop="removeSubmittedRule(rule)">
+											remove
+										</button>
+										<button v-if="rule.submitted && rule.edited"
+											v-on:click.stop="updateRule(rule)">
+											update
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div v-show="activeSection==2">
+					<button style="float:right" v-if="labelRules.length || packetRules.length" v-on:click="updateSVG">
+						Update graph
+					</button>
+					<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
+					<!-- TODO: Eventualmente altri grafici e statistiche -->
+				</div>
+				<p style="margin-top: 20px;" class="disclaimer" v-if="!labelRules.length && !packetRules.length && activeSection!=3">
+					Nessuna regola installata sullo switch {{ device }}
+				</p>
+				<div v-if="activeSection==3" class="bottoni">
+					<button v-show="columnsVisibility.statistics"
+						style="background-color: #faebd7; color: crimson"
+						class="btn btn-default"
+						v-on:click="askRyu('stats/aggregateflow')">
+						Get overall statistics
+					</button>
+					<button v-show="columnsVisibility.statistics"
+						style="background-color: #ffe4c4; color: chocolate"
+						class="btn btn-default"
+						v-on:click="askRyu('stats/port')">
+						Get ports statistics
+					</button>
+					<button
+						style="background-color: #fafad2; color: green"
+						class="btn btn-default"
+						v-on:click="askRyu('stats/portdesc')">
+						Get ports descriptions
+					</button>
+					<button v-show="columnsVisibility.statistics"
+						style="background-color: #fff8dc; color: rgb(247, 168, 139)"
+						class="btn btn-default"
+						v-on:click="askRyu('stats/table')">
+						Get tables statistics
+					</button>
+					<button
+						style="background-color: #fce1fc; color: magenta"
+						class="btn btn-default"
+						v-on:click="askRyu('stats/flow')">
+						Get flow-entries
+					</button>
+					<textarea style="height: 450px" disabled
+						v-model="responseTextareaContent">
+					</textarea>
+				</div>
+
+				<div id="d2-selection">
+					<p>
+						<input type="checkbox" v-model="columnsVisibility.idleTimeout"> idle timeout
+						<input type="checkbox" v-model="columnsVisibility.hardTimeout"> hard timeout
+						<input type="checkbox" v-model="columnsVisibility.tableId"> table
+						<input type="checkbox" v-model="columnsVisibility.statistics"> statistics
+					</p>
+				</div>
+			</div>
+			<script src="vue-components/switchDetailsSection.js"></script>
+
+			<!-- CONTROLLER AND RULES -->
+			<link rel="stylesheet" href="vue-components/controllerAndRulesSection.css" />
+			<div id="controllerAndRulesSection" v-if="visible">
+				<a v-on:click="close">X</a>
+				<div v-if="howtoVisibility">
+					<h3>Instructions:</h3>
+					<hr>
+					<p>
+						This tool allows you to configure the network flow of a software defined network (SDN) built on Katharà. In this page you
+						can se the actual topology of the network: blue circles are the switches, black ones are the network domains. The controller
+						node is hidden, but it exists and it is connected to all switches through a dedicated network!
+					</p>
+					<hr>
+					<p>
+						Labels represent a flow inside the network. They are like colored tunnels in which packets moves accordingly to certain rules.
+						Colors and paths are arbitrary. To create a tunnel click on the green button on top of the graph. Packets don't survive
+						the external networks, so, when a white circle is included in the flow, the program will automatically add a rule to
+						tag/untag the packets. The default match for tagging packets is the port from where the packet is received.
+					</p>
+					<hr>
+					<p>
+						To create a custom rule, click on a switch and then click on the 'create new rule' button. This will prompt a window where
+						you can specify which packet should match the rule and which action will be applied on it. You can edit or remove a
+						rule created before by opening the switch details and clicking on the row of the table which represents that rule:
+						the modal will popup again.
+					</p>
+					<hr>
+					<p>
+						Remember that rules are not automatically submitted to the controller. In this way you can check they are correct berfore
+						installing them. The status of a rule is represented by their color in the switch details. To submitt all the rules at once
+						click on the left button "Submit changes".
+					</p>
+				</div>
+				<div id="d3-controller" v-if="controllerSection.visible">
+					<h3>Controller</h3>
+					<hr>
+					<h4>input</h4>
+					<select v-model="controllerSection.request.method">
+						<option value="GET">GET</option>
+						<option value="POST">POST</option>
+					</select>
+					<input style="width: auto" type="text"
+						placeholder="path"
+						v-model="controllerSection.request.path"
+						onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13)
+							this.nextElementSibling.nextElementSibling.click()">
+					<textarea
+						v-bind:style="{
+							boxShadow: '0 0 2px ' + (controllerSection.request.paramsValidity ? 'green' : 'red'),
+							height: '200px',
+							width: '270px',
+							backgroundColor: 'white',
+							border: '1px solid darkgray',
+							margin: '5px 0px -4px 2px'
+						}"
+						v-show="controllerSection.request.method == 'POST'"
+						v-model="controllerSection.request.params"
+						v-on:keyup="checkParams"
+						placeholder='JSON parameters'>
+					</textarea>
+					<input style="width: 65px" type="submit" value="Submit"
+						v-on:click="makeRequest">
+					<hr>
+					<h4>output</h4>
+					<textarea
+						v-bind:style="{ height: (controllerSection.request.method == 'POST' ? '50px' : '')}"
+						v-model="controllerSection.output"
+						disabled>
+					</textarea>
+					<hr>
+					<h4>history</h4>
+					<table style="width: 100%">
+						<thead></thead>
+						<tbody>
+							<tr v-for="(command, index) in controllerSection.history">
+								<td>{{ command.method }}</td>
+								<td>{{ command.path }}</td>
+								<td v-on:click="repeat(index)" style="text-align: center; color: #777; font-weight: bold;">Repeat</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div id="d3-rules" v-if="rulesSection.visible">
+					<h3>Rules</h3>
+					<hr>
+					<span v-on:click="showSimulatedRules"
+						v-bind:class="[ (rulesSection.visible == 1) ? 'tab active' : 'tab' ]">
+						Simulated
+					</span>
+					<span v-on:click="showSubmittedRules"
+						v-bind:class="[ (rulesSection.visible == 2) ? 'tab active' : 'tab' ]">
+						Submitted
+					</span>
+					<input style="float: right; margin: 0 0 5px 5px" type="text" placeholder="Device name" v-on:change="showRulesFilteredByDevice"
+					 v-model="rulesSection.filter">
+					<textarea v-if="rulesSection.visible==1" v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
+					<textarea v-else-if="rulesSection.visible==2" v-model="rulesSection.submittedRules" cols="30" rows="10" disabled></textarea>
+					<button class="btn btn-warning" style="float: right;" v-if="rulesSection.visible==1" v-on:click="exportJSON">
+						Export JSON
+					</button>
+					<button class="btn btn-default" style="float: right;margin-right: 10px" v-if="rulesSection.visible==1" v-on:click="importRules">
+						Import
+					</button>
+					<input type="file" id="rules-file" onchange="this.previousElementSibling.click()" style="display: none">
+				</div>
+			</div>
+			<script src="vue-components/controllerAndRulesSection.js"></script>
+		</div>
+
+		<!-- RULE MODAL -->
+		<link rel="stylesheet" href="vue-components/ruleMakerModal.css">
+		<div id="rule-modal" class="modal modal-kathara" v-if="visible">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close"
+							style="font-size: xx-large;"
+							v-on:click="close">
+							&times;
+						</button>
+						<h4 class="modal-title">{{ header }}</h4>
+					</div>
+					<div class="modal-body">
+
+						<div class="half">
+							<h2>Match</h2>
+							<p>
+								<button class="btn btn-success"
+									:disabled="rule.matches[0].name=='any'"
+									v-on:click="makeNewMatchLine">
+									Add
+								</button>
+								<button class="btn btn-danger"
+									:disabled="rule.matches.length==1"
+									v-on:click="removeLastMatchLine">
+									Remove
+								</button>
+							</p>
+							<div v-for="(match, index) in rule.matches">
+								<select v-model="match.name">
+									<!-- Ogni match deve avere:
+										- un (eventuale) input in dynamic-selection
+										- un mapping in ryuActions
+									-->
+									<option disabled value="noselection">Select...</option>
+									<option v-if="index==0 && rule.matches.length < 2" value="any">Any</option>
+									<option v-if="labels.length" value="MPLS label">MPLS label</option>
+									<option value="source port">Source port</option>
+									<option value="ethertype">Protocol ethertype</option>
+									<option value="MAC source">MAC src</option>
+									<option value="MAC destination">MAC dst</option>
+									<option value="IPv4 source">IPv4 src</option>
+									<option value="IPv4 destination">IPv4 dst</option>
+									<option value="TCP source port">TCP sport</option>
+									<option value="TCP destination port">TCP dport</option>
+								</select>
+
+								<dynamic-selection
+									v-model="match.value"
+									v-bind:selection="match.name">
+								</dynamic-selection>
+							</div>
+						</div>
+
+						<div class="half">
+							<h2>Action</h2>
+							<p>
+								<button class="btn btn-success"
+									:disabled="rule.actions[0].name=='drop'"
+									v-on:click="makeNewActionLine">
+									Add
+								</button>
+								<button class="btn btn-danger"
+									:disabled="rule.actions.length==1"
+									v-on:click="removeLastActionLine">
+									Remove
+								</button>
+							</p>
+							<div v-for="(action, index) in rule.actions">
+								<select v-model="action.name">
+									<!-- Ogni azione deve avere:
+										- un (eventuale) input in dynamic-selection
+										- un mapping in ryuActions
+									-->
+									<option disabled value="noselection">Select...</option>
+									<option v-if="index==0 && rule.actions.length < 2" value="drop">Drop</option>
+									<option v-if="labels.length" value="set MPLS label">Set MPLS label</option>
+									<option value="pop MPLS label">Pop MPLS label</option>
+									<option value="forward to port">Forward to port</option>
+									<option value="send to controller">Send to controller</option>
+									<option value="send to table">Send to table</option>
+									<option value="set field">Set field</option>
+								</select>
+								
+								<dynamic-selection
+									v-model="action.value"
+									v-bind:selection="action.name">
+								</dynamic-selection>
+							</div>
+						</div>
+
+						<div class="half">
+							<h2>Table ID</h2>
+							<input v-model="rule.table" type="number" min="0">
+						</div>
+
+						<div class="half">
+							<h2>Priority</h2>
+							<input v-model="rule.priority" type="number" min="0" max="65535">
+						</div>
+
+						<div class="half">
+							<h2>Idle timeout</h2>
+							<input v-model="rule.idleTimeout" type="number" min="0">
+						</div>
+
+						<div class="half">
+							<h2>Hard timeout</h2>
+							<input v-model="rule.hardTimeout" type="number" min="0">
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button v-if="originalRule" v-on:click="deleteRule" class="btn btn-danger">Delete rule</button>
+						<button v-if="!originalRule" type="button" class="btn btn-danger" v-on:click="close">Undo</button>
+						<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="vue-components/ruleMakerModal.js"></script>
+
+</body>
+
+</html>
