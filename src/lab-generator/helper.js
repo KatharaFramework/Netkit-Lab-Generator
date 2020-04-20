@@ -98,8 +98,14 @@ function executeClean(e) {
 		_executeGeneric(e, "clean");
 		if (!document.getElementById("connect").classList.contains("disabledLink")) {
 			document.getElementById("connect").classList.add("disabledLink");
-			detachInterfaceToController();
 		}
+	}
+}
+
+function startSDNManager(e){
+	let sdnTabButton = document.getElementById("connect");
+	if (!sdnTabButton.classList.contains("disabledLink")){
+		electron.ipcRenderer.send("sdn:start");
 	}
 }
 
