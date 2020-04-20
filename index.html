@@ -7,8 +7,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="author" content="Lykon, Lollo, Neeja, Lollo" />
 	<title>Netkit Lab Generator</title>
-	<link rel="stylesheet" href="src/static/vendor/css/bootstrap.min.css" />
-	<script src="src/helper.js"></script>
+	<link rel="stylesheet" href="src/lab-generator/static/vendor/css/bootstrap.min.css" />
+	<script src="src/lab-generator/helper.js"></script>
 </head>
 
 <body>
@@ -20,9 +20,9 @@
 
 	<!-- MAIN-->
 	<div data-ng-app="napp" data-ng-controller="nc">
-		<link rel="stylesheet" href="src/style/main.css" />
-		<script src="src/static/vendor/js/angular.min.js"></script>
-		<script src="src/controller.js"></script>
+		<link rel="stylesheet" href="src/lab-generator/style/main.css" />
+		<script src="src/lab-generator/static/vendor/js/angular.min.js"></script>
+		<script src="src/lab-generator/controller.js"></script>
 
 		<!-- NAVBAR-->
 		<div>
@@ -55,7 +55,7 @@
 
 			<!-- Sub-menu Download Lab -->
 			<nav id="submenu-0" class="navbar navbar-primary navbar-kathara container-fluid navbar-kathara-secondary ng-hide">
-				<script src="src/static/vendor/js/jszip.min.js"></script>
+				<script src="src/lab-generator/static/vendor/js/jszip.min.js"></script>
 				<ul class="nav navbar-nav">
 					<li>
 						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')" onclick="toggle_submenu(-1)">Download .sh file</a>
@@ -68,7 +68,7 @@
 
 			<!-- Sub-menu Save and Load -->
 			<nav id="submenu-1" class="navbar container-fluid navbar-primary navbar-kathara navbar-kathara-secondary ng-hide">
-				<script src="src/static/vendor/js/FileSaver.min.js"></script>
+				<script src="src/lab-generator/static/vendor/js/FileSaver.min.js"></script>
 				<input type="file" id="file" onchange="this.nextElementSibling.firstElementChild.firstElementChild.click()" style="display: none"/>
 				<ul class="nav navbar-nav">
 					<li>
@@ -107,9 +107,9 @@
 
 			<!-- HOME -->
 			<div id="home" class="tab-pane active">
-				<link rel="stylesheet" href="src/style/home.css" />
-				<script src="src/models/model.js"></script>
-				<script src="src/make.js"></script>
+				<link rel="stylesheet" href="src/lab-generator/style/home.css" />
+				<script src="src/lab-generator/models/model.js"></script>
+				<script src="src/lab-generator/make.js"></script>
 
 				<div>
 					<h1>Netkit Lab Generator</h1>
@@ -477,9 +477,9 @@
 
 			<!-- GRAPH -->
 			<div id="graph" class="tab-pane">
-				<script src="src/static/vendor/js/vis.js"></script>
-				<script src="src/models/draw.js"></script>
-				<script src="src/make_draw_model.js"></script>
+				<script src="src/lab-generator/static/vendor/js/vis.js"></script>
+				<script src="src/lab-generator/models/draw.js"></script>
+				<script src="src/lab-generator/make_draw_model.js"></script>
 				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
 				<button class="btn btn-danger" data-ng-click="makeGraph(netkit)">Reset</button>
 			</div>
