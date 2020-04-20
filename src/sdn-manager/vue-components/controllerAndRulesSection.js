@@ -137,7 +137,7 @@ const controllerAndRulesSection = new Vue({
 						this.controllerSection.request.method,
 						this.controllerSection.request.path,
 						params,
-						(response /*, errorCode */) => { this._setHTTPResponse(response); }
+						(response) => { this._setHTTPResponse(response); }
 					);
 		
 					this._addToHistory();

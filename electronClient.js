@@ -19,6 +19,8 @@ function startMainWindow(){
 		slashes: true
 	}));
 
+	mainWindow.setTitle('Netkit-Lab-Generator');
+
 	mainWindow.on("closed", function () {
 		mainWindow = null;
 		if(sdnManagerWindow == null) app.quit();
@@ -34,6 +36,8 @@ function startSDNManagerWindow(){
 		slashes: true
 	}));
 
+	sdnManagerWindow.setTitle('SDN-Manager');
+
 	sdnManagerWindow.on("closed", function () {
 		sdnManagerWindow = null;
 		if(mainWindow == null) app.quit();
@@ -41,6 +45,7 @@ function startSDNManagerWindow(){
 }
 
 app.on("ready", startMainWindow);
+// app.on("ready", startSDNManagerWindow);
 
 /* ---------------------------------------------------------- */
 /* ------------------------- EVENTS ------------------------- */
@@ -49,7 +54,7 @@ app.on("ready", startMainWindow);
 let _baseFolder = app.getPath("userData");
 
 function _runKatharaCommand(command){
-	exec(command, (stderr) => { console.error(stderr) });
+	exec(command, (stderr) => { if(stderr) console.error(stderr) });
 }
 
 ipcMain.on("sdn:start", startSDNManagerWindow);
@@ -78,4 +83,6 @@ ipcMain.on("script:clean", function () {
 	
 	console.log("Running LClean on " + pathTemp);
 	_runKatharaCommand("kathara lclean -d \"" + pathTemp + "\"");
+
+	sdnManagerWindow.close();
 });

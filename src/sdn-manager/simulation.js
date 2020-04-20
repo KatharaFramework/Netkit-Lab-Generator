@@ -1,38 +1,33 @@
 /* ------------------------- PREPARE RAW DATA ------------------------- */
 
-function loadSDN(controllersIPisValid, forceStart) {
-	if(controllersIPisValid || forceStart){
-		let controllersInputField = document.querySelector("#connect > p > input");
-		let controllersIP = controllersInputField.value;
+function loadSDN(forceStart) {
+	myhttp.setController(document.querySelector("#connect > p > input").value);
 
-		if(!sdnData.isReady() || forceStart) {
-			if(!myhttp.isReady()) myhttp.set(controllersIP);
+	if(!sdnData.isReady() || forceStart) {
+		ryuActions.getTopology().then(machinesConfig => {	// TODO: Riscrivere 'getTopology' e i due metodi per la topologia che seguono in questo file
+			if(!sdnData.isReady() || forceStart){
+				// Preparo i dati
+				let simulationData = makeNodesAndEdges(machinesConfig);
+				sdnData.set(machinesConfig);
+				
+				// Preparo l'interfaccia
+				hide(document.getElementById("connect"));
+				resetButtons();
 
-			ryuActions.getTopology().then(machinesConfig => {	// TODO: Riscrivere 'getTopology' e i due metodi per la topologia che seguono in questo file
-				if(!sdnData.isReady() || forceStart){
-					// Preparo i dati
-					let simulationData = makeNodesAndEdges(machinesConfig);
-					sdnData.set(machinesConfig);
-					
-					// Preparo l'interfaccia
-					hide(document.getElementById("connect"));
-					resetButtons();
-
-					// Avvio la simulazione
-					startSimulation(simulationData);
-					
-				}
-			});
-		} else if (confirm("Are you sure? All labels and rules will be lost")) {
-			// Resetto i dati e ricarico la simulazione
-			for (let svg of document.getElementsByTagName("svg")) svg.innerHTML = "";
-			
-			labelsSection.reset();
-			switchDetailsSection.close();
-			controllerAndRulesSection.close();
-			
-			loadSDN(true, true);
-		}
+				// Avvio la simulazione
+				startSimulation(simulationData);
+				
+			}
+		});
+	} else if (confirm("Are you sure? All labels and rules will be lost")) {
+		// Resetto i dati e ricarico la simulazione
+		for (let svg of document.getElementsByTagName("svg")) svg.innerHTML = "";
+		
+		labelsSection.reset();
+		switchDetailsSection.close();
+		controllerAndRulesSection.close();
+		
+		loadSDN(true);
 	}
 }
 

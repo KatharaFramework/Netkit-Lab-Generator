@@ -7,7 +7,7 @@ const ryuActions = {
 			let machines = [];
 			let statsAPIcounter = 0;
 
-			myhttp.makeRequest("GET", "v1.0/topology/links", {}, function (response /*, errorCode */){
+			myhttp.get("v1.0/topology/links", {}, function (response){
 				let domainCounter = 1;
 				let macMapping = {};
 
@@ -25,7 +25,7 @@ const ryuActions = {
 					};
 				}
 
-				myhttp.makeRequest("GET", "stats/switches", {}, function (response /*, errorCode */) {
+				myhttp.get("stats/switches", {}, function (response) {
 					let switchNames = JSON.parse(response);
 					for (let switchName of switchNames) {
 						let machine = {
@@ -34,7 +34,7 @@ const ryuActions = {
 							interfaces: { if: [] }
 						};
 
-						myhttp.makeRequest("GET", "stats/portdesc/" + switchName, {}, function (response /*, errorCode */) {
+						myhttp.get("stats/portdesc/" + switchName, {}, function (response) {
 							statsAPIcounter++;
 							let switchDescription = JSON.parse(response);
 							switchDescription[switchName].forEach(port => {
@@ -89,17 +89,17 @@ const ryuActions = {
 	getFromSwitchCustom: function (switchName, what) {
 		// Metodo generico per ottenre informazioni da uno switch
 		return new Promise(function (resolve) {
-			myhttp.makeRequest("GET", what + "/" + switchName, {}, function (response /*, errorCode */) {
+			myhttp.get(what + "/" + switchName, {}, function (response) {
 				resolve(JSON.parse(response)[switchName]);
 			});
 		});
 	},
 	
 	updateStatisticsAll: function() {
-		myhttp.makeRequest("GET", "stats/switches", {}, function (response /*, errorCode */) {
+		myhttp.get("stats/switches", {}, function (response) {
 			let switchNames = JSON.parse(response);
 			for (let switchName of switchNames) {
-				myhttp.makeRequest("GET", "stats/flow/" + switchName, {}, function (response /*, errorCode */){
+				myhttp.get("stats/flow/" + switchName, {}, function (response){
 					response = JSON.parse(response);
 					// TODO
 				});
@@ -118,7 +118,7 @@ const ryuActions = {
 			let openflow_rule = ruleUtils.openFlowRules.makeOpenFlowRuleFromSimulatedOne(rule, 10000 * (index + 1));
 			openflowRules.push(openflow_rule);
 			// Installo la nuova regola nel controller
-			myhttp.makeRequest("POST", "stats/flowentry/add", openflow_rule);
+			myhttp.post("stats/flowentry/add", openflow_rule);
 			
 		});
 
@@ -140,7 +140,7 @@ const ryuActions = {
 
 		rule.openflowRules.forEach(openflowRule => {
 			ruleUtils.openFlowRules.removeNonStaticFields(openflowRule);
-			myhttp.makeRequest("POST", "stats/flowentry/delete_strict", openflowRule, (/*response, errorCode */) => callback());
+			myhttp.post("stats/flowentry/delete_strict", openflowRule, (/*response, errorCode */) => callback());
 		}
 		);
 	}
