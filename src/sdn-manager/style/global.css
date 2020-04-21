@@ -1,11 +1,12 @@
 :root {
 	--main-color: #337ab7;
 	--secondary-color: #5b8fbd;
-	--disclaimer-color: rgba(255, 0, 0, .2);
+	--disclaimer-color: rgb(255, 222, 222);
 }
 
 html, body, #main {
-	height: 100%
+	height: 100%;
+	background-image: url(../../static/images/background.png);
 }
 
 .browserupgrade {
@@ -29,10 +30,13 @@ html, body, #main {
 	background-color: var(--disclaimer-color);
 	border-radius: 1em;
 	margin: 1em;
+	z-index: 1;
 }
 
-hr {
+#button-controls hr {
 	margin: 10px 0;
+	display: block;
+	width: 100%;
 }
 
 /* ------------------------------------------------------- */
@@ -40,12 +44,12 @@ hr {
 /* ------------------------------------------------------- */
 
 #connect {
-	padding: 20%;
 	position: fixed;
 	height: 100%;
 	width: 100%;
 	background-color: white;
 	z-index: 10;
+	padding: 20% 0;
 }
 
 /* ------------------------------------------------------ */
@@ -107,32 +111,18 @@ input {
 
 /* ----------- BUTTONS ----------- */
 
-button {
-	color: initial;
-	font-weight: normal;
+#button-controls {
+	margin: 10px 0 0 10px;
+	box-shadow: 1px 0px 6px darkgrey;
+	background: white;
+	cursor: auto;
 }
 
-.btn {
-	margin: 2px 0;
-	border-radius: 0;
-	font-weight: bold;
-}
-
-.btn-danger[disabled],
-.btn-danger[disabled].active,
-.btn-danger[disabled].focus,
-.btn-danger[disabled]:active,
-.btn-danger[disabled]:focus,
-.btn-danger[disabled]:hover,
-.btn-success[disabled],
-.btn-success[disabled].active,
-.btn-success[disabled].focus,
-.btn-success[disabled]:active,
-.btn-success[disabled]:focus,
-.btn-success[disabled]:hover {
-	background-color: #9e9e9e;
-	border-color: #808080;
-	opacity: 0.2 !important;
+#button-controls button {
+	margin: 5px 0;
+	display: block;
+	box-shadow: 1px 1px 2px lightgray;
+	width: 100%;
 }
 
 td, th {
@@ -155,30 +145,21 @@ span.btn {
 	padding: 2% 4%;
 }
 
-/* -------------------------------------------- */
-
-#button-controls,
-#main-contents,
-#sdnGraph {
-	display: inline-block;
-	vertical-align: top;
-}
-
 /* ----------- DETAILS COMMON ----------- */
 
 #labelsSection,
 #switchDetailsSection,
 #controllerAndRulesSection {
-	position: absolute;
+	position: fixed;
 	right: 10px;
 	top: 10px;
-
-	border: 1px solid darkgray;
-	padding: 10px;
-	height: 750px;
-
+	min-height: 700px;
+	max-height: 90%;
 	background-color: white;
 	box-shadow: 0 0 5px darkgray;
+	white-space: normal;
+	text-align: left;
+	cursor: auto;
 }
 
 @media (min-width: 1450px), (min-height: 900px) {
@@ -187,26 +168,11 @@ span.btn {
 	}
 }
 
-@media (min-width: 1570px) {
-	#labelsSection,
-	#controllerAndRulesSection {
-		right: 100px;
-	}
-}
-
-@media (min-width: 1750px) {
-	#labelsSection,
-	#controllerAndRulesSection {
-		right: 200px;
-	}
-
-	#switchDetailsSection {
-		right: 100px;
-	}
-}
-
 #sdnGraph {
-	background-image: url("../../static/images/background.png");
+	border: 1px solid lightgray;
+	position: absolute;
+	top: 10px;
+	left: 240px;
 }
 
 .tab {
@@ -230,4 +196,9 @@ span.btn {
 	float: right;
 	color: red;
 	margin-bottom: 5px;
+}
+
+textarea {
+	display: block;
+	margin: 5px 0;
 }

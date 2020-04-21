@@ -28,39 +28,37 @@
 </head>
 
 <body>
-	
+
 	<!-- CONNECTION PAGE -->
 	<div id="connect">
-		<p style="font-size: x-large">
-			Connect to:
+		<div style="max-width: 90%;margin: auto;display: flex;flex-wrap: wrap;">
+			<p style="font-size: xx-large;margin: 0;">
+				Connect to:
+			</p>
 			<input placeholder="name of docker container"
-				style="margin: 0 20px; width: 250px"
-				type="text" class="minimal-input"
-				onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13)
-					this.nextElementSibling.click()">
-			<button
-				class="btn btn-default"
-				style="display: inline;"
-				onclick="loadSDN(false)">
+				style="margin: 0px 25px;border-width: 0 0 2px 0;border-color: lightblue;font-size: x-large;" type="text"
+				class="minimal-input" onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13) this.nextElementSibling.click()">
+			<button class="btn btn-default" style="font-size: large;" onclick="loadSDN(false)">
 				Connect
 			</button>
-		</p>
-		<hr>
-		<p>Please insert the name of the Ryu controller</p>
+			<hr style="display: flex;width: 100%;">
+			<p style="font-size: large;">
+				Please insert the name of the Docker node hosting the Ryu controller
+			</p>
+		</div>
 	</div>
 
 	<!-- MAIN -->
-	<div id="main" style="width: 905px">
+	<div id="main">
 		<!-- Horizontal buttons -->
-		<link rel="stylesheet" href="style/control-buttons.css" />
-		<div id="button-controls">
-			<button id="b4" style="background-color: green"
+		<div id="button-controls" class="btn">
+			<button id="b4" class="btn btn-success"
 				onclick="controllerAndRulesSection.close();switchDetailsSection.close();labelsSection.showLabelMaker()">
 				Create new label
 			</button>
 			<hr>
-			<button id="b1" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
-			<button id="b2"
+			<button id="b1" class="btn btn-default" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
+			<button id="b2" class="btn btn-default"
 				style="display:none; box-shadow: 0 0 7px 2px orange"
 				onclick="enablePathSelection()">
 				Disable nodes repositioning
@@ -69,25 +67,25 @@
 					riposizionamento; senza spunta = permetti selezione path)
 				-->
 			</button>
-			<button id="b3" onclick="releaseNodes()" disabled>Release fixed nodes</button>
+			<button id="b3" class="btn btn-default" onclick="releaseNodes()" disabled>Release fixed nodes</button>
 			<hr>
-			<button id="b5" style="background-color: green" onclick="applyPath()" disabled>Install flow</button>
-			<button id="b6" style="background-color: red" onclick="discardPath()" disabled>Discard flow</button>
+			<button id="b5" class="btn btn-success" style="display: inline-block;margin: 0;width: fit-content;" onclick="applyPath()" disabled>Install flow</button>
+			<button id="b6" class="btn btn-danger" style="display: inline-block;margin: 0;width: fit-content;" onclick="discardPath()" disabled>Discard flow</button>
 			<hr>
-			<button id="b7" onclick="sdnData.submitAllRules()">Submit changes</button>
-			<button id="b8" onclick="ryuActions.updateStatisticsAll(); alert('TODO')">Update statistics</button>
+			<button id="b7" class="btn btn-default" onclick="sdnData.submitAllRules()">Submit changes</button>
+			<button id="b8" class="btn btn-default" onclick="ryuActions.updateStatisticsAll(); alert('TODO')">Update statistics</button>
 			<hr>
-			<button id="b10" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
-			<button id="b11" onclick="controllerAndRulesSection.open(3)">SHOW RULES</button>
-			<button id="b12" onclick="controllerAndRulesSection.open(2)">CONTROLLER</button>
-			<button id="b13" style="background-color: red"
-				onclick="loadSDN(true)">
+			<button id="b10" class="btn btn-default" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
+			<button id="b11" class="btn btn-default" onclick="controllerAndRulesSection.open(3)">SHOW RULES</button>
+			<button id="b12" class="btn btn-default" onclick="controllerAndRulesSection.open(2)">CONTROLLER</button>
+			<button id="b13" class="btn btn-danger"
+				onclick="loadSDN(false)">
 				RELOAD
 			</button>
 		</div>
 
 		<!-- CONTENTS -->
-		<div id="main-contents" style="width: 690px;">
+		<div id="main-contents">
 			<p style="position: fixed; top: 10px; left: 50px;" class="disclaimer">Please update the size of the window to fit contents!
 				<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
 			</p>
@@ -98,7 +96,7 @@
 
 			<!-- LABELS SECTION -->
 			<link rel="stylesheet" href="vue-components/labelsSection.css" />
-			<div id="labelsSection">
+			<div id="labelsSection" class="btn">
 				<label-div v-for="label in labels" v-bind:name="label.name" v-bind:key="label.name" v-bind:color="label.color">
 				</label-div>
 
@@ -122,7 +120,7 @@
 
 			<!-- SWITCH DETAILS -->
 			<link rel="stylesheet" href="vue-components/switchDetailsSection.css" />
-			<div id="switchDetailsSection" v-show="visible">
+			<div id="switchDetailsSection" v-show="visible" class="btn">
 				<a v-on:click="close">X</a>
 				<h1>{{ device }}</h1>
 				<hr style="margin-bottom: 20px">
@@ -324,7 +322,7 @@
 						v-on:click="askRyu('stats/flow')">
 						Get flow-entries
 					</button>
-					<textarea style="height: 450px" disabled
+					<textarea style="height: 450px; display: block" disabled
 						v-model="responseTextareaContent">
 					</textarea>
 				</div>
@@ -342,7 +340,7 @@
 
 			<!-- CONTROLLER AND RULES -->
 			<link rel="stylesheet" href="vue-components/controllerAndRulesSection.css" />
-			<div id="controllerAndRulesSection" v-if="visible">
+			<div id="controllerAndRulesSection" v-if="visible" class="btn">
 				<a v-on:click="close">X</a>
 				<div v-if="howtoVisibility">
 					<h3>Instructions:</h3>
@@ -533,7 +531,7 @@
 									<option value="send to table">Send to table</option>
 									<option value="set field">Set field</option>
 								</select>
-								
+
 								<dynamic-selection
 									v-model="action.value"
 									v-bind:selection="action.name">

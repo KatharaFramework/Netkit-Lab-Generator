@@ -1,7 +1,7 @@
 /* ------------------------- PREPARE RAW DATA ------------------------- */
 
 function loadSDN(forceStart) {
-	myhttp.setController(document.querySelector("#connect > p > input").value);
+	myhttp.setController(document.querySelector("#connect input").value);
 
 	if(!sdnData.isReady() || forceStart) {
 		ryuActions.getTopology().then(machinesConfig => {	// TODO: Riscrivere 'getTopology' e i due metodi per la topologia che seguono in questo file
@@ -19,7 +19,7 @@ function loadSDN(forceStart) {
 
 			}
 		});
-	} else if (confirm("Are you sure? All labels and rules will be lost")) {
+	} else if (confirm("Are you sure?")) {
 		// Resetto i dati e ricarico la simulazione
 		for (let svg of document.getElementsByTagName("svg")) svg.innerHTML = "";
 

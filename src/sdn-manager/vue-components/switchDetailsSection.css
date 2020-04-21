@@ -1,7 +1,7 @@
 #switchDetailsSection {
-    width: 600px;
-    overflow-y: scroll;
-    overflow-x: auto;
+	width: 600px;
+	overflow-y: scroll;
+	overflow-x: auto;
 	text-align: center;
 }
 
@@ -11,8 +11,8 @@
 }
 
 #switchDetailsSection > button {
-    float: right;
-    margin: 10px 20px;
+	float: right;
+	margin: 10px 20px;
 }
 
 
@@ -23,36 +23,33 @@
 /* --- SVG --- */
 
 #switchDetailsSection svg {
-    border: 1px solid lightgray;
-    padding: 10px;
-    margin: 10px auto;
+	border: 1px solid lightgray;
+	padding: 10px;
+	margin: 10px auto;
 }
 
 .x-axis,
 .y-axis {
-    fill: black;
+	fill: black;
 }
 
 .domain {
-    fill: white;
+	fill: white;
 }
 
 /* --- Rules --- */
 
 #d2-rules {
-    margin: auto;
-    width: fit-content;
-    text-align: center;
+	margin: auto;
+	width: fit-content;
 }
 
 #d2-rules > div > h2 {
-    text-align: center;
-    text-decoration: underline;
-    color: var(--main-color);
+	color: var(--main-color);
 }
 
 #d2-rules table {
-    margin: auto;
+	margin: auto;
 }
 
 #switchDetailsSection .bottoni button {
@@ -65,17 +62,17 @@
 }
 
 #d2-selection {
-    margin-top: 30px;
-    bottom: 10px;
-    left: 0;
-    width: 100%;
-    height: 20px;
+	margin-top: 30px;
+	bottom: 10px;
+	left: 0;
+	width: 100%;
+	height: 20px;
 }
 
 #d2-selection p {
-    margin: 0;
+	margin: 0;
 }
 
 #d2-selection input {
-    margin: 1px 3px;
+	margin: 1px 3px;
 }

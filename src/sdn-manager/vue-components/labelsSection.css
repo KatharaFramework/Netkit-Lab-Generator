@@ -1,5 +1,5 @@
 #labelsSection {
-    width: 400px;
+	width: 400px;
 	overflow: auto;
 }
 
@@ -17,29 +17,29 @@
 }
 
 .colorTag {
-    display: inline-block;
-    width: 30px;
-    height: 15px;
-    margin-right: 10px;
+	display: inline-block;
+	width: 30px;
+	height: 15px;
+	margin-right: 10px;
 }
 
 .blu-bordered > input,
 .blu-bordered > button {
 	margin: 0 10px 0 0;
-    padding-left: 10px;
+	padding-left: 10px;
 
-    max-width: 30%;
+	max-width: 30%;
 	border: 1px solid black;
 }
 
 #labelsSection input:valid {
-    background-image: none;
+	background-image: none;
 }
 
 #labelsSection button {
-    float: right;
-    margin: 0;
-    margin-left: 5px;
+	float: right;
+	margin: 0;
+	margin-left: 5px;
 }
 
 #labelsSection button:hover {
