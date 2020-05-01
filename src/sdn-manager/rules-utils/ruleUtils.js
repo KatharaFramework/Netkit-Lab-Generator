@@ -94,7 +94,7 @@ const ruleUtils = {
 			} else if(values.length == 8){
 				[device, matches, actions, priority, table, idleTimeout, hardTimeout, stats] = values;
 				submitted = true;
-			} else  throw new Error("SDNData createNewRule: arguments lenght mismatch");
+			} else  throw new Error("dataStore createNewRule: arguments lenght mismatch");
 
 			let { checkedMatches, checkedActions } = this.checkActionsAndMatches(matches, actions);
 			matches = checkedMatches;

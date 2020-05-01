@@ -1,8 +1,7 @@
 #switchDetailsSection {
-	width: 600px;
-	overflow-y: scroll;
 	overflow-x: auto;
 	text-align: center;
+	min-width: 35rem;
 }
 
 #switchDetailsSection > h1 {
@@ -18,6 +17,12 @@
 
 #switchDetailsSection td > div:first-child hr {
 	display: none;
+}
+
+#switchDetailsSection td input[type=number] {
+	max-width: 50px;
+	margin: 0;
+	border: none;
 }
 
 /* --- SVG --- */

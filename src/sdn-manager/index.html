@@ -17,10 +17,9 @@
 	<script src="../static/vendor/js/vue.js"></script>
 
 	<!-- My modules -->
-	<script src="dataclass.js"></script>
+	<script src="dataStore.js"></script>
 	<script src="helper.js"></script>
 	<script src="simulation.js"></script>
-	<script src="myhttp.js"></script>
 
 	<script src="rules-utils/ruleUtils.js"></script>
 	<script src="rules-utils/rulesMapper.js"></script>
@@ -37,78 +36,64 @@
 			</p>
 			<input placeholder="name of docker container"
 				style="margin: 0px 25px;border-width: 0 0 2px 0;border-color: lightblue;font-size: x-large;" type="text"
-				class="minimal-input" onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13) this.nextElementSibling.click()">
-			<button class="btn btn-default" style="font-size: large;" onclick="loadSDN(false)">
+				class="minimal-input" onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13) loadSDN(false)">
+			<button class="btn btn-default" style="font-size: x-large;" onclick="loadSDN(false)">
 				Connect
 			</button>
-			<hr style="display: flex;width: 100%;">
+			<hr style="width: 100%;">
 			<p style="font-size: large;">
 				Please insert the name of the Docker node hosting the Ryu controller
 			</p>
 		</div>
 	</div>
 
+	<!-- BUTTONS -->
+	<div id="topbar">
+		<button id="b4" class="btn btn-success"
+			onclick="controllerAndRulesSection.close();switchDetailsSection.close();labelsSection.showLabelMaker()">
+			Create new label
+		</button>
+		<button id="b1" class="btn btn-default" onclick="enableMovingNodes()">Enable nodes repositioning</button>
+		<button id="b2" class="btn btn-default" style="display:none; box-shadow: 0 0 7px 2px orange" onclick="enablePathSelection()">
+			Disable nodes repositioning <!-- TODO: Unire al nodo precedente -->
+		</button>
+		<button id="b3" class="btn btn-default" onclick="releaseNodes()" disabled>Release fixed nodes</button>
+		<button class="btn btn-default" onclick="toggleSecondaryTopbar(true)">...</button>
+		<button class="btn btn-default" style="margin:0 0 0 auto;" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
+		<button class="btn btn-danger" onclick="loadSDN(false)">RELOAD</button>
+	</div>
+
+	<div id="secondaryTopbar">
+		<button class="btn btn-default" onclick="dataStore.submitAllRules();toggleSecondaryTopbar(false)">Submit all</button>
+		<button class="btn btn-default" onclick="ryuActions.updateStatisticsAll(); alert('TODO');toggleSecondaryTopbar(false)">Update statistics</button>
+		<button class="btn btn-default" onclick="controllerAndRulesSection.open(3);toggleSecondaryTopbar(false)">Show rules</button>
+		<button class="btn btn-default" onclick="controllerAndRulesSection.open(2);toggleSecondaryTopbar(false)">Controller</button>
+	</div>
+
 	<!-- MAIN -->
 	<div id="main">
-		<!-- Horizontal buttons -->
-		<div id="button-controls" class="btn">
-			<button id="b4" class="btn btn-success"
-				onclick="controllerAndRulesSection.close();switchDetailsSection.close();labelsSection.showLabelMaker()">
-				Create new label
-			</button>
-			<hr>
-			<button id="b1" class="btn btn-default" style="display:none" onclick="enableMovingNodes()">Enable nodes repositioning</button>
-			<button id="b2" class="btn btn-default"
-				style="display:none; box-shadow: 0 0 7px 2px orange"
-				onclick="enablePathSelection()">
-				Disable nodes repositioning
-				<!-- TODO: Valuta se aggiungere/sostituire questo bottone e il
-					precedente con una singola checkbox (es. spuntata = permetti
-					riposizionamento; senza spunta = permetti selezione path)
-				-->
-			</button>
-			<button id="b3" class="btn btn-default" onclick="releaseNodes()" disabled>Release fixed nodes</button>
-			<hr>
-			<button id="b5" class="btn btn-success" style="display: inline-block;margin: 0;width: fit-content;" onclick="applyPath()" disabled>Install flow</button>
-			<button id="b6" class="btn btn-danger" style="display: inline-block;margin: 0;width: fit-content;" onclick="discardPath()" disabled>Discard flow</button>
-			<hr>
-			<button id="b7" class="btn btn-default" onclick="sdnData.submitAllRules()">Submit changes</button>
-			<button id="b8" class="btn btn-default" onclick="ryuActions.updateStatisticsAll(); alert('TODO')">Update statistics</button>
-			<hr>
-			<button id="b10" class="btn btn-default" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
-			<button id="b11" class="btn btn-default" onclick="controllerAndRulesSection.open(3)">SHOW RULES</button>
-			<button id="b12" class="btn btn-default" onclick="controllerAndRulesSection.open(2)">CONTROLLER</button>
-			<button id="b13" class="btn btn-danger"
-				onclick="loadSDN(false)">
-				RELOAD
-			</button>
-		</div>
+		<!-- Disclaimer -->
+		<p class="disclaimer">Please increase the size of the window to fit its contents!
+			<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
+		</p>
 
-		<!-- CONTENTS -->
-		<div id="main-contents">
-			<p style="position: fixed; top: 10px; left: 50px;" class="disclaimer">Please update the size of the window to fit contents!
-				<a class="link" onclick="this.parentElement.classList.add('hidden')">click to close</a>
-			</p>
-
-			<!-- Main graph (unfilled) -->
-			<link rel="stylesheet" href="style/simulation.css" />
-			<svg id="sdnGraph" width="900" style="display: none" height="800"></svg>
-
+		<div id="main-grid">
 			<!-- LABELS SECTION -->
 			<link rel="stylesheet" href="vue-components/labelsSection.css" />
-			<div id="labelsSection" class="btn">
-				<label-div v-for="label in labels" v-bind:name="label.name" v-bind:key="label.name" v-bind:color="label.color">
-				</label-div>
+			<div id="labelsSection">
+				<div>
+					<label-div v-for="label in labels" v-bind:name="label.name" v-bind:key="label.name" v-bind:color="label.color"></label-div>
+				</div>
 
-				<div class="blu-bordered" v-if="newLabel.show">
+				<div id="labelAddRow" v-if="newLabel.show">
 					<input v-model="newLabel.color" type="text"
 						pattern='(#[0-9]{3,6})|([A-z]+)|(rgba?.*)'
 						placeholder='color'>
 					<input v-model="newLabel.name" type="text"
 						pattern='[A-z0-9]+' placeholder='name'
 						onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13) this.nextElementSibling.click()">
-					<button v-on:click="createNewLabel()">Add</button>
-					<button v-on:click="hideLabelMaker()">Ignore</button>
+					<button class="btn btn-success" v-on:click="createNewLabel()">Add</button>
+					<button class="btn btn-danger" v-on:click="hideLabelMaker()">Ignore</button>
 				</div>
 
 				<p v-if="!labels.length && !newLabel.show"
@@ -118,9 +103,19 @@
 			</div>
 			<script src="vue-components/labelsSection.js"></script>
 
+			<!-- Main graph (unfilled) -->
+			<link rel="stylesheet" href="style/simulation.css" />
+			<div>
+				<svg id="sdnGraph" width="900" style="display: none" height="800"></svg>
+				<div id="confirm-buttons" style="top: 0; opacity: 0;">
+					<button class="btn btn-success" onclick="applyPath()">Confirm</button>
+					<button class="btn btn-warning" onclick="discardPath()">Discard</button>
+				</div>
+			</div>
+
 			<!-- SWITCH DETAILS -->
 			<link rel="stylesheet" href="vue-components/switchDetailsSection.css" />
-			<div id="switchDetailsSection" v-show="visible" class="btn">
+			<div id="switchDetailsSection" v-show="visible">
 				<a v-on:click="close">X</a>
 				<h1>{{ device }}</h1>
 				<hr style="margin-bottom: 20px">
@@ -229,7 +224,7 @@
 							</thead>
 							<tbody>
 								<tr v-for="(rule, index) in labelRules"
-									v-on:mouseenter="highlightRuleOnGraph(index)" v-on:mouseleave="unhighlightRuleOnGraph"
+									v-on:mouseenter="highlightRuleOnGraph(index)" onmouseleave="removeNodesSelection()"
 									v-on:click="popupModal(index, 'labelRules')"
 									v-bind:style="{
 										textDecoration: (rule.deleted ? 'line-through' : 'none'),
@@ -340,7 +335,7 @@
 
 			<!-- CONTROLLER AND RULES -->
 			<link rel="stylesheet" href="vue-components/controllerAndRulesSection.css" />
-			<div id="controllerAndRulesSection" v-if="visible" class="btn">
+			<div id="controllerAndRulesSection" v-if="visible">
 				<a v-on:click="close">X</a>
 				<div v-if="howtoVisibility">
 					<h3>Instructions:</h3>
@@ -432,7 +427,7 @@
 						Submitted
 					</span>
 					<input style="float: right; margin: 0 0 5px 5px" type="text" placeholder="Device name" v-on:change="showRulesFilteredByDevice"
-					 v-model="rulesSection.filter">
+						v-model="rulesSection.filter">
 					<textarea v-if="rulesSection.visible==1" v-model="rulesSection.rules" cols="30" rows="10" disabled></textarea>
 					<textarea v-else-if="rulesSection.visible==2" v-model="rulesSection.submittedRules" cols="30" rows="10" disabled></textarea>
 					<button class="btn btn-warning" style="float: right;" v-if="rulesSection.visible==1" v-on:click="exportJSON">
@@ -445,131 +440,131 @@
 				</div>
 			</div>
 			<script src="vue-components/controllerAndRulesSection.js"></script>
-		</div>
 
-		<!-- RULE MODAL -->
-		<link rel="stylesheet" href="vue-components/ruleMakerModal.css">
-		<div id="rule-modal" class="modal modal-kathara" v-if="visible">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close"
-							style="font-size: xx-large;"
-							v-on:click="close">
-							&times;
-						</button>
-						<h4 class="modal-title">{{ header }}</h4>
-					</div>
-					<div class="modal-body">
+			<!-- RULE MODAL -->
+			<link rel="stylesheet" href="vue-components/ruleMakerModal.css">
+			<div id="rule-modal" class="modal modal-kathara" v-if="visible">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close"
+								style="font-size: xx-large;"
+								v-on:click="close">
+								&times;
+							</button>
+							<h4 class="modal-title">{{ header }}</h4>
+						</div>
+						<div class="modal-body">
 
-						<div class="half">
-							<h2>Match</h2>
-							<p>
-								<button class="btn btn-success"
-									:disabled="rule.matches[0].name=='any'"
-									v-on:click="makeNewMatchLine">
-									Add
-								</button>
-								<button class="btn btn-danger"
-									:disabled="rule.matches.length==1"
-									v-on:click="removeLastMatchLine">
-									Remove
-								</button>
-							</p>
-							<div v-for="(match, index) in rule.matches">
-								<select v-model="match.name">
-									<!-- Ogni match deve avere:
-										- un (eventuale) input in dynamic-selection
-										- un mapping in ryuActions
-									-->
-									<option disabled value="noselection">Select...</option>
-									<option v-if="index==0 && rule.matches.length < 2" value="any">Any</option>
-									<option v-if="labels.length" value="MPLS label">MPLS label</option>
-									<option value="source port">Source port</option>
-									<option value="ethertype">Protocol ethertype</option>
-									<option value="MAC source">MAC src</option>
-									<option value="MAC destination">MAC dst</option>
-									<option value="IPv4 source">IPv4 src</option>
-									<option value="IPv4 destination">IPv4 dst</option>
-									<option value="TCP source port">TCP sport</option>
-									<option value="TCP destination port">TCP dport</option>
-								</select>
+							<div class="half">
+								<h2>Match</h2>
+								<p>
+									<button class="btn btn-success"
+										:disabled="rule.matches[0].name=='any'"
+										v-on:click="makeNewMatchLine">
+										Add
+									</button>
+									<button class="btn btn-danger"
+										:disabled="rule.matches.length==1"
+										v-on:click="removeLastMatchLine">
+										Remove
+									</button>
+								</p>
+								<div v-for="(match, index) in rule.matches">
+									<select v-model="match.name">
+										<!-- Ogni match deve avere:
+											- un (eventuale) input in dynamic-selection
+											- un mapping in ryuActions
+										-->
+										<option disabled value="noselection">Select...</option>
+										<option v-if="index==0 && rule.matches.length < 2" value="any">Any</option>
+										<option v-if="labels.length" value="MPLS label">MPLS label</option>
+										<option value="source port">Source port</option>
+										<option value="ethertype">Protocol ethertype</option>
+										<option value="MAC source">MAC src</option>
+										<option value="MAC destination">MAC dst</option>
+										<option value="IPv4 source">IPv4 src</option>
+										<option value="IPv4 destination">IPv4 dst</option>
+										<option value="TCP source port">TCP sport</option>
+										<option value="TCP destination port">TCP dport</option>
+									</select>
 
-								<dynamic-selection
-									v-model="match.value"
-									v-bind:selection="match.name">
-								</dynamic-selection>
+									<dynamic-selection
+										v-model="match.value"
+										v-bind:selection="match.name">
+									</dynamic-selection>
+								</div>
 							</div>
-						</div>
 
-						<div class="half">
-							<h2>Action</h2>
-							<p>
-								<button class="btn btn-success"
-									:disabled="rule.actions[0].name=='drop'"
-									v-on:click="makeNewActionLine">
-									Add
-								</button>
-								<button class="btn btn-danger"
-									:disabled="rule.actions.length==1"
-									v-on:click="removeLastActionLine">
-									Remove
-								</button>
-							</p>
-							<div v-for="(action, index) in rule.actions">
-								<select v-model="action.name">
-									<!-- Ogni azione deve avere:
-										- un (eventuale) input in dynamic-selection
-										- un mapping in ryuActions
-									-->
-									<option disabled value="noselection">Select...</option>
-									<option v-if="index==0 && rule.actions.length < 2" value="drop">Drop</option>
-									<option v-if="labels.length" value="set MPLS label">Set MPLS label</option>
-									<option value="pop MPLS label">Pop MPLS label</option>
-									<option value="forward to port">Forward to port</option>
-									<option value="send to controller">Send to controller</option>
-									<option value="send to table">Send to table</option>
-									<option value="set field">Set field</option>
-								</select>
+							<div class="half">
+								<h2>Action</h2>
+								<p>
+									<button class="btn btn-success"
+										:disabled="rule.actions[0].name=='drop'"
+										v-on:click="makeNewActionLine">
+										Add
+									</button>
+									<button class="btn btn-danger"
+										:disabled="rule.actions.length==1"
+										v-on:click="removeLastActionLine">
+										Remove
+									</button>
+								</p>
+								<div v-for="(action, index) in rule.actions">
+									<select v-model="action.name">
+										<!-- Ogni azione deve avere:
+											- un (eventuale) input in dynamic-selection
+											- un mapping in ryuActions
+										-->
+										<option disabled value="noselection">Select...</option>
+										<option v-if="index==0 && rule.actions.length < 2" value="drop">Drop</option>
+										<option v-if="labels.length" value="set MPLS label">Set MPLS label</option>
+										<option value="pop MPLS label">Pop MPLS label</option>
+										<option value="forward to port">Forward to port</option>
+										<option value="send to controller">Send to controller</option>
+										<option value="send to table">Send to table</option>
+										<option value="set field">Set field</option>
+									</select>
 
-								<dynamic-selection
-									v-model="action.value"
-									v-bind:selection="action.name">
-								</dynamic-selection>
+									<dynamic-selection
+										v-model="action.value"
+										v-bind:selection="action.name">
+									</dynamic-selection>
+								</div>
 							</div>
-						</div>
 
-						<div class="half">
-							<h2>Table ID</h2>
-							<input v-model="rule.table" type="number" min="0">
-						</div>
+							<div class="half">
+								<h2>Table ID</h2>
+								<input v-model="rule.table" type="number" min="0">
+							</div>
 
-						<div class="half">
-							<h2>Priority</h2>
-							<input v-model="rule.priority" type="number" min="0" max="65535">
-						</div>
+							<div class="half">
+								<h2>Priority</h2>
+								<input v-model="rule.priority" type="number" min="0" max="65535">
+							</div>
 
-						<div class="half">
-							<h2>Idle timeout</h2>
-							<input v-model="rule.idleTimeout" type="number" min="0">
-						</div>
+							<div class="half">
+								<h2>Idle timeout</h2>
+								<input v-model="rule.idleTimeout" type="number" min="0">
+							</div>
 
-						<div class="half">
-							<h2>Hard timeout</h2>
-							<input v-model="rule.hardTimeout" type="number" min="0">
-						</div>
+							<div class="half">
+								<h2>Hard timeout</h2>
+								<input v-model="rule.hardTimeout" type="number" min="0">
+							</div>
 
-					</div>
-					<div class="modal-footer">
-						<button v-if="originalRule" v-on:click="deleteRule" class="btn btn-danger">Delete rule</button>
-						<button v-if="!originalRule" type="button" class="btn btn-danger" v-on:click="close">Undo</button>
-						<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
+						</div>
+						<div class="modal-footer">
+							<button v-if="originalRule" v-on:click="deleteRule" class="btn btn-danger">Delete rule</button>
+							<button v-if="!originalRule" type="button" class="btn btn-danger" v-on:click="close">Undo</button>
+							<button type="button" class="btn btn-success" v-on:click="makeRule">Confirm</button>
+						</div>
 					</div>
 				</div>
 			</div>
+			<script src="vue-components/ruleMakerModal.js"></script>
 		</div>
 	</div>
-	<script src="vue-components/ruleMakerModal.js"></script>
 
 </body>
 

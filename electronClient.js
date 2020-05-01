@@ -45,7 +45,7 @@ function startSDNManagerWindow(){
 }
 
 app.on("ready", startMainWindow);
-// app.on("ready", startSDNManagerWindow);
+// app.on("ready", startSDNManagerWindow);	// DEV
 
 /* ---------------------------------------------------------- */
 /* ------------------------- EVENTS ------------------------- */
@@ -66,21 +66,21 @@ ipcMain.on("script:copy", function (_, script, filename) {
 	console.log("Saving script to " + pathTemp);
 
 	fs.writeFileSync(pathTemp, script)
-	
+
 	console.log("Running " + pathTemp);
 	exec("bash \"" + pathTemp + "\"");
 });
 
 ipcMain.on("script:execute", function () {
 	let pathTemp = path.join(_baseFolder, "lab");
-	
+
 	console.log("Running LStart on " + pathTemp);
 	_runKatharaCommand("kathara lstart -d \"" + pathTemp + "\"");
 });
 
 ipcMain.on("script:clean", function () {
 	let pathTemp = path.join(_baseFolder, "lab");
-	
+
 	console.log("Running LClean on " + pathTemp);
 	_runKatharaCommand("kathara lclean -d \"" + pathTemp + "\"");
 

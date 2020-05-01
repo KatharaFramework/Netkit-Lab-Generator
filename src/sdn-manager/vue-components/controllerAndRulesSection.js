@@ -52,7 +52,7 @@ const controllerAndRulesSection = new Vue({
 		},
 
 		showRulesFilteredByDevice() {
-			let rules = this.rulesSection.visible == 1 ? sdnData.getRules() : sdnData.getSubmittedRules();
+			let rules = this.rulesSection.visible == 1 ? dataStore.getRules() : dataStore.getSubmittedRules();
 			rules = this._makeCleanRulesFromExistingOnes(rules);
 
 			let representation = JSON.stringify(
@@ -78,7 +78,7 @@ const controllerAndRulesSection = new Vue({
 		},
 
 		exportJSON(){
-			let rules = this._makeCleanRulesFromExistingOnes(sdnData.getRules());
+			let rules = this._makeCleanRulesFromExistingOnes(dataStore.getRules());
 			downloadString(JSON.stringify(rules), "rules.JSON");
 		},
 
@@ -93,7 +93,7 @@ const controllerAndRulesSection = new Vue({
 							let res = event.target.result;
 							let rules = JSON.parse(res
 								.substring(res.indexOf("[")));
-							sdnData.importRules(rules);
+							dataStore.importRules(rules);
 						}
 						catch (err) {
 							alert("Error: " + err);
@@ -133,7 +133,7 @@ const controllerAndRulesSection = new Vue({
 					} else params = {};
 
 					this.controllerSection.output = "Request sent...";
-					myhttp.makeRequest(
+					ryuActions.makeCustom(
 						this.controllerSection.request.method,
 						this.controllerSection.request.path,
 						params,

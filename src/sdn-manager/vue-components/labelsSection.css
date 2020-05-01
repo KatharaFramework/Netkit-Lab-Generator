@@ -1,19 +1,6 @@
 #labelsSection {
-	width: 400px;
 	overflow: auto;
-}
-
-.blu-bordered {
-	margin-bottom: 10px;
-	border: 1px solid black;
-	padding: 10px;
-
-	position: relative;
-	top: -10px;
-	left: -10px;
-	width: 398px;
-
-	background-color: var(--secondary-color);
+	width: 100%;
 }
 
 .colorTag {
@@ -23,23 +10,11 @@
 	margin-right: 10px;
 }
 
-.blu-bordered > input,
-.blu-bordered > button {
-	margin: 0 10px 0 0;
-	padding-left: 10px;
-
+#labelAddRow > input,
+#labelAddRow > button {
 	max-width: 30%;
-	border: 1px solid black;
-}
-
-#labelsSection input:valid {
-	background-image: none;
-}
-
-#labelsSection button {
-	float: right;
-	margin: 0;
-	margin-left: 5px;
+	height: 30px;
+	padding: 0 10px;
 }
 
 #labelsSection button:hover {
@@ -56,8 +31,8 @@
 #labelsSection span.hint::before {
 	position: absolute;
 	bottom: 100%;
-	font-size: smaller;
-	background-color: darkgray;
+	font-size: small;
+	background-color: #31708f;
 	border-radius: 5px;
 	padding: 10px;
 	width: 150px;
@@ -72,10 +47,27 @@
 
 #labelsSection span.hint-match::before {
 	left: -30px;
-	content: 'Other matches are defined';
+	content: 'Has more hidden matches';
 }
 
 #labelsSection span.hint-action::before {
 	left: -130px;
-	content: 'Other actions are defined';
+	content: 'Has more hidden actions';
+}
+
+#labelsdiv button {
+	margin: 0 .3rem;
+}
+
+#labelsdiv table td[colspan='3'] {
+	color: darkgray;
+	text-align: center;
+}
+
+.remove-slider {
+	background-color: red;
+	text-align: center;
+	color: white;
+	font-size: xx-large;
+	cursor: pointer;
 }

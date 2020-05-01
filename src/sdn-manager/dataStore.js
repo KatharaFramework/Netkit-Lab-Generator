@@ -1,24 +1,21 @@
-const sdnData = new (class SDNData {
-	constructor() {
-		this._katharaConfig = null;
-		this.simulation = null;
+const dataStore = {
+	_katharaConfig: null,
+	simulation: null,
+	_rules: [],
 
-		this._path = {
-			steps: [],
-			pendingStep: null,
-			startsFromEdge: false,
-			endsOnEdge: false
-		};
-
-		this._rules = [];
-	}
+	_path: {
+		steps: [],
+		pendingStep: null,
+		startsFromEdge: false,
+		endsOnEdge: false
+	},
 
 	set(katharaConfig){
 		this._katharaConfig = katharaConfig;
 		katharaConfig.forEach(machine => this.retrieveRulesOnTheSwitch(machine.name));
-	}
+	},
 
-	isReady(){ return this._katharaConfig !== null;}
+	isReady(){ return this._katharaConfig !== null},
 
 	/* --------------------------------------------- */
 	/* ------------------- PATHS ------------------- */
@@ -39,11 +36,11 @@ const sdnData = new (class SDNData {
 			this._path.pendingStep = null;
 			this._path.steps.push(step);
 		}
-	}
+	},
 
 	pathHasAtLeastOneStep() {
 		return this._path.steps.length > 0;
-	}
+	},
 
 	discardPath() {
 		if (this._path.steps.length)
@@ -51,12 +48,12 @@ const sdnData = new (class SDNData {
 		this._path.pendingStep = null;
 		this._path.startsFromEdge = false;
 		this._path.endsOnEdge = false;
-	}
+	},
 
 	setEdgeProperties(startsFromEdge, endsOnEdge){
 		if(startsFromEdge) this._path.startsFromEdge = true;
 		if(endsOnEdge) this._path.endsOnEdge = true;
-	}
+	},
 
 	getPath() {
 		if (this.pathHasAtLeastOneStep()){
@@ -65,7 +62,7 @@ const sdnData = new (class SDNData {
 
 			return this._path.steps;
 		}
-	}
+	},
 
 	/* ----------------------------------------------- */
 	/* -------------------- RULES -------------------- */
@@ -86,12 +83,12 @@ const sdnData = new (class SDNData {
 		let rule = ruleUtils.simulatedRules.createNewRule(...values);
 		this.storeRule(rule);
 		return rule;
-	}
+	},
 
 	storeRule(rule){
 		ruleUtils.simulatedRules.addAPointerToLabelInTheRuleMPLSFields_andAddLablesToLabelsSection(rule);
 		this._rules.push(rule);
-	}
+	},
 
 	/* ------------------- IMPORT ------------------- */
 
@@ -100,7 +97,7 @@ const sdnData = new (class SDNData {
 			let newRule = this.createAndSaveRule(rule.device, rule.matches, rule.actions, rule.priority, rule.table, rule.idleTimeout, rule.hardTimeout);
 			ruleUtils.simulatedRules.addAPointerToLabelInTheRuleMPLSFields_andAddLablesToLabelsSection(newRule, true);	// TODO: Controlla che funzioni
 		}
-	}
+	},
 
 	/* ------------------------------------------------ */
 	/* ------------------ CONTROLLER ------------------ */
@@ -124,7 +121,7 @@ const sdnData = new (class SDNData {
 				}
 			});
 		}
-	}
+	},
 
 	retrieveRulesOnTheSwitch(switchName){
 		ryuActions.getSwitchRules(switchName).then(rules => {
@@ -134,7 +131,7 @@ const sdnData = new (class SDNData {
 			let mergedRules = ruleUtils.simulatedRules.mergeMPLSRulesWithDifferentProtocolMatch(simulatedRules);
 			mergedRules.forEach(newRule => this.storeRule(newRule));
 		});
-	}
+	},
 
 	/* ---------------------------------------------- */
 	/* --------------- NETWORK CONFIG --------------- */
@@ -155,13 +152,7 @@ const sdnData = new (class SDNData {
 			name: deviceInfos.name,
 			type: deviceInfos.type
 		};
-	}
-
-	getControllerName(){
-		for (let machine of this._katharaConfig){
-			if(machine.type == "controller") return machine.name;
-		}
-	}
+	},
 
 	/* --------------------------------------------- */
 	/* ------------- GETTERS & SETTERS ------------- */
@@ -169,22 +160,22 @@ const sdnData = new (class SDNData {
 
 	getSimulation() {
 		return this.simulation;
-	}
+	},
 
 	setSimulation(simulation) {
 		this.simulation = simulation;
-	}
+	},
 
 	getRules(){
 		this._rules = this._rules.filter(rule => !rule.deleted || rule.submitted);
 		return this._rules;
-	}
+	},
 
 	getSwitchRules(deviceName) {
 		return this.getRules().filter(rule => rule.device == deviceName);
-	}
+	},
 
 	getSubmittedRules(){
 		return this.getRules().filter(rule => rule.submitted);
 	}
-})();
+}

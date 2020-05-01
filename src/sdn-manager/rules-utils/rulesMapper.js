@@ -1,7 +1,9 @@
 var rulesMapper = {
+
 	/* ---------------------------------------------------------------- */
 	/* ------------------------- RULES TO RYU ------------------------- */
 	/* ---------------------------------------------------------------- */
+
 	makeMatch: function (matches, offset) {
 		if (![20000, 10000].includes(offset))
 			throw new Error("Implicit protocol not recognized");
@@ -63,6 +65,7 @@ var rulesMapper = {
 		}
 		return ofmatch;
 	},
+
 	makeActions: function (actions, offset) {
 		var ofactions = [];
 		if (actions[0].name != "drop") {
@@ -111,9 +114,11 @@ var rulesMapper = {
 		}
 		return ofactions;
 	},
+
 	/* ---------------------------------------------------------------- */
 	/* ------------------------- RYU TO RULES ------------------------- */
 	/* ---------------------------------------------------------------- */
+
 	reverseMatch: function (match) {
 		var reversedMatches = [];
 		for (var matchKey in match) {
@@ -148,6 +153,7 @@ var rulesMapper = {
 		}
 		return reversedMatches;
 	},
+
 	reverseActions: function (actions) {
 		var reversedActions = [];
 		for (var _i = 0, actions_2 = actions; _i < actions_2.length; _i++) {
@@ -195,9 +201,11 @@ var rulesMapper = {
 		}
 		return reversedActions;
 	},
+
 	/* --------------------------------------------------------------- */
 	/* ---------------------------- OTHER ---------------------------- */
 	/* --------------------------------------------------------------- */
+
 	mapperMPLS: {
 		_counter: Math.floor(Math.random() * 990) + 9,
 		_map: {},

@@ -1,23 +1,20 @@
-/* ------------------------- PREPARE RAW DATA ------------------------- */
-
 function loadSDN(forceStart) {
-	myhttp.setController(document.querySelector("#connect input").value);
+	ryuActions.setController(document.querySelector("#connect input").value);
 
-	if(!sdnData.isReady() || forceStart) {
+	if(!dataStore.isReady() || forceStart) {
 		ryuActions.getTopology().then(machinesConfig => {	// TODO: Riscrivere 'getTopology' e i due metodi per la topologia che seguono in questo file
-			if(!sdnData.isReady() || forceStart){
-				// Preparo i dati
-				let simulationData = makeNodesAndEdges(machinesConfig);
-				sdnData.set(machinesConfig);
+			// Preparo i dati
+			let simulationData = makeNodesAndEdges(machinesConfig);
+			dataStore.set(machinesConfig);
 
-				// Preparo l'interfaccia
-				hide(document.getElementById("connect"));
-				resetButtons();
+			// Preparo l'interfaccia
+			hide(document.getElementById("connect"));
+			unhide(document.getElementById("b1"),document.getElementById("b4"));
+			hide(document.getElementById("b2"));
+			disableButtons("b3");
 
-				// Avvio la simulazione
-				startSimulation(simulationData);
-
-			}
+			// Avvio la simulazione
+			startSimulation(simulationData);
 		});
 	} else if (confirm("Are you sure?")) {
 		// Resetto i dati e ricarico la simulazione
@@ -99,9 +96,9 @@ function startSimulation(data) {
 		.attr("class", "links")
 		.selectAll("line")
 		.data(data.links)
-		.enter().append("line");
+			.enter().append("line");
 
-	linksGroup.append("title").text(function (d) { return "eth" + d.porta; });
+	linksGroup.append("title").text(d => "eth" + d.porta);
 
 	/* --------------------- PREPARE NODES --------------------- */
 
@@ -109,37 +106,23 @@ function startSimulation(data) {
 		.attr("class", "nodes")
 		.selectAll("circle")
 		.data(data.nodes)
-		.enter().append("circle")
-		.attr("r", function(d){
-			if(d.type == "network" || d.type == "network edge") return 15;
-			return 25;
-		})
-		.attr("class", function (d) { return d.type; });
-	// .attr("xlink:href", assignImage)
+			.enter().append("circle")
+			.attr("r", d => (d.type == "network" || d.type == "network edge") ? 15 : 25)
+			.attr("class", function (d) { return d.type; })
 
-	nodesGroup.append("title").text(function (d) { return d.id; });
+	nodesGroup.append("title").text(d => d.id);
 
 	/* ------------------- CREATE SIMULATION ------------------- */
 
-	let simulation = d3.forceSimulation(data.nodes) // <-- Da ora ogni nodo ha in più: index, x, y, vx, vy
+	let simulation = d3.forceSimulation(data.nodes)		// <-- Da ora ogni nodo ha in più: index, x, y, vx, vy
 		.force("link", d3.forceLink(data.links)
-			.id(function (d) { return d.id; }))      // <-- specificando id posso riferirmi ai nodi attraverso il loro campo 'id' piuttosto che al loro indice nell'array dei nodi
-		.force("attraction", d3.forceManyBody())
-		.force("repulsion", d3.forceCollide())
-		.force("center", d3.forceCenter(450, 400));
+			.id(d => d.id)		// <-- specificando id posso riferirmi ai nodi attraverso il loro campo 'id' piuttosto che al loro indice nell'array dei nodi
+			.distance(d => d.source.type == "switch" ? 80 :  60)
+		)
+		.force("anticollision", d3.forceCollide().radius(70))
+		.force("X", d3.forceX(400).strength(0.06))
+		.force("Y", d3.forceY(450).strength(0.06))
 
-	/* Adjusting parameters */
-	simulation.force("link")
-		.distance(function (d) {
-			if(d.source.type == "switch") return 80;
-			return 60;
-		});
-
-	simulation.force("attraction")
-		.strength(200);
-
-	simulation.force("repulsion")
-		.radius(70);
 	/* ---------------------- */
 
 	// Specifico come si aggiorna la simulazione ad ogni passo
@@ -164,7 +147,7 @@ function startSimulation(data) {
 	});
 
 	// Avvio la simulazione
-	sdnData.setSimulation(simulation);
+	dataStore.setSimulation(simulation);
 
 	// Classifico i link in base ai nodi che esso collega
 	linksGroup.attr("class", function (d) { return d.target.type + " " + d.source.type; }); // <-- Solo dopo aver creato la simulazione ogni link è collegato ai suoi nodi
@@ -181,6 +164,7 @@ function appendMarkersDefinitions(svg){
 	// Questi marcatori sono le punte delle frecce che indicheranno il verso del flusso.
 
 	let defs = svg.append("defs");
+
 	defs.append("marker")	// Questo marcatore va bene con marker-start
 		.attr("id", "markerArrow1")
 		.attr("markerWidth", "10").attr("markerHeight", "10")
@@ -209,7 +193,10 @@ function appendMarkersDefinitions(svg){
 function enableMovingNodes() {
 	hide(document.getElementById("b1"));
 	unhide(document.getElementById("b2"));
-	let simulation = sdnData.getSimulation();
+
+	let simulation = dataStore.getSimulation();
+	simulation.force("X").strength(0.01);
+	simulation.force("Y").strength(0.01);
 
 	d3.selectAll("g.nodes circle").call(  // call chiama la funzione passata per parametro esattamente una volta sola
 		d3.drag().on("start", function () {
@@ -217,9 +204,9 @@ function enableMovingNodes() {
 		}).on("drag", function (d) {
 			d.fx = d3.event.x;
 			d.fy = d3.event.y;
-			enableButtons("b3");
 		}).on("end", function () {
 			if (!d3.event.active) simulation.alphaTarget(0);
+			enableButtons("b3");
 		})
 	);
 }
@@ -233,7 +220,10 @@ function releaseNodes() {
 	});
 
 	if (released) {
-		let simulation = sdnData.getSimulation();
+		let simulation = dataStore.getSimulation();
+		simulation.force("X").strength(0.05);
+		simulation.force("Y").strength(0.05);
+
 		disableButtons("b3");
 		simulation.alphaTarget(0.1).restart();
 		setTimeout(() => simulation.alphaTarget(0), 3000);
@@ -249,6 +239,7 @@ function disableDragging() {
 function enablePathSelection() {
 	unhide(document.getElementById("b1"));
 	hide(document.getElementById("b2"));
+
 	disableDragging();
 
 	if (labelsSection.isEditing()) {
@@ -261,24 +252,23 @@ function enablePathSelection() {
 
 		d3.selectAll("circle.network:not(.external)").call(d3.drag()
 			.on("start", function (d, i, data) {
-				discardPath();
-
 				if(data[i].classList.contains("edge"))
 					startsFromEdge = true;
 				data[i].classList.add("selected");
 
 				linkLock = 1;
 				lastSelection = d.id;
-				togglePathButtons(false);
 			})
 			.on("end", function (/* d, i, data */) {
-				if (linkLock == 1 && sdnData.pathHasAtLeastOneStep()){
+				if (linkLock == 1 && dataStore.pathHasAtLeastOneStep()){
 					if(startsFromEdge)
-						sdnData.setEdgeProperties(true, false);
+						dataStore.setEdgeProperties(true, false);
 					if(lastSelectedIsEdge)
-						sdnData.setEdgeProperties(false, true);
+						dataStore.setEdgeProperties(false, true);
 
-					togglePathButtons(true);
+					let confirmBtnDivStyle = document.getElementById('confirm-buttons').style;
+					confirmBtnDivStyle.top = null;
+					confirmBtnDivStyle.opacity = null;
 				} else discardPath();
 
 				startsFromEdge = false;
@@ -310,14 +300,14 @@ function enablePathSelection() {
 
 					lastSelection = d.source.id;
 					data[i].classList.add("selected"); // Seleziona una rete. La prossima sarà una macchina
-					sdnData.appendPathStep({ device: d.source.id, ingressPort: d.porta });
+					dataStore.appendPathStep({ device: d.source.id, ingressPort: d.porta });
 				} else if (linkLock == 3 && d.source.id == lastSelection) {
 					linkLock = 0;
 					networksLocked = false;
 
 					lastSelection = d.target.id;
 					data[i].classList.add("selected"); // Seleziona una macchina. La prossima sarà una rete
-					sdnData.appendPathStep({ device: d.source.id, egressPort: d.porta });
+					dataStore.appendPathStep({ device: d.source.id, egressPort: d.porta });
 				}
 			});
 
@@ -333,17 +323,26 @@ function enablePathSelection() {
 	}
 }
 
-function applyPath() {
-	sdnData.getPath().forEach(step => labelsSection.addRuleStep(step));
+function removeNodesSelection(forceRemove = false) {
+	if(!dataStore.pathHasAtLeastOneStep() || forceRemove) {
+		document.querySelectorAll("svg .selected")
+			.forEach(function (el) { return el.classList.remove("selected", "straight", "reversed"); });
+	}
+}
 
-	togglePathButtons(false);
+function applyPath() {
+	dataStore.getPath().forEach(step => labelsSection.addRuleStep(step));
 	discardPath();
 }
 
 function discardPath() {
-	sdnData.discardPath();
-	removeNodesSelection();
-	togglePathButtons(false);
+	dataStore.discardPath();
+
+	let confirmBtnDivStyle = document.getElementById('confirm-buttons').style;
+	confirmBtnDivStyle.top = '0';
+	confirmBtnDivStyle.opacity = '0';
+	
+	removeNodesSelection(true);
 }
 
 /* ----------------- RULE HIGHLIGHT ----------------- */

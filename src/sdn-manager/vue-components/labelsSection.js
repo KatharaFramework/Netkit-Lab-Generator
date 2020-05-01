@@ -42,11 +42,14 @@ const labelsSection = new Vue({
 		/* ------------------------------------------------------------ */
 
 		createNewLabel(name, color) {
-			if(name && color){
+			if(!name || !color){
+				if(!this.newLabel.name || !this.newLabel.color) return;
+				this.createNewLabel(this.newLabel.name, this.newLabel.color);
+			} else {
 				if(!this.labels.some(el => el.name == name))
 					this.labels.push({ name, color });
-			} else if (this.newLabel.name && this.newLabel.color){
-				this._createLabelFromHTML();
+
+				this.hideLabelMaker();
 			}
 		},
 
@@ -55,27 +58,12 @@ const labelsSection = new Vue({
 			if(label) return label.color;
 		},
 
-		_createLabelFromHTML(){
-			let colorInputEl = this.$el.lastElementChild.firstElementChild;
-			let nameInputEl = colorInputEl.nextElementSibling;
-			if(colorInputEl.validity.valid && nameInputEl.validity.valid &&
-				!this.labels.some(el => el.name == this.newLabel.name)){
-
-				this.labels.push({
-					name: this.newLabel.name,
-					color: this.newLabel.color,
-				});
-
-				this.hideLabelMaker();
-			}
-		},
-
 		/* ----------------------------------------------------------- */
 		/* -------------------------- RULES -------------------------- */
 		/* ----------------------------------------------------------- */
 
 		addRuleStep(step){
-			let rule = sdnData.createAndStoreRule(
+			let rule = dataStore.createAndStoreRule(
 				step.device,
 				[{ name: "source port", value: step.ingressPort }],
 				[{ name: "forward to port", value: step.egressPort }]
@@ -106,6 +94,8 @@ const labelsSection = new Vue({
 			let labelComponent = this.$children.find(el => el.name == labelName);
 			labelComponent.rules.push(rule);
 		}
+
+		// TODO: Aggiungere la possibilità di cancellare una label
 	},
 
 	components: {"label-div": {
@@ -130,34 +120,49 @@ const labelsSection = new Vue({
 			};
 		},
 		template:
-			"<div style=\"margin: 0 0 10px\" v-on:mouseenter=\"highlightChildrenOnGraph()\" v-on:mouseleave=\"unhighlightChildrenOnGraph()\">" +
-				"<div class=\"colorTag\" v-bind:style=\"{ backgroundColor: color }\"></div>" +
-				"{{ name }}" +
-				"<button v-bind:class=\"{ 'btn-danger': buttons.remove.active }\" " +
-					"v-on:click=\"toggleRemove()\" " +
-					"v-if=\"buttons.edit.active\">{{ buttons.remove.text }}</button>" +
-				"<button v-bind:class=\"{ 'btn-success': buttons.edit.active }\" " +
-					"v-on:click=\"toggleEdit()\">{{ buttons.edit.text }}</button>" +
-				"<button v-on:click=\"toggleExpand()\">{{ buttons.show.text }}</button>" +
+			"<div id=\"labelsdiv\" v-on:mouseenter=\"highlightAllRulesOnGraph\"  onmouseleave=\"removeNodesSelection()\">" +
+				"<div style=\"display: flex\">" +
+					"<div class=\"colorTag\" v-bind:style=\"{ backgroundColor: color }\"></div>" +
+					"{{ name }}" +
+					"<button style=\"margin: 0 0 0 auto;\" v-bind:class=\"{ 'btn-success': buttons.edit.active }\" " +
+						"v-on:click=\"toggleEdit()\">{{ buttons.edit.text }}</button>" +
+					"<button v-on:click=\"toggleExpand()\">{{ buttons.show.text }}</button>" +
+				"</div>" +
 
-				"<table v-show=\"buttons.show.active\" style=\"margin-top: 15px; width: 100%; max-width: 378px\">" +
+				"<table v-show=\"buttons.show.active\" style=\"margin-top: 15px; width: 100%;\">" +
 					"<thead>" +
 						"<th>device</th>" +
 						"<th>match</th>" +
-						"<th>auto tag</th>" +
 						"<th>action</th>" +
-						"<th>auto untag</th>" +
 						"<th v-if=\"buttons.remove.active\" style=\"text-align: center; width: 5px\">-</th>" +
 					"</thead>" +
 					"<tbody>" +
-						"<label-rule v-for=\"rule in rules\" " +
-							"v-if=\"!rule.deleted\"" +
-							"v-bind:device=\"rule.device\" " +
-							"v-bind:matches=\"rule.matches\" " +
-							"v-bind:actions=\"rule.actions\">"+
-						"</label-rule>" +
+						"<tr v-for=\"rule in rules.filter(r => !r.deleted)\" v-on:mouseenter=\"highlightRuleOnGraph(rule)\" onmouseleave=\"removeNodesSelection()\">" +
+							"<td style=\"overflow: hidden; text-overflow: ellipsis; max-width: 75px; color: var(--main-color); text-decoration: underline; cursor: pointer;\" " +
+								"v-on:click=\"switchDetailsSection.open(rule.device)\" > " +
+								"{{ rule.device }}" +
+							"</td>" +
+							"<td>" +
+								"{{ rule.matches.find(match => match.name == \"source port\").name }} {{ rule.matches.find(match => match.name == \"source port\").value }} " +
+								"<span class=\"hint hint-match\" v-if=\"rule.matches.length > 2\">" +
+									"+ " +
+								"</span>" +
+							"</td>" +
+							"<td>forward to port {{ rule.actions.find(action => action.name == 'forward to port').value }} " +
+								"<span class=\"hint hint-action\" v-if=\"rule.actions.length > 1\">" +
+									"+ " +
+								"</span>" +
+							"</td>" +
+							"<td v-if=\"buttons.remove.active\" v-on:click=\"removeRule(rule)\" class=\"remove-slider\">" +
+							"-</td>" +
+						"</tr>" +
+						"<tr v-show=\"rules.length==0\"><td colspan=\"3\">No rules defined yet</td></tr>" +
 					"</tbody>" +
 				"</table>" +
+				"<div v-show=\"buttons.edit.active\" style=\"margin: 10px auto; width: fit-content;\">" +
+					"<button v-bind:class=\"{ 'btn btn-danger': buttons.remove.active, 'btn btn-default' : !buttons.remove.active }\" " +
+						"v-on:click=\"toggleRemove()\">{{ buttons.remove.text }}</button>" +
+				"</div>" +
 				"<hr>" +
 			"</div>",
 		methods: {
@@ -171,7 +176,6 @@ const labelsSection = new Vue({
 					this.buttons.edit.text = "Edit...";
 					this.toggleRemove(true);
 
-					discardPath();
 					disableDragging();
 				} else {
 					this.$parent.setAllEditButtonsDisabled();
@@ -190,7 +194,7 @@ const labelsSection = new Vue({
 					this.buttons.remove.text = "Remove...";
 				} else {
 					this.buttons.remove.active = true;
-					this.buttons.remove.text = "REMOVING";
+					this.buttons.remove.text = "Done";
 				}
 			},
 
@@ -208,73 +212,22 @@ const labelsSection = new Vue({
 			/* ------------------------- RULES ------------------------- */
 			/* --------------------------------------------------------- */
 
-			highlightChildrenOnGraph(){
-				this.$children.forEach(el => el.highlightMeOnGraph());
+			highlightAllRulesOnGraph(){
+				removeNodesSelection();
+				this.rules.filter(rule => !rule.deleted).forEach(rule => this.highlightRuleOnGraph(rule))
 			},
 
-			unhighlightChildrenOnGraph(){
-				this.$children.forEach(el => el.unhighlightMeOnGraph());
-			}
-		},
-
-		components: {"label-rule": {
-			props: ["device", "matches", "actions"],
-			data: function(){
-				return {
-					autoTag: this.actions.some(action => action.name == "set MPLS label") ? "Yes" : "No",
-					autoUntag: this.actions.some(action => action.name == "pop MPLS label") ? "Yes" : "No"
-				};
+			removeRule(rule){
+				rule.deleted = true;
 			},
-			template:
-				"<tr v-on:mouseenter=\"highlightMeOnGraph\" v-on:mouseleave=\"unhighlightMeOnGraph\">" +
-					"<td style=\"overflow: hidden; text-overflow: ellipsis; max-width: 75px; color: var(--main-color); text-decoration: underline; cursor: pointer;\" " +
-						"v-on:click=\"switchDetailsSection.open(device)\" > " +
-						"{{ device }}" +
-					"</td>" +
-					"<td>" +
-						"{{ matches.find(match => match.name == \"source port\").name }} {{ matches.find(match => match.name == \"source port\").value }} " +
-						"<span class=\"hint hint-match\" v-if=\"matches.length > (autoTag == 'Yes' ? 1 : 2)\">" +
-							"+ " +
-						"</span>" +
-					"</td>" +
-					"<td>{{ autoTag }}</td>" +
-					"<td>forward to port {{ actions.find(action => action.name == 'forward to port').value }} " +
-						"<span class=\"hint hint-action\" v-if=\"actions.length > ((autoUntag == 'Yes' || autoTag == 'Yes') ? 2 : 1)\">" +
-							"+ " +
-						"</span>" +
-					"</td>" +
-					"<td>{{ autoUntag }}</td>" +
-					"<td v-if=\"$parent.buttons.remove.active\">" +
-						"<button class=\"btn-danger\" " +
-						"v-on:click=\"removeMe()\">-</button>" +
-					"</td>" +
-				"</tr>",
-			methods: {
-				// TODO: Questi metodi si possono spostare tutti dentro 'labelComponent'... è più elegante
-				removeMe(){
-					let rule = this.$parent.rules.find(rule =>
-						rule.device == this.device &&
-						rule.matches == this.matches
-					);
-					rule.deleted = true;
-					this.$parent.rules.splice(this.$parent.rules.indexOf(rule), 1);
-				},
 
-				highlightMeOnGraph(){
-					highlightSegmentOnGraph(
-						this.device,
-						this.matches.find(match => match.name == "source port").value,
-						this.actions.find(action => action.name == "forward to port").value
-					);
-				},
-
-				unhighlightMeOnGraph(){
-					if(!sdnData.pathHasAtLeastOneStep())
-						removeNodesSelection();
-				}
+			highlightRuleOnGraph(rule){
+				highlightSegmentOnGraph(
+					rule.device,
+					rule.matches.find(match => match.name == "source port").value,
+					rule.actions.find(action => action.name == "forward to port").value
+				);
 			}
-		}}
+		}
 	}}
 });
-
-// TODO: In questa componente vue (solo qui ci sono) cambia $parent con $emit dove possibile

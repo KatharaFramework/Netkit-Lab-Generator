@@ -49,11 +49,11 @@ g.nodes circle.edge.selected {
 
 g.links line {
 	stroke: lightgray;
-	stroke-width: 4px;
+	stroke-width: .7rem;
 }
 
 g.links line.switch {
-	stroke: darkgray;
+	stroke: lightgray;
 }
 
 line.network.edge:not(.switch) {
@@ -64,7 +64,7 @@ line.network.edge:not(.switch) {
 
 
 g.links line:hover {
-	stroke-width: 6px;
+	stroke-width: 1rem;
 }
 
 /* --- selection --- */

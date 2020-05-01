@@ -19,14 +19,13 @@ const switchDetailsSection = new Vue({
 	},
 	methods: {
 		open(device){
-			labelsSection.reset();
 			controllerAndRulesSection.close();
 
 			this.close();
 			this.visible = true;
 			this.device = device;
 
-			let rules = sdnData.getSwitchRules(device);
+			let rules = dataStore.getSwitchRules(device);
 			if(rules){
 				this.packetRules = rules.filter(rule =>
 					!( rule.matches.some(match => match.label)
@@ -93,11 +92,6 @@ const switchDetailsSection = new Vue({
 			);
 		},
 
-		unhighlightRuleOnGraph(){
-			if(!sdnData.pathHasAtLeastOneStep())
-				removeNodesSelection();
-		},
-
 		/* ----------------------------------------------------- */
 		/* ------------------------ SVG ------------------------ */
 		/* ----------------------------------------------------- */
@@ -161,7 +155,7 @@ const switchDetailsSection = new Vue({
 		askRyu(action){
 			let responsePromise = (action == "stats/table") ?
 				ryuActions.getTablesFilteredNotEmpty(this.device)
-				: ryuActions.getFromSwitchCustom(this.device, action);
+				: ryuActions.getFromSwitchCustom(action, this.device);
 
 			responsePromise.then(response => {this.responseTextareaContent = JSON.stringify(response, null, 4);});
 		}

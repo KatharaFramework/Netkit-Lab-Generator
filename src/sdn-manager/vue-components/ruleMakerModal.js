@@ -27,7 +27,7 @@ const ruleModal = new Vue({
 			this.header = header || "Create new rule for " + device;
 
 			this.labels = labelsSection.labels;
-			this.deviceInfos = sdnData.getDeviceInfo(device);
+			this.deviceInfos = dataStore.getDeviceInfo(device);
 			this._resetRuleValues();
 		},
 
@@ -65,7 +65,7 @@ const ruleModal = new Vue({
 						}
 					}
 
-					let rule = sdnData.createAndStoreRule(
+					let rule = dataStore.createAndStoreRule(
 						this.deviceInfos.name,
 						this.rule.matches,
 						this.rule.actions,
