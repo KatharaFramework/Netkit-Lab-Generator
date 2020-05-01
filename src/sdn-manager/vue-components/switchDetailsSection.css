@@ -1,7 +1,7 @@
 #switchDetailsSection {
 	overflow-x: auto;
 	text-align: center;
-	min-width: 35rem;
+	min-width: 50rem;
 }
 
 #switchDetailsSection > h1 {

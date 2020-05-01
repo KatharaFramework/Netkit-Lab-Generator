@@ -119,7 +119,7 @@
 				<a v-on:click="close">X</a>
 				<h1>{{ device }}</h1>
 				<hr style="margin-bottom: 20px">
-				<p style="font-size: medium; text-align: left;">
+				<div style="font-size: medium; display: flex;">
 					<span v-on:click="switchTab(1)"
 						v-bind:class="[ (activeSection == 1) ? 'tab active' : 'tab']">
 						Rules
@@ -133,12 +133,12 @@
 						v-bind:class="[ (activeSection == 3) ? 'tab active' : 'tab']">
 						Inspect
 					</span>
-					<button style="color: var(--main-color); margin-left: 220px;" class="btn btn-default"
+					<button class="btn btn-default" style="margin: 0 0 0 auto;"
 						onclick="document.getElementById('b8').click()"
 						v-show="columnsVisibility.statistics">
 						Update statistics
 					</button>
-				</p>
+				</div>
 				<hr>
 				<div id="d2-rules" v-if="activeSection==1">
 					<div>
@@ -277,7 +277,7 @@
 					</div>
 				</div>
 				<div v-show="activeSection==2">
-					<button style="float:right" v-if="labelRules.length || packetRules.length" v-on:click="updateSVG">
+					<button class="btn btn-info" v-if="labelRules.length || packetRules.length" v-on:click="updateSVG">
 						Update graph
 					</button>
 					<svg width="563" height="200" v-show="labelRules.length || packetRules.length"></svg>
@@ -341,60 +341,54 @@
 					<h3>Instructions:</h3>
 					<hr>
 					<p>
-						This tool allows you to configure the network flow of a software defined network (SDN) built on Katharà. In this page you
-						can se the actual topology of the network: blue circles are the switches, black ones are the network domains. The controller
-						node is hidden, but it exists and it is connected to all switches through a dedicated network!
+						This tool allows you to configure the network flow of a software defined network (SDN) built on Kathar&aacute;. In this page you
+						can se the actual topology of the network: blue circles are the switches, black and white ones are the network domains. The controller
+						node is hidden, but it exists and it is connected to all the switches through a dedicated network!
 					</p>
 					<hr>
 					<p>
-						Labels represent a flow inside the network. They are like colored tunnels in which packets moves accordingly to certain rules.
-						Colors and paths are arbitrary. To create a tunnel click on the green button on top of the graph. Packets don't survive
-						the external networks, so, when a white circle is included in the flow, the program will automatically add a rule to
-						tag/untag the packets. The default match for tagging packets is the port from where the packet is received.
+						MPLS labels represent a flow inside the network. Each label is like a tunnel in which packets moves accordingly to certain rules.
+						Colors and paths are arbitrary. After you create a label, you can click on edit and drag a path on the graph. The path must start
+						From a domain (either white or black) and must end on a domain. A white domain are edge domanins: they are shared with an external network.
+						For this reason, when a white circle is included in the flow, the program will automatically add a rule to
+						tag/untag the packets with the MPLS label. The default match for tagging packets is the port from where the packet is received.
 					</p>
 					<hr>
 					<p>
-						To create a custom rule, click on a switch and then click on the 'create new rule' button. This will prompt a window where
+						You can also create a custom rule by clicking on a switch and then on the 'create new rule' button. This will prompt a window where
 						you can specify which packet should match the rule and which action will be applied on it. You can edit or remove a
 						rule created before by opening the switch details and clicking on the row of the table which represents that rule:
 						the modal will popup again.
 					</p>
 					<hr>
 					<p>
-						Remember that rules are not automatically submitted to the controller. In this way you can check they are correct berfore
-						installing them. The status of a rule is represented by their color in the switch details. To submitt all the rules at once
-						click on the left button "Submit changes".
+						Remember that rules are not automatically submitted to the controller. This allows you check twice they are correct berfore
+						installing them. The status of a rule is represented by its color in the switch details.
 					</p>
 				</div>
 				<div id="d3-controller" v-if="controllerSection.visible">
 					<h3>Controller</h3>
 					<hr>
-					<h4>input</h4>
-					<select v-model="controllerSection.request.method">
-						<option value="GET">GET</option>
-						<option value="POST">POST</option>
-					</select>
-					<input style="width: auto" type="text"
-						placeholder="path"
-						v-model="controllerSection.request.path"
-						onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13)
-							this.nextElementSibling.nextElementSibling.click()">
-					<textarea
-						v-bind:style="{
-							boxShadow: '0 0 2px ' + (controllerSection.request.paramsValidity ? 'green' : 'red'),
-							height: '200px',
-							width: '270px',
-							backgroundColor: 'white',
-							border: '1px solid darkgray',
-							margin: '5px 0px -4px 2px'
-						}"
+					<h4>Input</h4>
+					<div>
+						<select v-model="controllerSection.request.method" style="height: 3rem;">
+							<option value="GET">GET</option>
+							<option value="POST">POST</option>
+						</select>
+						<input style="width: auto" type="text"
+							placeholder="path"
+							v-model="controllerSection.request.path"
+							onkeyup="if(arguments[0].which == 13 || arguments[0].keyCode == 13)
+								this.nextElementSibling.nextElementSibling.click()">
+					</div>
+					<textarea id="controller-post-parameters-textarea"
+						v-bind:style="{boxShadow: '0 0 2px ' + (controllerSection.request.paramsValidity ? 'green' : 'red')}"
 						v-show="controllerSection.request.method == 'POST'"
 						v-model="controllerSection.request.params"
 						v-on:keyup="checkParams"
-						placeholder='JSON parameters'>
+						placeholder='{JSON parameters}'>
 					</textarea>
-					<input style="width: 65px" type="submit" value="Submit"
-						v-on:click="makeRequest">
+					<input type="submit" value="Submit" v-on:click="makeRequest">
 					<hr>
 					<h4>output</h4>
 					<textarea

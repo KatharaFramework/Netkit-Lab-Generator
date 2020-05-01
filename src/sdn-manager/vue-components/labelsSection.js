@@ -144,7 +144,7 @@ const labelsSection = new Vue({
 						"<th v-if=\"buttons.remove.active\" style=\"text-align: center; width: 5px\">-</th>" +
 					"</thead>" +
 					"<tbody>" +
-						"<tr v-for=\"rule in rules.filter(r => !r.deleted)\" v-on:mouseenter=\"highlightRuleOnGraph(rule)\" onmouseleave=\"removeNodesSelection()\">" +
+						"<tr v-for=\"rule in validRules\" v-on:mouseenter=\"highlightRuleOnGraph(rule)\" onmouseleave=\"removeNodesSelection()\">" +
 							"<td style=\"overflow: hidden; text-overflow: ellipsis; max-width: 75px; color: var(--main-color); text-decoration: underline; cursor: pointer;\" " +
 								"v-on:click=\"switchDetailsSection.open(rule.device)\" > " +
 								"{{ rule.device }}" +
@@ -166,7 +166,7 @@ const labelsSection = new Vue({
 						"<tr v-show=\"validRules.length==0\"><td colspan=\"3\">No rules defined yet</td></tr>" +
 					"</tbody>" +
 				"</table>" +
-				"<div v-show=\"buttons.edit.active && validRules.length!=0\" style=\"margin: 10px auto; width: fit-content;\">" +
+				"<div v-show=\"buttons.edit.active && validRules.length!=0 && buttons.show.active\" style=\"margin: 10px auto; width: fit-content;\">" +
 					"<button v-bind:class=\"{ 'btn btn-danger': buttons.remove.active, 'btn btn-default' : !buttons.remove.active }\" " +
 						"v-on:click=\"toggleRemove()\">{{ buttons.remove.text }}</button>" +
 				"</div>" +
