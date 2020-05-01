@@ -90,7 +90,7 @@
 #sdnGraph {
 	border: 1px solid lightgray;
 	background-color: white;
-	background-image: url(../../static/images/background.png);
+	background-image: url(../static/images/background.png);
 }
 
 #confirm-buttons {

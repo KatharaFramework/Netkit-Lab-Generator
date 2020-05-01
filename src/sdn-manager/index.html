@@ -10,7 +10,7 @@
 
 	<!-- Style -->
 	<link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css" />
-	<link rel="stylesheet" href="style/global.css" />
+	<link rel="stylesheet" href="../style/sdn-home.css" />
 
 	<!-- Frameworks -->
 	<script src="../static/vendor/js/d3.min.js"></script>
@@ -58,16 +58,16 @@
 			Disable nodes repositioning <!-- TODO: Unire al nodo precedente -->
 		</button>
 		<button id="b3" class="btn btn-default" onclick="releaseNodes()" disabled>Release fixed nodes</button>
-		<button class="btn btn-default" onclick="toggleSecondaryTopbar(true)">...</button>
+		<button class="btn btn-default" onclick="toggleSecondaryTopbar()">...</button>
 		<button class="btn btn-default" style="margin:0 0 0 auto;" onclick="controllerAndRulesSection.open(1)">HOW TO</button>
 		<button class="btn btn-danger" onclick="loadSDN(false)">RELOAD</button>
 	</div>
 
 	<div id="secondaryTopbar">
-		<button class="btn btn-default" onclick="dataStore.submitAllRules();toggleSecondaryTopbar(false)">Submit all</button>
-		<button class="btn btn-default" onclick="ryuActions.updateStatisticsAll(); alert('TODO');toggleSecondaryTopbar(false)">Update statistics</button>
-		<button class="btn btn-default" onclick="controllerAndRulesSection.open(3);toggleSecondaryTopbar(false)">Show rules</button>
-		<button class="btn btn-default" onclick="controllerAndRulesSection.open(2);toggleSecondaryTopbar(false)">Controller</button>
+		<button class="btn btn-default" onclick="dataStore.submitAllRules();toggleSecondaryTopbar()">Submit all</button>
+		<button class="btn btn-default" onclick="ryuActions.updateStatisticsAll(); alert('TODO');toggleSecondaryTopbar()">Update statistics</button>
+		<button class="btn btn-default" onclick="controllerAndRulesSection.open(3);toggleSecondaryTopbar()">Show rules</button>
+		<button class="btn btn-default" onclick="controllerAndRulesSection.open(2);toggleSecondaryTopbar()">Controller</button>
 	</div>
 
 	<!-- MAIN -->
@@ -104,7 +104,7 @@
 			<script src="vue-components/labelsSection.js"></script>
 
 			<!-- Main graph (unfilled) -->
-			<link rel="stylesheet" href="style/simulation.css" />
+			<link rel="stylesheet" href="../style/simulation.css" />
 			<div>
 				<svg id="sdnGraph" width="900" style="display: none" height="800"></svg>
 				<div id="confirm-buttons" style="top: 0; opacity: 0;">
