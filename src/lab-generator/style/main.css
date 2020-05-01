@@ -185,8 +185,6 @@ button {
 
 .btn {
 	margin: 2px 0;
-	border-radius: 0;
-	font-weight: bold;
 }
 
 .btn-danger[disabled],

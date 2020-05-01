@@ -21,11 +21,11 @@
 
 	.xs-floating-right {
 		z-index: 20;
-		opacity: 1;
 		position: fixed;
 		top: 50px;
 		right: 5px;
 		background-color: white;
+		width: 230px;
 	}
 
 	.xs-floating-right td {
@@ -81,6 +81,7 @@
 	text-align: left;
 	margin: 3px;
 	font-size: 80%;
+	border-radius: 0;
 }
 
 .mock-main-menu {
@@ -184,9 +185,9 @@
 	margin-top: 2em;
 }
 
-#netkit th,
 #netkit td {
 	max-width: 300px;
+	padding: 3px 10px;
 }
 
 #netkit tr {
@@ -196,12 +197,13 @@
 
 td, th {
 	border: 1px solid lightgray;
-	padding: 10px;
+	padding: 5px 10px;
 }
 
 th {
 	color: white;
 	background-color: var(--main-color);
+	padding: 10px;
 }
 
 label {
@@ -211,7 +213,6 @@ label {
 p.btn,
 span.btn {
 	width: 100%;
-	padding: 2% 4%;
 }
 
 .gateways > div:last-child > hr {
