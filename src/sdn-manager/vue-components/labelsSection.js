@@ -105,7 +105,7 @@ const labelsSection = new Vue({
 				buttons: {
 					show: {
 						active: false,
-						text: "Show"
+						text: "More"
 					},
 					edit: {
 						active: false,
@@ -119,14 +119,21 @@ const labelsSection = new Vue({
 				rules: []
 			};
 		},
+		computed: {
+			validRules() {
+				return this.rules.filter(rule => !rule.deleted)
+			}
+		},
 		template:
 			"<div id=\"labelsdiv\" v-on:mouseenter=\"highlightAllRulesOnGraph\"  onmouseleave=\"removeNodesSelection()\">" +
 				"<div style=\"display: flex\">" +
 					"<div class=\"colorTag\" v-bind:style=\"{ backgroundColor: color }\"></div>" +
-					"{{ name }}" +
-					"<button style=\"margin: 0 0 0 auto;\" v-bind:class=\"{ 'btn-success': buttons.edit.active }\" " +
-						"v-on:click=\"toggleEdit()\">{{ buttons.edit.text }}</button>" +
-					"<button v-on:click=\"toggleExpand()\">{{ buttons.show.text }}</button>" +
+					"<input style=\"font-size: large; margin: auto 1rem;\" v-model=\"name\" :disabled=\"!buttons.edit.active\"></input>" +
+					"<button style=\"margin-left: auto;\" v-on:click=\"toggleEdit()\"" +
+						"v-bind:class=\"{ 'btn btn-success': buttons.edit.active, 'btn btn-default': !buttons.edit.active }\" >" +
+						"{{ buttons.edit.text }}</button>" +
+					"<button class=\"btn btn-default\"" +
+						"v-on:click=\"toggleExpand()\">	{{ buttons.show.text }}</button>" +
 				"</div>" +
 
 				"<table v-show=\"buttons.show.active\" style=\"margin-top: 15px; width: 100%;\">" +
@@ -156,10 +163,10 @@ const labelsSection = new Vue({
 							"<td v-if=\"buttons.remove.active\" v-on:click=\"removeRule(rule)\" class=\"remove-slider\">" +
 							"-</td>" +
 						"</tr>" +
-						"<tr v-show=\"rules.length==0\"><td colspan=\"3\">No rules defined yet</td></tr>" +
+						"<tr v-show=\"validRules.length==0\"><td colspan=\"3\">No rules defined yet</td></tr>" +
 					"</tbody>" +
 				"</table>" +
-				"<div v-show=\"buttons.edit.active\" style=\"margin: 10px auto; width: fit-content;\">" +
+				"<div v-show=\"buttons.edit.active && validRules.length!=0\" style=\"margin: 10px auto; width: fit-content;\">" +
 					"<button v-bind:class=\"{ 'btn btn-danger': buttons.remove.active, 'btn btn-default' : !buttons.remove.active }\" " +
 						"v-on:click=\"toggleRemove()\">{{ buttons.remove.text }}</button>" +
 				"</div>" +
@@ -201,10 +208,10 @@ const labelsSection = new Vue({
 			toggleExpand(forceShow) {
 				if(this.buttons.show.active && !forceShow){
 					this.buttons.show.active = false;
-					this.buttons.show.text = "Show";
+					this.buttons.show.text = "More";
 				} else {
 					this.buttons.show.active = true;
-					this.buttons.show.text = "Hide";
+					this.buttons.show.text = "Less";
 				}
 			},
 
@@ -219,6 +226,7 @@ const labelsSection = new Vue({
 
 			removeRule(rule){
 				rule.deleted = true;
+				if(this.validRules.length == 0) this.toggleRemove(true);
 			},
 
 			highlightRuleOnGraph(rule){

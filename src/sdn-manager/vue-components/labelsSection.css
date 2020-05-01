@@ -5,9 +5,9 @@
 
 .colorTag {
 	display: inline-block;
-	width: 30px;
-	height: 15px;
+	width: 5rem;
 	margin-right: 10px;
+	margin: 2px;
 }
 
 #labelAddRow > input,
@@ -55,8 +55,23 @@
 	content: 'Has more hidden actions';
 }
 
+#labelsdiv input {
+	border: 1px solid;
+	max-width: 10rem;
+	padding: 0 1rem;
+	background-color: cornsilk;
+}
+
+#labelsdiv input:disabled {
+	border: none;
+	max-width: 10rem;
+	padding: 0 1rem;
+	background-color: transparent;
+}
+
 #labelsdiv button {
 	margin: 0 .3rem;
+	padding: 0.3em;
 }
 
 #labelsdiv table td[colspan='3'] {
