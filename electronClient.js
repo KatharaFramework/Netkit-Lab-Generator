@@ -11,7 +11,12 @@ const fs = require("fs");
 let mainWindow, sdnManagerWindow
 
 function startMainWindow(){
-	mainWindow = new BrowserWindow({ minWidth: 770, minHeight: 500 });
+	mainWindow = new BrowserWindow({ 
+		width: 1280, 
+		height: 760,
+		minWidth: 800, 
+		minHeight: 600
+	});
 
 	mainWindow.loadURL(url.format({
 		pathname: path.join(__dirname, "index.html"),
