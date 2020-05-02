@@ -1,0 +1,47 @@
+#rule-modal {
+	text-align: center;
+}
+
+.half {
+	width: 50%;
+	float: left;
+	padding: 1em;
+}
+
+.modal-body input {
+	margin: 10px;
+	border: 1px solid darkgray;
+	padding: 0 10px;
+	background-image: none;
+}
+
+#rule-modal input:invalid {
+	box-shadow: 0 0 2px red;
+}
+
+.modal-body select {
+	margin: 5px;
+}
+
+#rule-modal .half button {
+	min-width: 80px;
+	margin-bottom: 5px;
+	border-radius: 15px;
+	padding: 0;
+}
+
+#rule-modal .half button.btn-danger {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+#rule-modal .half button.btn-success {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.answer-selection {
+	background-color: white;
+	min-width: 180px;
+	padding: 1px 10px;
+}

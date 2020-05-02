@@ -1,6 +1,4 @@
-.old/
-.idea/
-release-builds/
-tmp/lab/
 node_modules/
-package-lock.json
+release-builds/
+tmp/
+.vscode/

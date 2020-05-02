@@ -1,0 +1,83 @@
+/* ---------------- */
+/* ----- NODI ----- */
+/* ---------------- */
+
+g.nodes circle {
+	fill: lightgray;
+}
+
+g.nodes circle.network {
+	fill: black;
+}
+
+g.nodes circle.network.external {
+	fill: lightgray;
+}
+
+g.nodes circle.switch {
+	fill: blue;
+}
+
+g.nodes circle.edge {
+	stroke: black;
+	stroke-width: 1px;
+	fill: white;
+}
+
+/* --- mouseover --- */
+
+g.nodes circle:hover {
+	r: 30;
+}
+
+g.nodes circle.network:hover {
+	r: 20;
+}
+
+/* --- selection --- */
+
+g.nodes circle.selected,
+g.nodes circle.edge.selected {
+	stroke: black;
+	stroke-width: 2px;
+	fill: red;
+}
+
+/* ----------------- */
+/* ----- LINKS ----- */
+/* ----------------- */
+
+g.links line {
+	stroke: lightgray;
+	stroke-width: .7rem;
+}
+
+g.links line.switch {
+	stroke: lightgray;
+}
+
+line.network.edge:not(.switch) {
+	stroke-dasharray: 10px 10px;
+}
+
+/* --- mouseover --- */
+
+
+g.links line:hover {
+	stroke-width: 1rem;
+}
+
+/* --- selection --- */
+
+
+g.links line.selected {
+	stroke: red;
+}
+
+g.links line.selected.straight {
+	marker-start: url(#markerArrow1)
+}
+
+g.links line.selected.reversed {
+	marker-end: url(#markerArrow2)
+}

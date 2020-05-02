@@ -1,0 +1,88 @@
+#labelsSection {
+	overflow: auto;
+	width: 100%;
+}
+
+.colorTag {
+	display: inline-block;
+	width: 5rem;
+	margin-right: 10px;
+	margin: 2px;
+}
+
+#labelAddRow > input,
+#labelAddRow > button {
+	max-width: 30%;
+	height: 30px;
+	padding: 0 10px;
+}
+
+#labelsSection button:hover {
+	background-color: #bbb;
+}
+
+#labelsSection span.hint {
+	color: orange;
+	float: right;
+	font-size: 1.5em;
+	position: relative;
+}
+
+#labelsSection span.hint::before {
+	position: absolute;
+	bottom: 100%;
+	font-size: small;
+	background-color: #31708f;
+	border-radius: 5px;
+	padding: 10px;
+	width: 150px;
+	color: white;
+	border: 2px solid black;
+	transform: scale(0);
+}
+
+#labelsSection span.hint:hover::before {
+	transform: scale(1);
+}
+
+#labelsSection span.hint-match::before {
+	left: -30px;
+	content: 'Has more hidden matches';
+}
+
+#labelsSection span.hint-action::before {
+	left: -130px;
+	content: 'Has more hidden actions';
+}
+
+#labelsdiv input {
+	border: 1px solid;
+	max-width: 10rem;
+	padding: 0 1rem;
+	background-color: cornsilk;
+}
+
+#labelsdiv input:disabled {
+	border: none;
+	max-width: 10rem;
+	padding: 0 1rem;
+	background-color: transparent;
+}
+
+#labelsdiv button {
+	margin: 0 .3rem;
+	padding: 0.3em;
+}
+
+#labelsdiv table td[colspan='3'] {
+	color: darkgray;
+	text-align: center;
+}
+
+.remove-slider {
+	background-color: red;
+	text-align: center;
+	color: white;
+	font-size: xx-large;
+	cursor: pointer;
+}

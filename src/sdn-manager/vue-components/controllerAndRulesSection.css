@@ -1,0 +1,29 @@
+#controllerAndRulesSection {
+	width: 400px;
+	overflow-y: hidden;
+}
+
+#controllerAndRulesSection hr {
+	margin: 10px;
+}
+
+#controllerAndRulesSection h3 {
+	margin-top: 10px;
+}
+
+#controllerAndRulesSection input {
+	background: none;
+	border: 1px solid darkgray;
+	padding: 3px 10px;
+	margin: 3px;
+}
+
+#d3-rules textarea:disabled {
+	height: 600px;
+}
+
+#controller-post-parameters-textarea {
+	min-height: 300px;
+	background-color: white;
+	margin: 5px;
+}
