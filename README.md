@@ -18,10 +18,7 @@ Now supports network topology preview (requires a modern browser or the Electrum
 
 #### Created by
 
-   * Gaetano Bonofiglio (Kidel)
-   * Veronica Iovinella (Neeja)
-   * Lorenzo Ariemma (lorenzo93)
-   * Lorenzo Mignone (Pastello)
+   * https://github.com/KatharaFramework/Netkit-Lab-Generator/graphs/contributors
 
 ### Links
 
