@@ -23,7 +23,7 @@ function startMainWindow(){
 
 	mainWindow.on("closed", function () {
 		mainWindow = null;
-		if(sdnManagerWindow == null) app.quit();
+		if(!sdnManagerWindow) app.quit();
 	});
 }
 
@@ -40,7 +40,7 @@ function startSDNManagerWindow(){
 
 	sdnManagerWindow.on("closed", function () {
 		sdnManagerWindow = null;
-		if(mainWindow == null) app.quit();
+		if(!mainWindow) app.quit();
 	});
 }
 
@@ -84,5 +84,5 @@ ipcMain.on("script:clean", function () {
 	console.log("Running LClean on " + pathTemp);
 	_runKatharaCommand("kathara lclean -d \"" + pathTemp + "\"");
 
-	sdnManagerWindow.close();
+	if(sdnManagerWindow) sdnManagerWindow.close();
 });
