@@ -54,7 +54,7 @@ function makeLabConfFile(netkit, lab) {
 // TODO: Metti a fattor comune:
 /*
 	for (let machine of netkit) {
-        if (machine.name && machine.name != "" && .....
+		if (machine.name && machine.name != "" && .....
 */
 
 function makeTerminal(netkit, lab) {
@@ -433,8 +433,7 @@ function makeBgpConf(router, lab) {
 
 	lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
 
-	//Inserisco tutti i Neibourgh
-	for (let remote in router.routing.bgp.remote) {
+	router.routing.bgp.remote.forEach(function (remote) {
 		if (remote && remote.neighbor != "" && remote.as != "") {
 			//Aggiungo il remote-as
 			lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " remote-as " + remote.as + "\n";
@@ -444,7 +443,8 @@ function makeBgpConf(router, lab) {
 				lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " description " + remote.description + "\n";
 			}
 		}
-	}
+	});
+
 	//Free conf
 	if (router.routing.bgp.free && router.routing.bgp.free != "")
 		lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n";
@@ -457,10 +457,10 @@ function makeFilesStructure(netkit, labInfo) {
 	let isAllValidNames = netkit
 		.map(machine => machine.name && /[A-z0-9]+/i.test(machine.name))
 		.reduce((prev, curr, ind) => ind == 0 ? curr : (prev && curr))	// Tutti i nomi devono aver soddisfatto la regex
-	if(!isAllValidNames)
+	if (!isAllValidNames)
 		return { folders: [], file: [] }
 
-	var lab = [];		// TODO: E' un oggetto... Cosa c'entra un array?! sistemare (se ho tempo di ricontrollare bene tutto)
+	var lab = {};
 	lab.folders = [];
 	lab.file = [];
 	lab.warning = 0;
