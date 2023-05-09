@@ -15,7 +15,8 @@ function startMainWindow(){
 		width: 1280, 
 		height: 760,
 		minWidth: 800, 
-		minHeight: 600
+		minHeight: 600,
+		icon: '/src/static/images/icons/icon.png'
 	});
 
 	mainWindow.loadURL(url.format({
