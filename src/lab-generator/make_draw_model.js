@@ -71,9 +71,9 @@ function get_eth_ip_difference(network, ip) {
 	if (net_split_i.length != ip_split_i.length) return 0;
 	for (let i in net_split_i) {
 		if (net_split_i[i] != ip_split_i[i]) {
-			if (i == 3) return ip_split_i[i];
-			if (i == 2) return ip_split_i[i] + "." + ip_split_i[i + 1];
-			if (i == 1) return ip_split_i[i] + "." + ip_split_i[i + 1] + "." + ip_split_i[i + 2];
+			if (i == 3) return ip_split_i[3];
+			if (i == 2) return ip_split_i[2] + "." + ip_split_i[3];
+			if (i == 1) return ip_split_i[1] + "." + ip_split_i[2] + "." + ip_split_i[3];
 			if (i == 0) return ip_split;
 		}
 	}
