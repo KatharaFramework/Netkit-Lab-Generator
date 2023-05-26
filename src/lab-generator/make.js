@@ -520,5 +520,9 @@ function makeZip(lab) {
 		zip.file(fileName, lab.file[fileName]);
 	}
 	let content = zip.generate({ type: "blob" });
-	saveAs(content, "lab.zip");
+
+  let zipname = document.getElementById('zipFileName').value;
+  zipname === '' ? zipname = 'lab.zip' : zipname = zipname.replace('.zip', '') + '.zip';
+
+	saveAs(content, zipname);
 }

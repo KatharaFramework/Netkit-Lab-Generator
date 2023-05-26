@@ -158,9 +158,19 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		}
 	};
 
-	$scope.makeDownload = function (text, filename) {
+	$scope.makeDownload = function (text, dest) {
 		var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-		saveAs(blob, filename, true);
+		var filename;
+    
+    if (dest === 'config') {
+      filename = document.getElementById('configFileName').value;
+      filename === '' ? filename = 'lab.config' : filename = filename.replace('.zip', '') + '.config';
+    } else if (dest === 'script') {
+      filename = document.getElementById('scriptFileName').value;
+      filename === '' ? filename = 'netkit.script' : filename = filename.replace('.script', '') + '.script';
+    }
+    
+    saveAs(blob, filename, true);
 	};
 
 	$scope.generateScript = function (netkitData, labInfoData) {

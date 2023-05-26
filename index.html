@@ -57,12 +57,14 @@
 			<nav id="submenu-0" class="navbar navbar-primary navbar-kathara container-fluid navbar-kathara-secondary ng-hide">
 				<script src="src/static/vendor/js/jszip.min.js"></script>
 				<ul class="nav navbar-nav">
-					<li>
-						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')" onclick="toggle_submenu(-1)">Download .sh file</a>
+					<li style='display: flex;border-right: 1px solid;align-items: baseline;'>
+						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'script')" onclick="toggle_submenu(-1)">Download .sh file</a>
+            <a><input id='scriptFileName' type='text' style='color: black;' placeholder='filename'></a>
 					</li>
-					<li>
+					<li style='display: flex;align-items: baseline;'>
 						<a data-ng-click="generateZip(netkit, labInfo)" onclick="toggle_submenu(-1)">Download .zip file</a>
-					</li>
+            <a><input id='zipFileName' type='text' style='color: black;' placeholder='filename'></a>
+          </li>
 				</ul>
 			</nav>
 
@@ -74,8 +76,9 @@
 					<li>
 						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
 					</li>
-					<li>
-						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')" onclick="toggle_submenu(-1)">Export configuration</a>
+					<li style='display: flex;border-left: 1px solid; align-items: baseline;'>
+						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'config')" onclick="toggle_submenu(-1)">Export configuration</a>
+            <a><input id='configFileName' type='text' style='color: black;' placeholder='filename'></a>
 					</li>
 				</ul>
 			</nav>
