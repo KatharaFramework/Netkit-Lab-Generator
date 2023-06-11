@@ -119,3 +119,41 @@ function _executeGeneric(e, command) {
 	);
 	electron.ipcRenderer.send("script:" + command);
 }
+
+function setNetworkOptions() {
+  let smoothEnabled = document.getElementById("smoothEnabled");
+  let smoothType = document.getElementById("smoothType");
+  let physicsEnabled = document.getElementById("physicsEnabled");
+  let physicsGConstant = document.getElementById("physicsGravitationalConstant");
+  document.getElementById("physicsGravitationalConstantValue").value = parseInt(physicsGConstant.value);
+
+  let edges = {}
+  let physics = {}
+
+  if (smoothEnabled.checked) {
+    edges = {
+      smooth: {
+        type: smoothType.value
+      }
+    }
+  } else {
+    edges = {
+      smooth: false
+    }
+  }
+
+  if (physicsEnabled.checked) {
+    physics = {
+      enabled: true,
+      barnesHut: {
+        gravitationalConstant: parseInt(physicsGConstant.value)
+      }
+    }
+  } else {
+    physics = {
+      enabled: false
+    }
+  }
+
+  network.setOptions({edges, physics})
+}
