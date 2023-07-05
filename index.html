@@ -480,11 +480,51 @@
 				<script src="src/static/vendor/js/vis.js"></script>
 				<script src="src/lab-generator/models/draw.js"></script>
 				<script src="src/lab-generator/make_draw_model.js"></script>
-				<div id="mynetwork" style="height: 80vh; border: 1px solid lightgray;"></div>
-				<button class="btn btn-danger" data-ng-click="makeGraph(netkit)">Reset</button>
-			</div>
-
-		</div>
+				<div id="mynetwork" style="height: 75vh; border: 1px solid lightgray;"></div>
+        <br>
+        <div id="controls" style="border: 1px solid lightgray; width: max-content;">
+          <div style='display: flex; gap: 30px; justify-content: baseline; padding: 10px 10px 0px 10px'>  
+            <div class='form-group'>
+              <h4>Edges smooth:</h4>
+              <div class="form-group">
+                <label for="smoothEnabled">&nbsp;Enabled:</label>
+                <input type="checkbox" id="smoothEnabled" checked='true'
+                onclick='setNetworkOptions()'>
+              </div>
+              <div class="form-group">
+                <label for="smoothType">&nbsp;Type:</label>
+                <select id="smoothType" onchange='setNetworkOptions()'>
+                  <option value="dynamic">Dynamic</option>
+                  <option value="continuous">Continuous</option>
+                  <option value="discrete">Discrete</option>
+                  <option value="diagonalCross">DiagonalCross</option>
+                  <option value="straightCross">StraightCross</option>
+                  <option value="horizontal">Horizontal</option>
+                  <option value="vertical">Vertical</option>
+                  <option value="curvedCW">CurvedCW</option>
+                  <option value="curvedCCW">CurvedCCW</option>
+                  <option value="cubicBezier">CubicBezier</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <h4>Physics</h4>  
+              <div class='form-group'>
+                <label for="physicsEnabled">&nbsp;Enabled:</label>
+                <input type="checkbox" id="physicsEnabled" onclick='setNetworkOptions()' checked='true'>
+              </div>
+              <div class='form-group' style='display: flex; gap: 10px'>
+                <label for='physicsGravitationalConstant'>&nbsp;Gravitational Constant:</label>
+                <input style="width: 300px" type='range' min='-30000' max='0' value='-1200' step='50' id='physicsGravitationalConstant' onchange='setNetworkOptions()'>
+                <input type='text' value='-1200' id='physicsGravitationalConstantValue' readonly='true'>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-danger" data-ng-click="makeGraph(netkit)">Reset</button>
+            </div>
+          </div>
+        </div>
+		  </div>
 	</div> 
 
 	<!-- LSTART MODAL -->

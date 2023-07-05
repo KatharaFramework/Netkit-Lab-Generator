@@ -33,12 +33,18 @@ function draw(nodes, edges) {
 			}
 		},
 		edges: {
+      smooth: {
+        type: "dynamic"
+      },
 			color: BLACK
 		},
 		physics: {
 			enabled: true,
 			barnesHut: { gravitationalConstant: -1200 }
 		},
+    interaction: {
+      multiselect: true
+    },
 		groups: {
 			"terminal": {
 				image: DIR + "terminal.png",
@@ -97,4 +103,10 @@ function draw(nodes, edges) {
 	};
 
 	network = new vis.Network(container, data, options);
+  
+  document.getElementById("smoothEnabled").checked = true;
+  document.getElementById("smoothType").value = "dynamic";
+  document.getElementById("physicsEnabled").checked = true;
+  document.getElementById("physicsGravitationalConstant").value = -1200;
+  document.getElementById("physicsGravitationalConstantValue").value = -1200;
 }
