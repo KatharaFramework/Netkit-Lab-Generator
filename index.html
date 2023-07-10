@@ -213,7 +213,7 @@
 								<div>
 									<label>Machine {{machine.row}}:</label>
 									<input type="text" data-ng-model="machine.name" class="form-control"
-										placeholder="pc{{machine.row}}" pattern="[A-z0-9]+" required />
+										placeholder="pc{{machine.row}}" pattern="[a-z0-9_]{1,30}" required />
 								</div>
 								<p>
 									<input title="type" type="radio" value="terminal" data-ng-model="machine.type" />
