@@ -1,7 +1,7 @@
 {
   "name": "nlg",
   "productName": "Netkit Lab Generator",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "Desktop UI for Kathara",
   "repository": "https://github.com/KatharaFramework/Netkit-Lab-Generator.git",
   "main": "electronClient.js",
