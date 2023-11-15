@@ -70,11 +70,11 @@ function makeWebserver(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "ws") {
 			if (machine.ws.userdir == true) {
-				lab.folders.push(machine.name + "/home/guest/public_html");
-				lab.file[machine.name + "/home/guest/public_html/index.html"] = "<html><head><title>Guest Home</title></head><body>Guest Home</body></html>";
-				lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
+				lab.folders.push(machine.name + "/var/www/html");
+				lab.file[machine.name + "/var/www/html/index.html"] = "<html><head><title>Guest Home</title></head><body>Guest Home</body></html>";
+				//lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
 			}
-			lab.file[machine.name + ".startup"] += "/etc/init.d/apache2 start\n";
+			lab.file[machine.name + ".startup"] += "systemctl start apache2\n";
 		}
 	}
 }
@@ -206,6 +206,52 @@ function makeNameserver(netkit, lab) {
 	}
 }
 
+function makeRouterRip(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ripd=yes\n";
+
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router rip\n";
+
+	for (let network of machine.routing.rip.network)
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
+
+	for (let route of machine.routing.rip.route) {
+		if (route && route != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "route " + route + "\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+
+		//nb: mantenere l'ordine
+	if (machine.routing.rip.en && machine.routing.rip.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.ospf) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute ospf\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
+	}
+}
+
+function makeRouterOspf(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ospfd=yes\n";
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router ospf\n";
+	for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n";
+		if (machine.routing.ospf.stub[m])
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+	if (machine.routing.ospf.en && machine.routing.ospf.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.rip) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute rip\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
+	}
+}
+
 function makeRouter(netkit, lab) {
 	// routing dinamico RIP e OSPF
 	for (let machine of netkit) {
@@ -215,61 +261,17 @@ function makeRouter(netkit, lab) {
 				lab.folders.push(machine.name + "/etc/frr");
 				lab.file[machine.name + "/etc/frr/daemons"] = "zebra=yes\n";
 			}
-
+			//inizializziamo il file frr.conf
+			lab.file[machine.name+"/etc/frr/frr.conf"]="";
 			if (machine.routing.rip.en) {
-				lab.file[machine.name + "/etc/frr/daemons"] += "ripd=yes\n";
-
-				lab.file[machine.name + "/etc/frr/frr.conf"] = "router rip\n";
-
-				for (let network of machine.routing.rip.network)
-					lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
-
-				for (let route of machine.routing.rip.route) {
-					if (route && route != "")
-						lab.file[machine.name + "/etc/frr/frr.conf"] += "route " + route + "\n";
-				}
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+				makeRouterRip(machine, lab);
 			}
 
 			if (machine.routing.ospf.en) {
-				lab.file[machine.name + "/etc/frr/daemons"] += "ospfd=yes\n";
-
-				// lab.file[machine.name + "/etc/frr/frr.conf"] = "hostname ospfd\n"
-				// 	+ "password zebra\n"
-				// 	+ "enable password zebra\n"
-				// 	+ "\n"
-				// 	+ "router ospf\n";
-				lab.file[machine.name + "/etc/frr/frr.conf"] = "router ospf\n";
-
-				for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
-					lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n";
-					if (machine.routing.ospf.stub[m])
-						lab.file[machine.name + "/etc/frr/frr.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n";
-				}
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+				makeRouterOspf(machine, lab);
 			}
 
 			if (machine.routing.bgp.en) makeBgpConf(machine, lab);
-
-			//nb: mantenere l'ordine
-			if (machine.routing.rip.en && machine.routing.rip.connected) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
-			}
-			if (machine.routing.ospf.en && machine.routing.ospf.connected) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
-			}
-			if (machine.routing.rip.en && machine.routing.rip.ospf) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute ospf\n";
-			}
-			if (machine.routing.rip.en && machine.routing.rip.bgp) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
-			}
-			if (machine.routing.ospf.en && machine.routing.ospf.rip) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute rip\n";
-			}
-			if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
-			}
 
 			//nb: i costi vanno qui alla fine
 			if (machine.routing.ospf.en) {
@@ -291,12 +293,7 @@ function makeRouter(netkit, lab) {
 					lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.rip.free + "\n";
 			}
 			//nb: e infine i log
-			if (machine.routing.rip.en) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";
-			}
-			if (machine.routing.ospf.en) {
-				lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";
-			}
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";
 		}
 	}
 }
