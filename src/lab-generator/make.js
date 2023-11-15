@@ -400,7 +400,7 @@ function makeStaticRouting(netkit, lab) {
 function makeBgpConf(router, lab) {
 	lab.file[router.name + "/etc/frr/daemons"] += "bgpd=yes\n";
 
-	lab.file[router.name + "/etc/frr/frr.conf"] = "router bgp " + router.routing.bgp.as + "\n\n";
+	lab.file[router.name + "/etc/frr/frr.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
 
 	// Inserimento tutte le Network su cui annunciare BGP
 	for (let network of router.routing.bgp.network) {
