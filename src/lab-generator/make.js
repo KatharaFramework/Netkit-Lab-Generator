@@ -43,6 +43,14 @@ function makeLabConfFile(netkit, lab) {
 				lab.file["lab.conf"] += machine.name + "[" + interface.eth.number + "]=" + interface.eth.domain + "\n";
 			}
 		}
+		if(machine.type == "router"){
+			if(machine.routingSoftware == "frr"){
+				lab.file["lab.conf"] += machine.name + "[image]=kathara/frr";
+			}
+			if(machine.routingSoftware == "quagga"){
+				lab.file["lab.conf"] += machine.name + "[image]=kathara/quagga";
+			}
+		}
 		lab.file["lab.conf"] += "\n";
 	}
 }
@@ -56,7 +64,6 @@ function makeLabConfFile(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && .....
 */
-/* Both QUAGGA and FRR */
 function makeTerminal(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "terminal" && machine.pc.dns && machine.pc.dns != "-") {
@@ -65,72 +72,26 @@ function makeTerminal(netkit, lab) {
 		}
 	}
 }
-/* --------------------------------------------------- */
-/* ------------------------ FRR ---------------------- */
-/* --------------------------------------------------- */
 
-function makeWebserverFrr(netkit, lab) {
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "ws") {
-			if (machine.ws.userdir == true) {
-				lab.folders.push(machine.name + "/var/www/html");
-				lab.file[machine.name + "/var/www/html/index.html"] = "<html><head><title>Hello World!</title></head><body>Hello World!</body></html>";
-				//lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
+function makeRouter(netkit, lab){
+	for(let machine of netkit){
+		if(machine.name && machine.name != "" && machine.type=="router"){
+			if(machine.routingSoftware == "frr"){
+				makeRouterFrr(machine, lab);
 			}
-			lab.file[machine.name + ".startup"] += "systemctl start apache2\n";
+			if(machine.routingSoftware == "quagga"){
+				makeRouterQuagga(machine, lab);
+			}
 		}
 	}
 }
 
-function makeRouterRipFrr(machine, lab){
-	lab.file[machine.name + "/etc/frr/daemons"] += "ripd=yes\n";
+/* --------------------------------------------------- */
+/* ------------------------ FRR ---------------------- */
+/* --------------------------------------------------- */
 
-	lab.file[machine.name + "/etc/frr/frr.conf"] += "router rip\n";
-
-	for (let network of machine.routing.rip.network)
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
-
-	for (let route of machine.routing.rip.route) {
-		if (route && route != "")
-			lab.file[machine.name + "/etc/frr/frr.conf"] += "route " + route + "\n";
-	}
-	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
-
-		//nb: mantenere l'ordine
-	if (machine.routing.rip.en && machine.routing.rip.connected) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
-	}
-	if (machine.routing.rip.en && machine.routing.rip.ospf) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute ospf\n";
-	}
-	if (machine.routing.rip.en && machine.routing.rip.bgp) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
-	}
-}
-
-function makeRouterOspfFrr(machine, lab){
-	lab.file[machine.name + "/etc/frr/daemons"] += "ospfd=yes\n";
-	lab.file[machine.name + "/etc/frr/frr.conf"] += "router ospf\n";
-	for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n";
-		if (machine.routing.ospf.stub[m])
-			lab.file[machine.name + "/etc/frr/frr.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n";
-	}
-	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
-	if (machine.routing.ospf.en && machine.routing.ospf.connected) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
-	}
-	if (machine.routing.ospf.en && machine.routing.ospf.rip) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute rip\n";
-	}
-	if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
-		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
-	}
-}
-
-function makeRouterFrr(netkit, lab) {
+function makeRouterFrr(machine, lab) {
 	// routing dinamico RIP e OSPF
-	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "router") {
 			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
 				lab.file[machine.name + ".startup"] += "systemctl start frr\n";
@@ -147,7 +108,8 @@ function makeRouterFrr(netkit, lab) {
 				makeRouterOspfFrr(machine, lab);
 			}
 
-			if (machine.routing.bgp.en) makeBgpConfFrr(machine, lab);
+			if (machine.routing.bgp.en) 
+				makeBgpConfFrr(machine, lab);
 
 			//nb: i costi vanno qui alla fine
 			if (machine.routing.ospf.en) {
@@ -171,45 +133,53 @@ function makeRouterFrr(netkit, lab) {
 			//nb: e infine i log
 			lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";
 		}
+}
+
+function makeRouterRipFrr(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ripd=yes\n";
+
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router rip\n";
+
+	for (let network of machine.routing.rip.network)
+		if(network && network != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
+
+	for (let route of machine.routing.rip.route) {
+		if (route && route != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "route " + route + "\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+
+		//nb: mantenere l'ordine
+	if (machine.routing.rip.en && machine.routing.rip.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.ospf) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute ospf\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
 	}
 }
 
-/* ------------------------------------------------------- */
-/* ------------------ FRR AUX FUNCTIONS ------------------ */
-/* ------------------------------------------------------- */
-
-function makeStaticRoutingFrr(netkit, lab) {
-	// generazione networking e routing statico
-	let switchCounter = 2;
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "") {
-			for (let interface of machine.interfaces.if) {
-				if (interface.eth.number == 0) {
-					if (machine.type == "switch") {
-						interface.ip = "192.168.100." + switchCounter++ + "/24";	// TODO: E se non bastassero 200+ switch?
-					} else if (machine.type == "controller") {
-						interface.ip = "192.168.100.1/24";
-					}
-				}
-				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ip a add "+interface.ip+" dev eth" + interface.eth.number+"\n";
-				}
-			}
-
-			for (let gateway of machine.gateways.gw) {
-				if (gateway.gw && gateway.gw != "") {
-					if (gateway.route == "") {
-						lab.file[machine.name + ".startup"] += "ip route add 0.0.0.0/0 via "+ gateway.gw +" dev eth"+gateway.if+ "\n";
-					}
-					else {
-						lab.file[machine.name + ".startup"] += "ip route add " + gateway.route +" via "+gateway.gw + " dev eth" +gateway.if + "\n";
-					}
-				}
-			}
-
-			if (machine.interfaces.free && machine.interfaces.free != "")
-				lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n";
-		}
+function makeRouterOspfFrr(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ospfd=yes\n";
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router ospf\n";
+	for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
+		if(machine.routing.ospf.network[m] && machine.routing.ospf.network[m] != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n";
+		if (machine.routing.ospf.stub[m] && machine.routing.ospf.stub[m]!="")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+	if (machine.routing.ospf.en && machine.routing.ospf.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.rip) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute rip\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
 	}
 }
 
@@ -243,28 +213,15 @@ function makeBgpConfFrr(router, lab) {
 	if (router.routing.bgp.free && router.routing.bgp.free != "")
 		lab.file[router.name + "/etc/frr/frr.conf"] += "\n" + router.routing.bgp.free + "\n";
 
-	lab.file[router.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n\n"
-		+ "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
-}
-
-function makeOther(netkit, lab) {
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
-			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
-			for (let file of machine.other.files) {
-				lab.file["/etc/scripts/" + file.name] = file.contents;
-			}
-		}
-	}
+	lab.file[router.name + "/etc/frr/frr.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
 }
 
 /* ------------------------------------------------------ */
 /* ------------------------ QUAGGA ---------------------- */
 /* ------------------------------------------------------ */
 
-function makeRouterQuagga(netkit, lab) {
+function makeRouterQuagga(machine, lab) {
 	// routing dinamico RIP e OSPF
-	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "router") {
 			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
 				lab.file[machine.name + ".startup"] += "/etc/init.d/zebra start\n";
@@ -362,67 +319,6 @@ function makeRouterQuagga(netkit, lab) {
 				lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
 			}
 		}
-	}
-}
-
-function makeWebserverQuagga(netkit, lab) {
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "ws") {
-			if (machine.ws.userdir == true) {
-				lab.folders.push(machine.name + "/home/guest/public_html");
-				lab.file[machine.name + "/home/guest/public_html/index.html"] = "<html><head><title>Guest Home</title></head><body>Guest Home</body></html>";
-				lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
-			}
-			lab.file[machine.name + ".startup"] += "/etc/init.d/apache2 start\n";
-		}
-	}
-}
-
-
-/* -------------------------------------------------------------------- */
-/* ------------------------ QUAGGA AUX FUNCTIONS ---------------------- */
-/* -------------------------------------------------------------------- */
-
-function makeStaticRoutingQuagga(netkit, lab) {
-	// generazione networking e routing statico
-	let switchCounter = 2;
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "") {
-			for (let interface of machine.interfaces.if) {
-				if (interface.eth.number == 0) {
-					if (machine.type == "switch") {
-						interface.ip = "192.168.100." + switchCounter++ + "/24";	// TODO: E se non bastassero 200+ switch?
-					} else if (machine.type == "controller") {
-						interface.ip = "192.168.100.1/24";
-					}
-				}
-				//ifconfig eth_ SELFADDRESS/MASK up
-				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ifconfig eth" + interface.eth.number + " " + interface.ip + " up\n";
-				}
-			}
-
-			for (let gateway of machine.gateways.gw) {
-				if (gateway.gw && gateway.gw != "") {
-					//route add default gw GATEWAY dev eth_
-					if (gateway.route == "") {
-						lab.file[machine.name + ".startup"] += "route add default gw " +
-							gateway.gw + " dev eth" +
-							gateway.if + "\n";
-					}
-					//route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
-					else {
-						lab.file[machine.name + ".startup"] += "route add -net " + gateway.route + " gw " +
-							gateway.gw + " dev eth" +
-							gateway.if + "\n";
-					}
-				}
-			}
-
-			if (machine.interfaces.free && machine.interfaces.free != "")
-				lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n";
-		}
-	}
 }
 
 function makeBgpConfQuagga(router, lab) {
@@ -467,7 +363,75 @@ function makeBgpConfQuagga(router, lab) {
 }
 
 
-/* BOTH QUAGGA AND FRR */
+/*-----------------------------------*/
+/*----------- WEB SERVER ------------*/
+/*-----------------------------------*/
+
+function makeWebserver(netkit, lab) {
+	for (let machine of netkit) {
+		if (machine.name && machine.name != "" && machine.type == "ws") {
+			if (machine.ws.userdir == true) {
+				lab.folders.push(machine.name + "/var/www/html");
+				lab.file[machine.name + "/var/www/html/index.html"] = "<html><head><title>Hello World!</title></head><body>Hello World!</body></html>";
+				lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
+			}
+			lab.file[machine.name + ".startup"] += "systemctl start apache2\n";
+		}
+	}
+}
+
+/* ------------------------------------------------------- */
+/* ------------------ AUX FUNCTIONS -----------------------*/
+/* ------------------------------------------------------- */
+
+function makeStaticRouting(netkit, lab){
+	let switchCounter = 2;
+	for(let machine of netkit){
+		if (machine.name && machine.name != "") {
+			for (let interface of machine.interfaces.if) {
+				if (interface.eth.number == 0) {
+					if (machine.type == "switch") {
+						interface.ip = "192.168.100." + switchCounter++ + "/24";	// TODO: E se non bastassero 200+ switch?
+					} else if (machine.type == "controller") {
+						interface.ip = "192.168.100.1/24";
+					}
+				}
+				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
+					lab.file[machine.name + ".startup"] += "ip a add "+interface.ip+" dev eth" + interface.eth.number+"\n";
+				}
+			}
+
+			for (let gateway of machine.gateways.gw) {
+				if (gateway.gw && gateway.gw != "") {
+					if (gateway.route == "") {
+						lab.file[machine.name + ".startup"] += "ip route add 0.0.0.0/0 via "+ gateway.gw +" dev eth"+gateway.if+ "\n";
+					}
+					else {
+						lab.file[machine.name + ".startup"] += "ip route add " + gateway.route +" via "+gateway.gw + " dev eth" +gateway.if + "\n";
+					}
+				}
+			}
+
+			if (machine.interfaces.free && machine.interfaces.free != "")
+				lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n";
+		}
+	}
+}
+
+function makeOther(netkit, lab) {
+	for (let machine of netkit) {
+		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
+			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
+			for (let file of machine.other.files) {
+				lab.file["/etc/scripts/" + file.name] = file.contents;
+			}
+		}
+	}
+}
+
+/*---------------------------------------------*/
+/*------------- NAMESERVER CONFIG -------------*/
+/*---------------------------------------------*/
 
 function makeNameserver(netkit, lab) {
 	//Gestione Nameserver
@@ -660,19 +624,10 @@ function makeFilesStructure(netkit, labInfo, daemonOption) {
 	makeMachineFolders(netkit, lab);
 	makeLabConfFile(netkit, lab);
 	makeStartupFiles(netkit, lab);
-	if(daemonOption == "frr"){
-		makeStaticRoutingFrr(netkit, lab);
-	}else{
-		makeStaticRoutingQuagga(netkit, lab);
-	}
+	makeStaticRouting(netkit, lab);
 	makeTerminal(netkit, lab);
-	if(daemonOption == "frr"){
-		makeRouterFrr(netkit, lab);
-		makeWebserverFrr(netkit, lab);
-	}else{
-		makeRouterQuagga(netkit, lab);
-		makeWebserverQuagga(netkit, lab);
-	}
+	makeRouter(netkit, lab);
+	makeWebserver(netkit, lab);
 	makeNameserver(netkit, lab);
 	makeOther(netkit, lab);
 	makeOVSwitch(netkit, lab);
