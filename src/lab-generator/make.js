@@ -72,6 +72,10 @@ function makeTerminal(netkit, lab) {
 		}
 	}
 }
+/*-----------------------------------------*/
+/*---------------- ROUTING ----------------*/
+/*-----------------------------------------*/
+
 
 function makeRouter(netkit, lab){
 	for(let machine of netkit){
@@ -122,13 +126,8 @@ function makeRouterFrr(machine, lab) {
 			}
 
 			//Free conf
-			if (machine.routing.ospf.en) {
-				if (machine.routing.ospf.free && machine.routing.ospf.free != "")
-					lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.ospf.free + "\n";
-			}
-			if (machine.routing.rip.en) {
-				if (machine.routing.rip.free && machine.routing.rip.free != "")
-					lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.rip.free + "\n";
+			if(machine.routing.frr.free){
+				lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.frr.free + "\n";
 			}
 			//nb: e infine i log
 			lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";

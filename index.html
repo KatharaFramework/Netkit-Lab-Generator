@@ -451,10 +451,12 @@
 											<input title="redistributec" type="checkbox" value="1"
 												data-ng-model="machine.routing.rip.connected" /> redistribute connected
 										</div>
+										<div data-ng-show="machine.routingSoftware == 'quagga'">
 										<label>Directly in ripd.conf:</label>
 										<textarea title="free" rows="3" class="form-control"
 											data-ng-model="machine.routing.rip.free"></textarea>
 										<hr>
+										</div>
 									</div>
 									<p>
 										<input title="en" type="checkbox" value="ns"
@@ -510,10 +512,12 @@
 													value="{{i.eth.number}}">eth{{i.eth.number}}</option>
 											</select>
 										</div>
+										<div data-ng-show="machine.routingSoftware == 'quagga'">
 										<label>Directly in ospfd.conf:</label>
 										<textarea title="free" rows="3" class="form-control"
 											data-ng-model="machine.routing.ospf.free"></textarea>
 										<hr>
+										</div>
 									</div>
 									<p>
 										<input title="en" type="checkbox" value="router"
@@ -553,11 +557,16 @@
 											<input type="text" title="description" class="form-control"
 												data-ng-model="machine.routing.bgp.remote[$index].description" />
 										</div>
-										<div>
+										<div data-ng-show="machine.routingSoftware == 'quagga'">
 											<label>Directly in bgpd.conf:</label>
 											<textarea title="free" rows="3" class="form-control"
 												data-ng-model="machine.routing.bgp.free"></textarea>
 										</div>
+									</div>
+									<div data-ng-show="machine.routingSoftware == 'frr'">
+										<label>Directly in frr.conf:</label>
+										<textarea title="free" rows="3" class="form-control"
+											data-ng-model="machine.routing.frr.free"></textarea>
 									</div>
 								</div>
 							</td>
