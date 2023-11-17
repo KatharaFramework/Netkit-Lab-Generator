@@ -184,16 +184,6 @@
 									</label>
 								</td>
 							</tr>
-							<tr>
-								<td>
-									<label>Routing software
-										<select id="daemonDropDown" data-ng-model="daemonOption">
-											<option value="frr">Frr</option>
-											<option value="quagga">Quagga</option>
-										</select>
-									</label>
-								</td>
-							</tr>
 							<tr class="xs-floating-right">
 								<td>
 									<p class="btn btn-success" data-ng-click="addMachine()">Add machine</p>
@@ -412,7 +402,14 @@
 								</div>
 
 								<div data-ng-show="machine.type=='router'">
-									<label>Dynamic routing: </label>
+									<label>Dynamic routing </label><br>
+									<span>Routing software:</span>
+									<select id="daemonDropDown" data-ng-model="machine.routingSoftware">
+										<option value="frr">Frr</option>
+										<option value="quagga">Quagga</option>
+									</select>
+									<br><br>
+									<span>Routing protocols:</span>
 									<p>
 										<input title="en" type="checkbox" value="router"
 											data-ng-model="machine.routing.rip.en" /> rip
