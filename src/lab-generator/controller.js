@@ -11,8 +11,6 @@ app.config(["$compileProvider",
 app.controller("nc", function ($location, $anchorScroll, $scope) {
 
 	$scope.app = "include/app.html";
-	//default routing software option
-	$scope.daemonOption = "frr";
 	$scope.labInfo = JSON.clone(labInfo);
 	$scope.netkit = [];
 	$scope.counter = 0;
