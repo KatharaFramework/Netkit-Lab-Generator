@@ -23,7 +23,7 @@
 		<link rel="stylesheet" href="src/style/main.css" />
 		<script src="src/static/vendor/js/angular.min.js"></script>
 		<script src="src/lab-generator/controller.js"></script>
-
+		
 		<!-- NAVBAR-->
 		<div>
 			<nav id="main-nav" style="-webkit-app-region: drag"
@@ -181,6 +181,16 @@
 									<label>Website:
 										<input type="text" data-ng-model="labInfo.web" class="form-control"
 											placeholder="http://yoursite.dom" />
+									</label>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label>Routing software
+										<select id="daemonDropDown" data-ng-model="daemonOption">
+											<option value="frr">Frr</option>
+											<option value="quagga">Quagga</option>
+										</select>
 									</label>
 								</td>
 							</tr>
@@ -562,7 +572,7 @@
 				<div class="bash">
 					<h3>Bash file preview:</h3>
 					<textarea id="sh_script" title="script" rows="15"
-						readonly>{{ generateScript(netkit, labInfo) }}</textarea>
+						readonly>{{ generateScript(netkit, labInfo, daemonOption) }}</textarea>
 				</div>
 
 				<!-- MINIMAP -->

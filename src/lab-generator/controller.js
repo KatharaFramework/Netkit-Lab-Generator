@@ -11,7 +11,8 @@ app.config(["$compileProvider",
 app.controller("nc", function ($location, $anchorScroll, $scope) {
 
 	$scope.app = "include/app.html";
-
+	//default routing software option
+	$scope.daemonOption = "frr";
 	$scope.labInfo = JSON.clone(labInfo);
 	$scope.netkit = [];
 	$scope.counter = 0;
@@ -163,8 +164,8 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		saveAs(blob, filename, true);
 	};
 
-	$scope.generateScript = function (netkitData, labInfoData) {
-		return makeScript(makeFilesStructure(netkitData, labInfoData));
+	$scope.generateScript = function (netkitData, labInfoData, daemonOption) {
+		return makeScript(makeFilesStructure(netkitData, labInfoData, daemonOption));
 	};
 
 	$scope.generateConfig = function (netkitData, labInfoData) {
@@ -172,8 +173,8 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		return JSON.stringify(all, undefined, 4);
 	};
 
-	$scope.generateZip = function (netkitData, labInfoData) {
-		return makeZip(makeFilesStructure(netkitData, labInfoData));
+	$scope.generateZip = function (netkitData, labInfoData, daemonOption) {
+		return makeZip(makeFilesStructure(netkitData, labInfoData, daemonOption));
 	};
 
 	$scope.makeGraph = function (netkitData) {
