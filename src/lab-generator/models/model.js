@@ -79,6 +79,8 @@ var backbone = {
 				as: "",
 				description: ""
 			}],
+		},
+		frr: {
 			free: ""
 		}
 	}

@@ -126,7 +126,7 @@ function makeRouterFrr(machine, lab) {
 			}
 
 			//Free conf
-			if(machine.routing.frr.free){
+			if(machine.routing.frr.free && machine.routing.frr.free != ""){
 				lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.frr.free + "\n";
 			}
 			//nb: e infine i log
@@ -141,7 +141,7 @@ function makeRouterRipFrr(machine, lab){
 
 	for (let network of machine.routing.rip.network)
 		if(network && network != "")
-			lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
 
 	for (let route of machine.routing.rip.route) {
 		if (route && route != "")
