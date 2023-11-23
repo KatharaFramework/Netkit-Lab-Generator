@@ -51,6 +51,9 @@ function makeLabConfFile(netkit, lab) {
 				lab.file["lab.conf"] += machine.name + "[image]=kathara/quagga";
 			}
 		}
+		if(machine.type == "terminal" || machine.type == "ws" || machine.type == "ns"){
+			lab.file["lab.conf"] += machine.name + "[image]=kathara/base";
+		}
 		lab.file["lab.conf"] += "\n";
 	}
 }
@@ -104,6 +107,8 @@ function makeRouterFrr(machine, lab) {
 			}
 			//inizializziamo il file frr.conf
 			lab.file[machine.name+"/etc/frr/frr.conf"]="";
+			//creiamo il file di vtysh
+			lab.file[machine.name+"/etc/frr/vtysh.conf"]="service integrated-vtysh-config";
 			if (machine.routing.rip.en) {
 				makeRouterRipFrr(machine, lab);
 			}
