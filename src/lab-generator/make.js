@@ -189,7 +189,8 @@ function makeRouterOspfFrr(machine, lab){
 
 function makeBgpConfFrr(router, lab) {
 	lab.file[router.name + "/etc/frr/daemons"] += "bgpd=yes\n";
-
+	
+	lab.file[router.name + "/etc/frr/frr.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
 	lab.file[router.name + "/etc/frr/frr.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
 
 	// Inserimento tutte le Network su cui annunciare BGP
@@ -198,9 +199,8 @@ function makeBgpConfFrr(router, lab) {
 			lab.file[router.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
 		}
 	}
-
+	
 	lab.file[router.name + "/etc/frr/frr.conf"] += "\n";
-
 	router.routing.bgp.remote.forEach(function (remote) {
 		if (remote && remote.neighbor != "" && remote.as != "") {
 			//Aggiungo il remote-as
@@ -217,7 +217,6 @@ function makeBgpConfFrr(router, lab) {
 	if (router.routing.bgp.free && router.routing.bgp.free != "")
 		lab.file[router.name + "/etc/frr/frr.conf"] += "\n" + router.routing.bgp.free + "\n";
 
-	lab.file[router.name + "/etc/frr/frr.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
 }
 
 /* ------------------------------------------------------ */
