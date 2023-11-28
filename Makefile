@@ -20,3 +20,6 @@ build-linux-arm64: install-deps
 
 install-deps:
 	npm install
+
+start: install-deps
+	npm start
