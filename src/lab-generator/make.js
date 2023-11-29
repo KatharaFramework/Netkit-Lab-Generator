@@ -212,11 +212,6 @@ function makeBgpConfFrr(router, lab) {
 			}
 		}
 	});
-
-	//Free conf
-	if (router.routing.bgp.free && router.routing.bgp.free != "")
-		lab.file[router.name + "/etc/frr/frr.conf"] += "\n" + router.routing.bgp.free + "\n";
-
 }
 
 /* ------------------------------------------------------ */
@@ -400,7 +395,7 @@ function makeStaticRouting(netkit, lab){
 					}
 				}
 				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ip a add "+interface.ip+" dev eth" + interface.eth.number+"\n";
+					lab.file[machine.name + ".startup"] += "ip address add "+interface.ip+" dev eth" + interface.eth.number+"\n";
 				}
 			}
 
@@ -611,7 +606,7 @@ function makeRyuController(netkit, lab) {
 }
 
 
-function makeFilesStructure(netkit, labInfo, daemonOption) {
+function makeFilesStructure(netkit, labInfo) {
 	let isAllValidNames = netkit
 		.map(machine => machine.name && /[A-z0-9]+/i.test(machine.name))
 		.reduce((prev, curr, ind) => ind == 0 ? curr : (prev && curr))	// Tutti i nomi devono aver soddisfatto la regex
