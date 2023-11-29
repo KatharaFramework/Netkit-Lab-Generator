@@ -97,6 +97,10 @@ function generate_nodes_edges(lab) {
 	let nodes = [];
 	let edges = [];
 
+	let ifNameAt = document.getElementById("ifNameAt");
+	let ifOspfCost = document.getElementById("ifOspfCost");
+ 	let routingLabel = document.getElementById("routingLabel");
+
 	let pendingDomainNodes = [];
 
 	for (let m in lab) {
@@ -114,7 +118,7 @@ function generate_nodes_edges(lab) {
 
 		if (machine.type == "router") {
 			if (machine.routing.rip.en) {
-				if (!containsNodeWithID("label-rip-" + machine.name, nodes)) {
+				if (!containsNodeWithID("label-rip-" + machine.name, nodes) && routingLabel.checked) {
 					nodes.push({
 						id: "label-rip-" + machine.name,
 						label: "RIP",
@@ -131,7 +135,7 @@ function generate_nodes_edges(lab) {
 				}
 			}
 			if (machine.routing.ospf.en) {
-				if (!containsNodeWithID("label-ospf-" + machine.name, nodes)) {
+				if (!containsNodeWithID("label-ospf-" + machine.name, nodes) && routingLabel.checked) {
 					nodes.push({
 						id: "label-ospf-" + machine.name,
 						label: "OSPF",
@@ -148,7 +152,7 @@ function generate_nodes_edges(lab) {
 				}
 			}
 			if (machine.routing.bgp.en) {
-				if (!containsNodeWithID("label-bgp-" + machine.name, nodes)) {
+				if (!containsNodeWithID("label-bgp-" + machine.name, nodes) && routingLabel.checked) {
 					nodes.push({
 						id: "label-bgp-" + machine.name,
 						label: "AS " + machine.routing.bgp.as + "\n" + machine.routing.bgp.network,
@@ -170,14 +174,22 @@ function generate_nodes_edges(lab) {
 			let domain_name = interface.eth.domain;
 			if (!domain_name || domain_name == "") continue;
 
-			let if_name = "eth" + interface.eth.number;
+			let if_name = (ifNameAt.checked ? "@" : "eth") + interface.eth.number;
 			let domain_id = "domain-" + domain_name;
 			let app_to = "iplabel-" + domain_name + "-domain_ip";
 			let domain_ip, if_ip;
 			if(interface.ip){
 				domain_ip = get_network_from_ip_net(interface.ip);
 				if_ip = get_eth_ip_difference(domain_ip, interface.ip);
-			} 
+			}
+      
+			let ifCost = "";
+			if (machine.type == "router") {
+				if (machine.routing.ospf.en && ifOspfCost.checked) {
+					let cost = machine.routing.ospf.if.filter(ifn => ifn.interface == interface.eth.number)[0];
+					ifCost = cost ? cost.cost : "";
+				}
+			}
 
 			// the domain is a new node. beware of duplicates.
 			// domain should have a child node with the ip description
@@ -210,9 +222,15 @@ function generate_nodes_edges(lab) {
 				}
 			}
 			//each eth is a new node, linked to its domain and its machine. can't be duplicated
-			nodes.push({
+			let ifLabel = if_ip ? if_ip + (ifNameAt.checked ? "" : "\n") + if_name : if_name;
+
+			if (ifCost) {
+				ifLabel += "\nCost: " + ifCost;
+			}
+
+      		nodes.push({
 				id: "eth-" + id + "-" + if_name + "-" + m,
-				label: if_ip ? (if_ip + "\n" + if_name) : if_name,
+				label: ifLabel,
 				group: "eth",
 				value: 2
 			});
