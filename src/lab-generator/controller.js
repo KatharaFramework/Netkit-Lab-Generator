@@ -162,8 +162,8 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		saveAs(blob, filename, true);
 	};
 
-	$scope.generateScript = function (netkitData, labInfoData, daemonOption) {
-		return makeScript(makeFilesStructure(netkitData, labInfoData, daemonOption));
+	$scope.generateScript = function (netkitData, labInfoData) {
+		return makeScript(makeFilesStructure(netkitData, labInfoData));
 	};
 
 	$scope.generateConfig = function (netkitData, labInfoData) {
@@ -171,8 +171,8 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		return JSON.stringify(all, undefined, 4);
 	};
 
-	$scope.generateZip = function (netkitData, labInfoData, daemonOption) {
-		return makeZip(makeFilesStructure(netkitData, labInfoData, daemonOption));
+	$scope.generateZip = function (netkitData, labInfoData) {
+		return makeZip(makeFilesStructure(netkitData, labInfoData));
 	};
 
 	$scope.makeGraph = function (netkitData) {
