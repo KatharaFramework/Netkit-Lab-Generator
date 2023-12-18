@@ -8,6 +8,7 @@
 	<meta name="author" content="Lykon, Lollo, Neeja, Pastello" />
 	<title>Netkit Lab Generator</title>
 	<link rel="stylesheet" href="src/static/vendor/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="src/style/main.css" />
 	<script src="src/lab-generator/helper.js"></script>
 </head>
 
@@ -20,10 +21,8 @@
 
 	<!-- MAIN-->
 	<div data-ng-app="napp" data-ng-controller="nc">
-		<link rel="stylesheet" href="src/style/main.css" />
 		<script src="src/static/vendor/js/angular.min.js"></script>
 		<script src="src/lab-generator/controller.js"></script>
-
 		<!-- NAVBAR-->
 		<div>
 			<nav id="main-nav" style="-webkit-app-region: drag"
@@ -593,16 +592,16 @@
 			</div>
 
 			<!-- GRAPH -->
-			<div id="graph" class="tab-pane">
+			<div id="graph" class="tab-pane" style="height: 100%; margin-bottom: 0;">
 				<script src="src/static/vendor/js/vis.js"></script>
 				<script src="src/lab-generator/models/draw.js"></script>
 				<script src="src/lab-generator/make_draw_model.js"></script>
-				<div id="mynetwork" style="height: 65vh; border: 1px solid lightgray;"></div>
+				<div id="mynetwork" style="height: calc(100% - 280px); border: 1px solid lightgray;"></div>
 
 				<div id="controls"
-					style="border: 1px solid lightgray; width: 100%; margin-top: 1em; height: 25vh; overflow: scroll;">
+					style="border: 1px solid lightgray; width: 100%; margin-top: 1em; height: 244px;">
 					<div class="row" style="margin: 0 !important;">
-						<div class="col-md-offset-3 col-md-2">
+						<div class="col-md-offset-2 col-md-3">
 							<h3 class="margin-bottom: 5px;">Edges smoothness</h3>
 
 							<div class="form-group">
@@ -629,7 +628,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<h3 class="margin-bottom: 5px;">Physics</h3>
 
 							<div class="form-group">
@@ -648,7 +647,7 @@
 									value='-1200' id='physicsGravitationalConstantValue' readonly='true'>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<h3 class="margin-bottom: 5px;">Miscellaneous</h3>
 
 							<div class="form-group">
