@@ -440,9 +440,14 @@ function makeNameserver(netkit, lab) {
 	// generazione file e cartelle comuni
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "ns") {
-			lab.file[machine.name + ".startup"] += "/etc/init.d/bind start\n";
+			lab.file[machine.name + ".startup"] += "systemctl start named\n";
 			lab.folders.push(machine.name + "/etc/bind");
-			lab.file[machine.name + "/etc/bind/named.conf"] = "";
+			lab.file[machine.name + "/etc/bind/named.conf"] = "include \"/etc/bind/named.conf.options\";\n";
+			lab.file[machine.name + "/etc/bind/named.conf.options"] = "options {\ndirectory \"/var/cache/bind\";\n";
+			if (machine.ns.recursion) {
+				lab.file[machine.name + "/etc/bind/named.conf.options"] += "allow-recursion {0/0;};\n";
+			}
+			lab.file[machine.name + "/etc/bind/named.conf.options"] += "dnssec-validation no;\n};";
 		}
 		//Trovo il root-ns e lo salvo
 		if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority && machine.ns.zone == ".") {
@@ -459,9 +464,6 @@ function makeNameserver(netkit, lab) {
 				if (machine.ns.authority && machine.ns.zone == ".") {
 					lab.file[machine.name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA " + nsroot.interfaces.if[0].name +
 						" root." + nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
-				}
-				if (machine.ns.recursion) {
-					lab.file[machine.name + "/etc/bind/named.conf"] += "options {\n allow-recursion {0/0; };\n};\n\n";
 				}
 				lab.file[machine.name + "/etc/bind/db.root"] += ".    IN NS " + nsroot.interfaces.if[0].name + "\n";
 				lab.file[machine.name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name + "    IN A " + nsroot.interfaces.if[0].ip.split("/")[0] + "\n";
@@ -501,8 +503,7 @@ function makeNameserver(netkit, lab) {
 								machine.ns.zone.substring(1) + "    IN NS "
 								+ machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
 								+ "     IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n";
-						}
-						else {
+						} else {
 							let nome = machine.interfaces.if[f].name; //www.pluto.net.
 							let nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
 							let a = ".";
@@ -532,9 +533,12 @@ function makeNameserver(netkit, lab) {
 										lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] +=
 											machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n"
 											+ machine.interfaces.if[f].name + "    IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n"
-											+ machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n";
+
 									}
-									//e poi inserisco anche il record A, altirmenti solo A
+									//e poi inserisco anche il record A, altrimenti solo A
+									if(machine.type == "ns" && machine.ns.authority){
+										lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n";
+									}
 									lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.interfaces.if[f].name + "    IN A " + ip + "\n";
 								}
 							}
