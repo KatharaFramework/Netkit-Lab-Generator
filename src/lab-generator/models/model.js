@@ -80,6 +80,7 @@ var backbone = {
 				as: "",
 				description: ""
 			}],
+			free: ""
 		},
 		frr: {
 			free: ""

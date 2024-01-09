@@ -164,6 +164,12 @@ function makeRouterRipFrr(machine, lab){
 	if (machine.routing.rip.en && machine.routing.rip.bgp) {
 		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
 	}
+
+	//Free conf
+	if (machine.routing.rip.en && machine.routing.rip.connected){
+		if (machine.routing.rip.free && machine.routing.rip.free != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += machine.routing.rip.free + "\n";
+	}
 }
 
 function makeRouterOspfFrr(machine, lab){
@@ -185,6 +191,13 @@ function makeRouterOspfFrr(machine, lab){
 	if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
 		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
 	}
+
+	//Free conf
+	if (machine.routing.ospf.en && machine.routing.ospf.connected){
+		if (machine.routing.ospf.free && machine.routing.ospf.free != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += machine.routing.ospf.free + "\n";
+	}
+
 }
 
 function makeBgpConfFrr(router, lab) {
@@ -212,6 +225,10 @@ function makeBgpConfFrr(router, lab) {
 			}
 		}
 	});
+
+	//Free conf
+	if (router.routing.bgp.free && router.routing.bgp.free != "")
+		lab.file[router.name + "/etc/frr/frr.conf"] += router.routing.bgp.free + "\n";
 }
 
 /* ------------------------------------------------------ */
