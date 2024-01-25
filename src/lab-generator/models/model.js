@@ -10,6 +10,7 @@ var backbone = {
 	name: "",
 	row: 1,
 	type: "terminal",
+	routingSoftware: "frr",
 	interfaces: {
 		counter: 1,
 		if: [{
@@ -79,6 +80,9 @@ var backbone = {
 				as: "",
 				description: ""
 			}],
+			free: ""
+		},
+		frr: {
 			free: ""
 		}
 	}

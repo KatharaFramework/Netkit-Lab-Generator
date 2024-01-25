@@ -11,7 +11,6 @@ app.config(["$compileProvider",
 app.controller("nc", function ($location, $anchorScroll, $scope) {
 
 	$scope.app = "include/app.html";
-
 	$scope.labInfo = JSON.clone(labInfo);
 	$scope.netkit = [];
 	$scope.counter = 0;
