@@ -8,6 +8,7 @@
 	<meta name="author" content="Lykon, Lollo, Neeja, Pastello" />
 	<title>Netkit Lab Generator</title>
 	<link rel="stylesheet" href="src/static/vendor/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="src/style/main.css" />
 	<script src="src/lab-generator/helper.js"></script>
 </head>
 
@@ -20,10 +21,8 @@
 
 	<!-- MAIN-->
 	<div data-ng-app="napp" data-ng-controller="nc">
-		<link rel="stylesheet" href="src/style/main.css" />
 		<script src="src/static/vendor/js/angular.min.js"></script>
 		<script src="src/lab-generator/controller.js"></script>
-
 		<!-- NAVBAR-->
 		<div>
 			<nav id="main-nav" style="-webkit-app-region: drag"
@@ -402,7 +401,14 @@
 								</div>
 
 								<div data-ng-show="machine.type=='router'">
-									<label>Dynamic routing: </label>
+									<label>Dynamic routing </label><br>
+									<span>Routing software:</span>
+									<select id="daemonDropDown" data-ng-model="machine.routingSoftware">
+										<option value="frr">FRR</option>
+										<option value="quagga">Quagga</option>
+									</select>
+									<br><br>
+									<span>Routing protocols:</span>
 									<p>
 										<input title="en" type="checkbox" value="router"
 											data-ng-model="machine.routing.rip.en" /> rip
@@ -444,10 +450,13 @@
 											<input title="redistributec" type="checkbox" value="1"
 												data-ng-model="machine.routing.rip.connected" /> redistribute connected
 										</div>
-										<label>Directly in ripd.conf:</label>
+										<div>
+										<label data-ng-show="machine.routingSoftware == 'quagga'">Directly in ripd.conf:</label>
+										<label data-ng-show="machine.routingSoftware == 'frr'">Directly after rip config in frr.conf:</label>
 										<textarea title="free" rows="3" class="form-control"
 											data-ng-model="machine.routing.rip.free"></textarea>
 										<hr>
+										</div>
 									</div>
 									<p>
 										<input title="en" type="checkbox" value="ns"
@@ -458,7 +467,7 @@
 											Network</span>
 										<span class="btn btn-danger" data-ng-click="removeOspfNetwork(machine)"
 											data-ng-disabled="machine.routing.ospf.network.length<=1">Remove
-											Newtork</span>
+											Network</span>
 										<div data-ng-repeat="onet in machine.routing.ospf.network track by $index">
 											<div>
 												<label>Network: </label>
@@ -503,10 +512,13 @@
 													value="{{i.eth.number}}">eth{{i.eth.number}}</option>
 											</select>
 										</div>
-										<label>Directly in ospfd.conf:</label>
+										<div>
+										<label data-ng-show="machine.routingSoftware == 'quagga'">Directly in ospfd.conf:</label>
+										<label data-ng-show="machine.routingSoftware == 'frr'">Directly after ospf config in frr.conf:</label>
 										<textarea title="free" rows="3" class="form-control"
 											data-ng-model="machine.routing.ospf.free"></textarea>
 										<hr>
+										</div>
 									</div>
 									<p>
 										<input title="en" type="checkbox" value="router"
@@ -547,10 +559,17 @@
 												data-ng-model="machine.routing.bgp.remote[$index].description" />
 										</div>
 										<div>
-											<label>Directly in bgpd.conf:</label>
+											<label data-ng-show="machine.routingSoftware == 'quagga'">Directly in bgpd.conf:</label>
+											<label data-ng-show="machine.routingSoftware == 'frr'">Directly after bgp config in frr.conf:</label>
 											<textarea title="free" rows="3" class="form-control"
 												data-ng-model="machine.routing.bgp.free"></textarea>
+											<hr>
 										</div>
+									</div>
+									<div data-ng-show="machine.routingSoftware == 'frr'">
+										<label>Directly in frr.conf:</label>
+										<textarea title="free" rows="3" class="form-control"
+											data-ng-model="machine.routing.frr.free"></textarea>
 									</div>
 								</div>
 							</td>
@@ -593,15 +612,16 @@
 			</div>
 
 			<!-- GRAPH -->
-			<div id="graph" class="tab-pane">
+			<div id="graph" class="tab-pane" style="height: 100%; margin-bottom: 0;">
 				<script src="src/static/vendor/js/vis.js"></script>
 				<script src="src/lab-generator/models/draw.js"></script>
 				<script src="src/lab-generator/make_draw_model.js"></script>
-				<div id="mynetwork" style="height: 75vh; border: 1px solid lightgray;"></div>
+				<div id="mynetwork" style="height: calc(100% - 280px); border: 1px solid lightgray;"></div>
 
-				<div id="controls" style="border: 1px solid lightgray; width: 100%; margin-top: 1em;">
+				<div id="controls"
+					style="border: 1px solid lightgray; width: 100%; margin-top: 1em; height: 244px;">
 					<div class="row" style="margin: 0 !important;">
-						<div class="col-md-offset-4 col-md-2">
+						<div class="col-md-offset-2 col-md-3">
 							<h3 class="margin-bottom: 5px;">Edges smoothness</h3>
 
 							<div class="form-group">
@@ -628,31 +648,56 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<h3 class="margin-bottom: 5px;">Physics</h3>
 
 							<div class="form-group">
 								<input class="form-check-input" type="checkbox" value="" id="physicsEnabled"
 									onclick="setNetworkOptions()">
-								<label class="form-check-label" for="smoothEnabled">
+								<label class="form-check-label" for="physicsEnabled">
 									Enabled
 								</label>
 							</div>
 
 							<div class="form-group">
 								<label for='physicsGravitationalConstant'>&nbsp;Gravitational Constant:</label>
-								<input style="max-width: 300px;" type='range' min='-30000' max='0' value='-1200' step='50'
-									id='physicsGravitationalConstant' onchange='setNetworkOptions()'>
+								<input style="max-width: 300px;" type='range' min='-30000' max='0' value='-1200'
+									step='50' id='physicsGravitationalConstant' onchange='setNetworkOptions()'>
 								<input style="max-width: 300px; margin-top: 10px;" class="form-control" type='text'
 									value='-1200' id='physicsGravitationalConstantValue' readonly='true'>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<h3 class="margin-bottom: 5px;">Miscellaneous</h3>
+
+							<div class="form-group">
+								<input class="form-check-input" type="checkbox" value="" id="ifNameAt">
+								<label class="form-check-label" for="ifNameAt">
+									Replace interface name with "@"
+								</label>
+							</div>
+
+							<div class="form-group">
+								<input class="form-check-input" type="checkbox" value="" id="ifOspfCost">
+								<label class="form-check-label" for="ifOspfCost">
+									Show OSPF interface cost
+								</label>
+							</div>
+
+							<div class="form-group">
+								<input class="form-check-input" type="checkbox" value="" id="routingLabel">
+								<label class="form-check-label" for="routingLabel">
+									Show OSPF/RIP/BGP label on router
+								</label>
 							</div>
 						</div>
 					</div>
 
 					<div class="row" style="margin: 0 !important; margin-top: 10px;">
-						<div class="col-md-offset-4 col-md-4">
+						<div class="col-md-offset-3 col-md-6">
 							<div class="form-group">
-								<button class="btn btn-danger btn-block" data-ng-click="makeGraph(netkit)">Reset</button>
+								<button class="btn btn-danger btn-block"
+									data-ng-click="makeGraph(netkit)">Reset</button>
 							</div>
 						</div>
 					</div>
@@ -695,6 +740,7 @@
 				}
 			}
 		</script>
+	</div>
 </body>
 
 </html>

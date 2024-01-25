@@ -43,6 +43,17 @@ function makeLabConfFile(netkit, lab) {
 				lab.file["lab.conf"] += machine.name + "[" + interface.eth.number + "]=" + interface.eth.domain + "\n";
 			}
 		}
+		if(machine.type == "router"){
+			if(machine.routingSoftware == "frr"){
+				lab.file["lab.conf"] += machine.name + "[image]=kathara/frr";
+			}
+			if(machine.routingSoftware == "quagga"){
+				lab.file["lab.conf"] += machine.name + "[image]=kathara/quagga";
+			}
+		}
+		if(machine.type == "terminal" || machine.type == "ws" || machine.type == "ns"){
+			lab.file["lab.conf"] += machine.name + "[image]=kathara/base";
+		}
 		lab.file["lab.conf"] += "\n";
 	}
 }
@@ -56,7 +67,6 @@ function makeLabConfFile(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && .....
 */
-
 function makeTerminal(netkit, lab) {
 	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "terminal" && machine.pc.dns && machine.pc.dns != "-") {
@@ -65,150 +75,168 @@ function makeTerminal(netkit, lab) {
 		}
 	}
 }
+/*-----------------------------------------*/
+/*---------------- ROUTING ----------------*/
+/*-----------------------------------------*/
 
-function makeWebserver(netkit, lab) {
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "ws") {
-			if (machine.ws.userdir == true) {
-				lab.folders.push(machine.name + "/home/guest/public_html");
-				lab.file[machine.name + "/home/guest/public_html/index.html"] = "<html><head><title>Guest Home</title></head><body>Guest Home</body></html>";
-				lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
+
+function makeRouter(netkit, lab){
+	for(let machine of netkit){
+		if(machine.name && machine.name != "" && machine.type=="router"){
+			if(machine.routingSoftware == "frr"){
+				makeRouterFrr(machine, lab);
 			}
-			lab.file[machine.name + ".startup"] += "/etc/init.d/apache2 start\n";
-		}
-	}
-}
-
-function makeOther(netkit, lab) {
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
-			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
-			for (let file of machine.other.files) {
-				lab.file["/etc/scripts/" + file.name] = file.contents;
+			if(machine.routingSoftware == "quagga"){
+				makeRouterQuagga(machine, lab);
 			}
 		}
 	}
 }
 
-function makeNameserver(netkit, lab) {
-	//Gestione Nameserver
-	//variabili d'appoggio comuni ai vari cicli
-	let authority = [];
-	let nsroot;
+/* --------------------------------------------------- */
+/* ------------------------ FRR ---------------------- */
+/* --------------------------------------------------- */
 
-	// generazione file e cartelle comuni
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "" && machine.type == "ns") {
-			lab.file[machine.name + ".startup"] += "/etc/init.d/bind start\n";
-			lab.folders.push(machine.name + "/etc/bind");
-			lab.file[machine.name + "/etc/bind/named.conf"] = "";
-		}
-		//Trovo il root-ns e lo salvo
-		if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority && machine.ns.zone == ".") {
-			nsroot = machine;
-		}
-	}
-
-	//Se non ho root-ns evito di generare una configurazione incoerente
-	//db.root in ogni macchina dns
-	if (nsroot) {
-		for (let machine of netkit) {
-			if (machine.name && machine.name != "" && machine.type == "ns") {
-				lab.file[machine.name + "/etc/bind/db.root"] = "";
-				if (machine.ns.authority && machine.ns.zone == ".") {
-					lab.file[machine.name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA " + nsroot.interfaces.if[0].name +
-						" root." + nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
-				}
-				if (machine.ns.recursion) {
-					lab.file[machine.name + "/etc/bind/named.conf"] += "options {\n allow-recursion {0/0; };\n};\n\n";
-				}
-				lab.file[machine.name + "/etc/bind/db.root"] += ".    IN NS " + nsroot.interfaces.if[0].name + "\n";
-				lab.file[machine.name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name + "    IN A " + nsroot.interfaces.if[0].ip.split("/")[0] + "\n";
-				if (machine.ns.authority && machine.ns.zone == ".") {
-					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \".\" {\n type master;\n file \"/etc/bind/db.root\";\n};\n\n";
-				} else {
-					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \".\" {\n type hint;\n file \"/etc/bind/db.root\";\n};\n\n";
-				}
+function makeRouterFrr(machine, lab) {
+	// routing dinamico RIP e OSPF
+		if (machine.name && machine.name != "" && machine.type == "router") {
+			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
+				lab.file[machine.name + ".startup"] += "systemctl start frr\n";
+				lab.folders.push(machine.name + "/etc/frr");
+				lab.file[machine.name + "/etc/frr/daemons"] = "zebra=yes\n";
+			}
+			//inizializziamo il file frr.conf
+			lab.file[machine.name+"/etc/frr/frr.conf"]="";
+			//creiamo il file di vtysh
+			lab.file[machine.name+"/etc/frr/vtysh.conf"]="service integrated-vtysh-config";
+			if (machine.routing.rip.en) {
+				makeRouterRipFrr(machine, lab);
 			}
 
-		}
-		//entry in db.zona e named.conf per le altre macchine
-		for (let machine of netkit) {
-			if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority) {
-				authority[machine.ns.zone] = machine;
-				if (machine.ns.zone != ".") {
-					lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] = "$TTL   60000\n@    IN SOA " + machine.interfaces.if[0].name + " root." + machine.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
-					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \"" + machine.ns.zone.slice(1, -1) + "\" {\n type master;\n file \"/etc/bind/db" + machine.ns.zone.slice(0, -1) + "\";\n};\n\n";
-				}
+			if (machine.routing.ospf.en) {
+				makeRouterOspfFrr(machine, lab);
 			}
-		}
-		//entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
-		for (let machine of netkit) {
-			if (machine.name && machine.name != "") {
-				for (let f in machine.interfaces.if) {
-					let ip;
-					if (machine.interfaces.if[f].ip)
-						ip = machine.interfaces.if[f].ip.split("/")[0];
-					if (machine.interfaces.if[f].name) { //Entrano tutte le interfacce di tutte le macchine con un nome ns
-						//Caso particolare per ns di primo livello
-						if (machine.ns.zone && machine.type == "ns" && machine.ns.authority && machine.ns.zone.split(".").length == 3) {
-							lab.file[authority["."].name + "/etc/bind/db.root"] +=
-								machine.ns.zone.substring(1) + "    IN NS "
-								+ machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
-								+ "    IN A " + ip + "\n";
-							lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] +=
-								machine.ns.zone.substring(1) + "    IN NS "
-								+ machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
-								+ "     IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n";
-						}
-						else {
-							let nome = machine.interfaces.if[f].name; //www.pluto.net.
-							let nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
-							let a = ".";
 
-							//Questo for toglie il primo pezzo www.pluto.net. => pluto.net.
-							for (let i = 1; i < nomediviso.length; i++) {
-								if (nomediviso[i] != "") {
-									a += nomediviso[i] + ".";
-								}
-							}
+			if (machine.routing.bgp.en) 
+				makeBgpConfFrr(machine, lab);
 
-							if (authority[a] && authority[a].ns.zone) {
-								let fileExt = authority[a].ns.zone.slice(0, -1);
-								//Evito che entri in caso di root-ns
-								if (fileExt != "") {
-									//se è un NS inserisco il glue record
-									if (machine.type == "ns" && machine.ns.authority) {
-										//Creo le linee relative a me stesso nel mio file db
-										let aSup = ".";
-										let nomediviso2 = authority[a].ns.zone.split(".");
-										//Questo for toglie il primo pezzo .www.pluto.net. => pluto.net.
-										for (let i = 2; i < nomediviso2.length; i++) {
-											if (nomediviso2[i] != "") {
-												aSup += nomediviso2[i] + ".";
-											}
-										}
-										lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] +=
-											machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n"
-											+ machine.interfaces.if[f].name + "    IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n"
-											+ machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n";
-									}
-									//e poi inserisco anche il record A, altirmenti solo A
-									lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.interfaces.if[f].name + "    IN A " + ip + "\n";
-								}
-							}
-						}
-
+			//nb: i costi vanno qui alla fine
+			if (machine.routing.ospf.en) {
+				for (let interface of machine.routing.ospf.if) {
+					if (interface.cost != "" && interface.cost) {
+						lab.file[machine.name + "/etc/frr/frr.conf"] += "interface eth" + interface.interface + "\n";
+						lab.file[machine.name + "/etc/frr/frr.conf"] += "ospf cost " + interface.cost + "\n";
 					}
 				}
 			}
+
+			//Free conf
+			if(machine.routing.frr.free && machine.routing.frr.free != ""){
+				lab.file[machine.name + "/etc/frr/frr.conf"] += "\n" + machine.routing.frr.free + "\n";
+			}
+			//nb: e infine i log
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "\nlog file /var/log/frr/frr.log\n";
 		}
+}
+
+function makeRouterRipFrr(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ripd=yes\n";
+
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router rip\n";
+
+	for (let network of machine.routing.rip.network)
+		if(network && network != "")
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
+
+	for (let route of machine.routing.rip.route) {
+		if (route && route != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "route " + route + "\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+
+		//nb: mantenere l'ordine
+	if (machine.routing.rip.en && machine.routing.rip.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.ospf) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute ospf\n";
+	}
+	if (machine.routing.rip.en && machine.routing.rip.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
+	}
+
+	//Free conf
+	if (machine.routing.rip.en && machine.routing.rip.connected){
+		if (machine.routing.rip.free && machine.routing.rip.free != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += machine.routing.rip.free + "\n";
 	}
 }
 
-function makeRouter(netkit, lab) {
+function makeRouterOspfFrr(machine, lab){
+	lab.file[machine.name + "/etc/frr/daemons"] += "ospfd=yes\n";
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "router ospf\n";
+	for (let m /* non trasformare in un for... of */ in machine.routing.ospf.network) {
+		if(machine.routing.ospf.network[m] && machine.routing.ospf.network[m] != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "network " + machine.routing.ospf.network[m] + " area " + machine.routing.ospf.area[m] + "\n";
+		if (machine.routing.ospf.stub[m] && machine.routing.ospf.stub[m]!="")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += "area " + machine.routing.ospf.area[m] + " stub\n";
+	}
+	lab.file[machine.name + "/etc/frr/frr.conf"] += "\n";
+	if (machine.routing.ospf.en && machine.routing.ospf.connected) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute connected\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.rip) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute rip\n";
+	}
+	if (machine.routing.ospf.en && machine.routing.ospf.bgp) {
+		lab.file[machine.name + "/etc/frr/frr.conf"] += "redistribute bgp\n";
+	}
+
+	//Free conf
+	if (machine.routing.ospf.en && machine.routing.ospf.connected){
+		if (machine.routing.ospf.free && machine.routing.ospf.free != "")
+			lab.file[machine.name + "/etc/frr/frr.conf"] += machine.routing.ospf.free + "\n";
+	}
+
+}
+
+function makeBgpConfFrr(router, lab) {
+	lab.file[router.name + "/etc/frr/daemons"] += "bgpd=yes\n";
+	
+	lab.file[router.name + "/etc/frr/frr.conf"] += "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
+	lab.file[router.name + "/etc/frr/frr.conf"] += "router bgp " + router.routing.bgp.as + "\n\n";
+
+	// Inserimento tutte le Network su cui annunciare BGP
+	for (let network of router.routing.bgp.network) {
+		if (network && network != "") {
+			lab.file[router.name + "/etc/frr/frr.conf"] += "network " + network + "\n";
+		}
+	}
+	
+	lab.file[router.name + "/etc/frr/frr.conf"] += "\n";
+	router.routing.bgp.remote.forEach(function (remote) {
+		if (remote && remote.neighbor != "" && remote.as != "") {
+			//Aggiungo il remote-as
+			lab.file[router.name + "/etc/frr/frr.conf"] += "neighbor " + remote.neighbor + " remote-as " + remote.as + "\n";
+
+			//Aggiungo la descrizione
+			if ((remote.description) && remote.description != "") {
+				lab.file[router.name + "/etc/frr/frr.conf"] += "neighbor " + remote.neighbor + " description " + remote.description + "\n";
+			}
+		}
+	});
+
+	//Free conf
+	if (router.routing.bgp.free && router.routing.bgp.free != "")
+		lab.file[router.name + "/etc/frr/frr.conf"] += router.routing.bgp.free + "\n";
+}
+
+/* ------------------------------------------------------ */
+/* ------------------------ QUAGGA ---------------------- */
+/* ------------------------------------------------------ */
+
+function makeRouterQuagga(machine, lab) {
 	// routing dinamico RIP e OSPF
-	for (let machine of netkit) {
 		if (machine.name && machine.name != "" && machine.type == "router") {
 			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
 				lab.file[machine.name + ".startup"] += "/etc/init.d/zebra start\n";
@@ -257,7 +285,7 @@ function makeRouter(netkit, lab) {
 				lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\n";
 			}
 
-			if (machine.routing.bgp.en) makeBgpConf(machine, lab);
+			if (machine.routing.bgp.en) makeBgpConfQuagga(machine, lab);
 
 			//nb: mantenere l'ordine
 			if (machine.routing.rip.en && machine.routing.rip.connected) {
@@ -306,8 +334,240 @@ function makeRouter(netkit, lab) {
 				lab.file[machine.name + "/etc/zebra/ospfd.conf"] += "\nlog file /var/log/zebra/ospfd.log\n";
 			}
 		}
+}
+
+function makeBgpConfQuagga(router, lab) {
+	lab.file[router.name + "/etc/zebra/daemons"] += "bgpd=yes\n";
+
+	lab.file[router.name + "/etc/zebra/bgpd.conf"] = ""
+		+ "hostname bgpd\n"
+		+ "password zebra\n"
+		+ "enable password zebra\n"
+		+ "\n"
+
+		// Inserimento nome AS
+		+ "router bgp " + router.routing.bgp.as + "\n\n";
+
+	// Inserimento tutte le Network su cui annunciare BGP
+	for (let network of router.routing.bgp.network) {
+		if (network && network != "") {
+			lab.file[router.name + "/etc/zebra/bgpd.conf"] += "network " + network + "\n";
+		}
+	}
+
+	lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
+
+	router.routing.bgp.remote.forEach(function (remote) {
+		if (remote && remote.neighbor != "" && remote.as != "") {
+			//Aggiungo il remote-as
+			lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " remote-as " + remote.as + "\n";
+
+			//Aggiungo la descrizione
+			if ((remote.description) && remote.description != "") {
+				lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " description " + remote.description + "\n";
+			}
+		}
+	});
+
+	//Free conf
+	if (router.routing.bgp.free && router.routing.bgp.free != "")
+		lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n";
+
+	lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n"
+		+ "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
+}
+
+
+/*-----------------------------------*/
+/*----------- WEB SERVER ------------*/
+/*-----------------------------------*/
+
+function makeWebserver(netkit, lab) {
+	for (let machine of netkit) {
+		if (machine.name && machine.name != "" && machine.type == "ws") {
+			if (machine.ws.userdir == true) {
+				lab.folders.push(machine.name + "/var/www/html");
+				lab.file[machine.name + "/var/www/html/index.html"] = "<html><head><title>Hello World!</title></head><body>Hello World!</body></html>";
+				lab.file[machine.name + ".startup"] += "a2enmod userdir\n";
+			}
+			lab.file[machine.name + ".startup"] += "systemctl start apache2\n";
+		}
 	}
 }
+
+/* ------------------------------------------------------- */
+/* ------------------ AUX FUNCTIONS -----------------------*/
+/* ------------------------------------------------------- */
+
+function makeStaticRouting(netkit, lab){
+	let switchCounter = 2;
+	for(let machine of netkit){
+		if (machine.name && machine.name != "") {
+			for (let interface of machine.interfaces.if) {
+				if (interface.eth.number == 0) {
+					if (machine.type == "switch") {
+						interface.ip = "192.168.100." + switchCounter++ + "/24";	// TODO: E se non bastassero 200+ switch?
+					} else if (machine.type == "controller") {
+						interface.ip = "192.168.100.1/24";
+					}
+				}
+				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
+					lab.file[machine.name + ".startup"] += "ip address add "+interface.ip+" dev eth" + interface.eth.number+"\n";
+				}
+			}
+
+			for (let gateway of machine.gateways.gw) {
+				if (gateway.gw && gateway.gw != "") {
+					if (gateway.route == "") {
+						lab.file[machine.name + ".startup"] += "ip route add 0.0.0.0/0 via "+ gateway.gw +" dev eth"+gateway.if+ "\n";
+					}
+					else {
+						lab.file[machine.name + ".startup"] += "ip route add " + gateway.route +" via "+gateway.gw + " dev eth" +gateway.if + "\n";
+					}
+				}
+			}
+
+			if (machine.interfaces.free && machine.interfaces.free != "")
+				lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n";
+		}
+	}
+}
+
+function makeOther(netkit, lab) {
+	for (let machine of netkit) {
+		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
+			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
+			for (let file of machine.other.files) {
+				lab.file["/etc/scripts/" + file.name] = file.contents;
+			}
+		}
+	}
+}
+
+/*---------------------------------------------*/
+/*------------- NAMESERVER CONFIG -------------*/
+/*---------------------------------------------*/
+
+function makeNameserver(netkit, lab) {
+	//Gestione Nameserver
+	//variabili d'appoggio comuni ai vari cicli
+	let authority = [];
+	let nsroot;
+
+	// generazione file e cartelle comuni
+	for (let machine of netkit) {
+		if (machine.name && machine.name != "" && machine.type == "ns") {
+			lab.file[machine.name + ".startup"] += "systemctl start named\n";
+			lab.folders.push(machine.name + "/etc/bind");
+			lab.file[machine.name + "/etc/bind/named.conf"] = "include \"/etc/bind/named.conf.options\";\n";
+			lab.file[machine.name + "/etc/bind/named.conf.options"] = "options {\ndirectory \"/var/cache/bind\";\n";
+			if (machine.ns.recursion) {
+				lab.file[machine.name + "/etc/bind/named.conf.options"] += "allow-recursion {0/0;};\n";
+			}
+			lab.file[machine.name + "/etc/bind/named.conf.options"] += "dnssec-validation no;\n};";
+		}
+		//Trovo il root-ns e lo salvo
+		if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority && machine.ns.zone == ".") {
+			nsroot = machine;
+		}
+	}
+
+	//Se non ho root-ns evito di generare una configurazione incoerente
+	//db.root in ogni macchina dns
+	if (nsroot) {
+		for (let machine of netkit) {
+			if (machine.name && machine.name != "" && machine.type == "ns") {
+				lab.file[machine.name + "/etc/bind/db.root"] = "";
+				if (machine.ns.authority && machine.ns.zone == ".") {
+					lab.file[machine.name + "/etc/bind/db.root"] += "$TTL   60000\n@    IN SOA " + nsroot.interfaces.if[0].name +
+						" root." + nsroot.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n";
+				}
+				lab.file[machine.name + "/etc/bind/db.root"] += ".    IN NS " + nsroot.interfaces.if[0].name + "\n";
+				lab.file[machine.name + "/etc/bind/db.root"] += nsroot.interfaces.if[0].name + "    IN A " + nsroot.interfaces.if[0].ip.split("/")[0] + "\n";
+				if (machine.ns.authority && machine.ns.zone == ".") {
+					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \".\" {\n type master;\n file \"/etc/bind/db.root\";\n};\n\n";
+				} else {
+					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \".\" {\n type hint;\n file \"/etc/bind/db.root\";\n};\n\n";
+				}
+			}
+
+		}
+		//entry in db.zona e named.conf per le altre macchine
+		for (let machine of netkit) {
+			if (machine.name && machine.name != "" && machine.type == "ns" && machine.ns.authority) {
+				authority[machine.ns.zone] = machine;
+				if (machine.ns.zone != ".") {
+					lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] = "$TTL   60000\n@    IN SOA " + machine.interfaces.if[0].name + " root." + machine.interfaces.if[0].name + " 2006031201 28800 14400 3600000 0\n\n"; //ho preso il nome dell'interfaccia eth0
+					lab.file[machine.name + "/etc/bind/named.conf"] += "zone \"" + machine.ns.zone.slice(1, -1) + "\" {\n type master;\n file \"/etc/bind/db" + machine.ns.zone.slice(0, -1) + "\";\n};\n\n";
+				}
+			}
+		}
+		//entry per l'alberatura delle zone (. conosce .com, .com conosce pippo.com, ecc)
+		for (let machine of netkit) {
+			if (machine.name && machine.name != "") {
+				for (let f in machine.interfaces.if) {
+					let ip;
+					if (machine.interfaces.if[f].ip)
+						ip = machine.interfaces.if[f].ip.split("/")[0];
+					if (machine.interfaces.if[f].name) { //Entrano tutte le interfacce di tutte le macchine con un nome ns
+						//Caso particolare per ns di primo livello
+						if (machine.ns.zone && machine.type == "ns" && machine.ns.authority && machine.ns.zone.split(".").length == 3) {
+							lab.file[authority["."].name + "/etc/bind/db.root"] +=
+								machine.ns.zone.substring(1) + "    IN NS "
+								+ machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
+								+ "    IN A " + ip + "\n";
+							lab.file[machine.name + "/etc/bind/db" + machine.ns.zone.slice(0, -1)] +=
+								machine.ns.zone.substring(1) + "    IN NS "
+								+ machine.interfaces.if[f].name + "\n" + machine.interfaces.if[f].name
+								+ "     IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n";
+						} else {
+							let nome = machine.interfaces.if[f].name; //www.pluto.net.
+							let nomediviso = nome.split("."); //[0]www [1]pluto [2]net [3].
+							let a = ".";
+
+							//Questo for toglie il primo pezzo www.pluto.net. => pluto.net.
+							for (let i = 1; i < nomediviso.length; i++) {
+								if (nomediviso[i] != "") {
+									a += nomediviso[i] + ".";
+								}
+							}
+
+							if (authority[a] && authority[a].ns.zone) {
+								let fileExt = authority[a].ns.zone.slice(0, -1);
+								//Evito che entri in caso di root-ns
+								if (fileExt != "") {
+									//se è un NS inserisco il glue record
+									if (machine.type == "ns" && machine.ns.authority) {
+										//Creo le linee relative a me stesso nel mio file db
+										let aSup = ".";
+										let nomediviso2 = authority[a].ns.zone.split(".");
+										//Questo for toglie il primo pezzo .www.pluto.net. => pluto.net.
+										for (let i = 2; i < nomediviso2.length; i++) {
+											if (nomediviso2[i] != "") {
+												aSup += nomediviso2[i] + ".";
+											}
+										}
+										lab.file[authority[aSup].name + "/etc/bind/db" + authority[aSup].ns.zone.slice(0, -1)] +=
+											machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n"
+											+ machine.interfaces.if[f].name + "    IN A " + machine.interfaces.if[f].ip.split("/")[0] + "\n"
+
+									}
+									//e poi inserisco anche il record A, altrimenti solo A
+									if(machine.type == "ns" && machine.ns.authority){
+										lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.ns.zone.substring(1) + "    IN NS " + machine.interfaces.if[f].name + "\n";
+									}
+									lab.file[authority[a].name + "/etc/bind/db" + fileExt] += machine.interfaces.if[f].name + "    IN A " + ip + "\n";
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
+	}
+}
+
 
 function makeOVSwitch(netkit, lab) {
 	for (let machine of netkit) {
@@ -366,92 +626,6 @@ function makeRyuController(netkit, lab) {
 	else document.getElementById("connect").classList.add("hidden");
 }
 
-/* --------------------------------------------------- */
-/* ------------------ AUX FUNCTIONS ------------------ */
-/* --------------------------------------------------- */
-
-function makeStaticRouting(netkit, lab) {
-	// generazione networking e routing statico
-	let switchCounter = 2;
-	for (let machine of netkit) {
-		if (machine.name && machine.name != "") {
-			for (let interface of machine.interfaces.if) {
-				if (interface.eth.number == 0) {
-					if (machine.type == "switch") {
-						interface.ip = "192.168.100." + switchCounter++ + "/24";	// TODO: E se non bastassero 200+ switch?
-					} else if (machine.type == "controller") {
-						interface.ip = "192.168.100.1/24";
-					}
-				}
-				//ifconfig eth_ SELFADDRESS/MASK up
-				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ifconfig eth" + interface.eth.number + " " + interface.ip + " up\n";
-				}
-			}
-
-			for (let gateway of machine.gateways.gw) {
-				if (gateway.gw && gateway.gw != "") {
-					//route add default gw GATEWAY dev eth_
-					if (gateway.route == "") {
-						lab.file[machine.name + ".startup"] += "route add default gw " +
-							gateway.gw + " dev eth" +
-							gateway.if + "\n";
-					}
-					//route add -net NETADDRESS/MASK gw GATEADDRESS dev eth_
-					else {
-						lab.file[machine.name + ".startup"] += "route add -net " + gateway.route + " gw " +
-							gateway.gw + " dev eth" +
-							gateway.if + "\n";
-					}
-				}
-			}
-
-			if (machine.interfaces.free && machine.interfaces.free != "")
-				lab.file[machine.name + ".startup"] += "\n" + machine.interfaces.free + "\n";
-		}
-	}
-}
-
-function makeBgpConf(router, lab) {
-	lab.file[router.name + "/etc/zebra/daemons"] += "bgpd=yes\n";
-
-	lab.file[router.name + "/etc/zebra/bgpd.conf"] = ""
-		+ "hostname bgpd\n"
-		+ "password zebra\n"
-		+ "enable password zebra\n"
-		+ "\n"
-
-		// Inserimento nome AS
-		+ "router bgp " + router.routing.bgp.as + "\n\n";
-
-	// Inserimento tutte le Network su cui annunciare BGP
-	for (let network of router.routing.bgp.network) {
-		if (network && network != "") {
-			lab.file[router.name + "/etc/zebra/bgpd.conf"] += "network " + network + "\n";
-		}
-	}
-
-	lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n";
-
-	router.routing.bgp.remote.forEach(function (remote) {
-		if (remote && remote.neighbor != "" && remote.as != "") {
-			//Aggiungo il remote-as
-			lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " remote-as " + remote.as + "\n";
-
-			//Aggiungo la descrizione
-			if ((remote.description) && remote.description != "") {
-				lab.file[router.name + "/etc/zebra/bgpd.conf"] += "neighbor " + remote.neighbor + " description " + remote.description + "\n";
-			}
-		}
-	});
-
-	//Free conf
-	if (router.routing.bgp.free && router.routing.bgp.free != "")
-		lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\n" + router.routing.bgp.free + "\n";
-
-	lab.file[router.name + "/etc/zebra/bgpd.conf"] += "\nlog file /var/log/zebra/bgpd.log\n\n"
-		+ "debug bgp\ndebug bgp events\ndebug bgp filters\ndebug bgp fsm\ndebug bgp keepalives\ndebug bgp updates\n";
-}
 
 function makeFilesStructure(netkit, labInfo) {
 	let isAllValidNames = netkit
@@ -465,9 +639,7 @@ function makeFilesStructure(netkit, labInfo) {
 	lab.file = [];
 	lab.warning = 0;
 	lab.error = 0;
-
 	makeLabInfo(labInfo, lab);
-
 	makeMachineFolders(netkit, lab);
 	makeLabConfFile(netkit, lab);
 	makeStartupFiles(netkit, lab);
