@@ -123,7 +123,7 @@ function makeRouterFrr(machine, lab) {
 			//nb: i costi vanno qui alla fine
 			if (machine.routing.ospf.en) {
 				for (let interface of machine.routing.ospf.if) {
-					if (interface.cost != "" && interface.cost) {
+					if (interface && interface !== undefined && interface.cost != "" && interface.cost) {
 						lab.file[machine.name + "/etc/frr/frr.conf"] += "interface eth" + interface.interface + "\n";
 						lab.file[machine.name + "/etc/frr/frr.conf"] += "ospf cost " + interface.cost + "\n";
 					}
