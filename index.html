@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="src/static/vendor/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="src/style/main.css" />
 	<script src="src/lab-generator/helper.js"></script>
+	<script src="src/lab-generator/ip_validation.js"></script>
 </head>
 
 <body>
@@ -271,8 +272,8 @@
 											<div data-ng-show="machine.type!='switch'">
 												<label> IP/Net: </label>
 												<input type="text" data-ng-model="i.ip" class="form-control"
-													placeholder="0.0.0.0/0"
-													pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
+													placeholder="192.0.2.1/24 or 2001:db8::1/64"
+													oninput="this.setCustomValidity(validateIpNet(this.value) ? '' : 'Enter a valid IPv4 or IPv6 CIDR address')" />
 											</div>
 											<div data-ng-show="machine.type!='switch'">
 												<label> Complete DNS Name: </label>
@@ -301,14 +302,14 @@
 										<div>
 											<label>Route (empty for default gw):</label>
 											<input type="text" data-ng-model="gateway.route" class="form-control"
-												placeholder="0.0.0.0/0"
-												pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$" />
+												placeholder="0.0.0.0/0 or 2001:db8::/64"
+												oninput="this.setCustomValidity(validateIpNet(this.value) ? '' : 'Enter a valid IPv4 or IPv6 CIDR prefix')" />
 										</div>
 										<div>
 											<label>GW (empty to generate nothing):</label>
 											<input type="text" data-ng-model="gateway.gw" class="form-control"
-												placeholder="0.0.0.0"
-												pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" />
+												placeholder="10.0.0.254 or 2001:db8::fe"
+												oninput="this.setCustomValidity(validateIpAddress(this.value) ? '' : 'Enter a valid IPv4 or IPv6 gateway address')" />
 										</div>
 										<div>
 											<label>Interface:</label>
