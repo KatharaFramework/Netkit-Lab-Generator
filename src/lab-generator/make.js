@@ -55,6 +55,12 @@ function makeLabConfFile(netkit, lab) {
 			lab.file["lab.conf"] += machine.name + "[image]=kathara/base";
 		}
 		lab.file["lab.conf"] += "\n";
+		// Kathará applies net.* sysctls during container creation.
+		// Inside an already-running container this write may be denied.
+		if (machine.type == "router" && machine.interfaces.if.some(
+			iface => iface.eth.domain && iface.ip && iface.ip.includes(":"))) {
+			lab.file["lab.conf"] += machine.name + '[sysctl]="net.ipv6.conf.all.forwarding=1"\n';
+		}
 	}
 }
 
@@ -100,9 +106,10 @@ function makeRouter(netkit, lab){
 function makeRouterFrr(machine, lab) {
 	// routing dinamico RIP e OSPF
 		if (machine.name && machine.name != "" && machine.type == "router") {
+			// frr.conf and vtysh.conf are generated even without dynamic routing.
+			lab.folders.push(machine.name + "/etc/frr");
 			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
 				lab.file[machine.name + ".startup"] += "systemctl start frr\n";
-				lab.folders.push(machine.name + "/etc/frr");
 				lab.file[machine.name + "/etc/frr/daemons"] = "zebra=yes\n";
 			}
 			//inizializziamo il file frr.conf
@@ -412,18 +419,20 @@ function makeStaticRouting(netkit, lab){
 					}
 				}
 				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ip address add "+interface.ip+" dev eth" + interface.eth.number+"\n";
+					const ipFamilyOption = interface.ip.includes(":") ? "-6 " : "";
+					lab.file[machine.name + ".startup"] += "ip " + ipFamilyOption + "address add " + interface.ip + " dev eth" + interface.eth.number + "\n";
 				}
 			}
 
 			for (let gateway of machine.gateways.gw) {
 				if (gateway.gw && gateway.gw != "") {
-					if (gateway.route == "") {
-						lab.file[machine.name + ".startup"] += "ip route add 0.0.0.0/0 via "+ gateway.gw +" dev eth"+gateway.if+ "\n";
+					const ipv6 = gateway.gw.includes(":");
+					const route = gateway.route || (ipv6 ? "::/0" : "0.0.0.0/0");
+					if (gateway.route && gateway.route.includes(":") !== ipv6) {
+						throw new Error("Route and gateway address families must match on " + machine.name);
 					}
-					else {
-						lab.file[machine.name + ".startup"] += "ip route add " + gateway.route +" via "+gateway.gw + " dev eth" +gateway.if + "\n";
-					}
+					lab.file[machine.name + ".startup"] += "ip " + (ipv6 ? "-6 " : "") +
+						"route add " + route + " via " + gateway.gw + " dev eth" + gateway.if + "\n";
 				}
 			}
 
