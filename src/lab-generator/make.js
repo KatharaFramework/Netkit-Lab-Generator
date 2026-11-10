@@ -667,13 +667,32 @@ function makeFilesStructure(netkit, labInfo) {
 	return lab;
 }
 
-function makeScript(lab) {
+function getLabSlug(description) {
+	const normalized = String(description || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	const slug = normalized.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+	return slug || "lab";
+}
+
+function getLabScriptFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".sh";
+}
+
+function getLabConfigFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".config";
+}
+
+function getLabZipFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".zip";
+}
+
+function makeScript(lab, labInfo) {
+	const directory = getLabSlug(labInfo && labInfo.description);
 	let text = "#! /bin/sh\n"
 		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
 		+ "\n"
-		+ "rm -rf \"$(dirname \"$0\")/lab\"\n"
-		+ "mkdir \"$(dirname \"$0\")/lab\"\n"
-		+ "cd \"$(dirname \"$0\")/lab\"\n";
+		+ "rm -rf \"$(dirname \"$0\")/" + directory + "\"\n"
+		+ "mkdir \"$(dirname \"$0\")/" + directory + "\"\n"
+		+ "cd \"$(dirname \"$0\")/" + directory + "\"\n";
 
 	for (let folderName of lab.folders) {
 		if (folderName != "") text += "mkdir -p " + folderName + "\n";
@@ -683,7 +702,10 @@ function makeScript(lab) {
 		text += "\ntouch " + fileName + "\n";
 		let lines = lab.file[fileName].split("\n");
 		for (let line of lines) {
-			if (line != "") text += "echo '" + line + "' >> " + fileName + "\n";
+			if (line != "") {
+				const quoted = "'" + line.replace(/'/g, "'\"'\"'") + "'";
+				text += "printf '%s\\n' " + quoted + " >> " + fileName + "\n";
+			}
 		}
 	}
 
@@ -691,7 +713,7 @@ function makeScript(lab) {
 	return text;
 }
 
-function makeZip(lab) {
+function makeZip(lab, labInfo) {
 	let zip = new JSZip();
 
 	for (let folderName of lab.folders) {
@@ -701,5 +723,5 @@ function makeZip(lab) {
 		zip.file(fileName, lab.file[fileName]);
 	}
 	let content = zip.generate({ type: "blob" });
-	saveAs(content, "lab.zip");
+	saveAs(content, getLabZipFilename(labInfo));
 }

@@ -58,7 +58,7 @@
 				<script src="src/static/vendor/js/jszip.min.js"></script>
 				<ul class="nav navbar-nav">
 					<li>
-						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), 'netkit.script')"
+						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), getLabScriptFilename(labInfo))"
 							onclick="toggle_submenu(-1)">Download .sh file</a>
 					</li>
 					<li>
@@ -80,7 +80,7 @@
 						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
 					</li>
 					<li>
-						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), 'netkit.config')"
+						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), getLabConfigFilename(labInfo))"
 							onclick="toggle_submenu(-1)">Export configuration</a>
 					</li>
 				</ul>
