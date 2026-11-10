@@ -685,6 +685,12 @@ function getLabZipFilename(labInfo) {
 	return getLabSlug(labInfo && labInfo.description) + ".zip";
 }
 
+// Example only: generated labs are not served by this client-side application.
+function getLabCurlExample(labInfo) {
+	const filename = getLabZipFilename(labInfo);
+	return "curl -fL 'https://YOUR_SERVER/labs/" + filename + "' -o '" + filename + "'";
+}
+
 function makeScript(lab, labInfo) {
 	const directory = getLabSlug(labInfo && labInfo.description);
 	let text = "#! /bin/sh\n"
@@ -722,6 +728,5 @@ function makeZip(lab, labInfo) {
 	for (let fileName in lab.file) {
 		zip.file(fileName, lab.file[fileName]);
 	}
-	let content = zip.generate({ type: "blob" });
-	saveAs(content, getLabZipFilename(labInfo));
+	return zip.generate({ type: "blob" });
 }

@@ -58,14 +58,21 @@
 				<script src="src/static/vendor/js/jszip.min.js"></script>
 				<ul class="nav navbar-nav">
 					<li>
-						<a data-ng-click="makeDownload(generateScript(netkit, labInfo), getLabScriptFilename(labInfo))"
+						<a data-ng-click="saveGeneratedFile(generateScript(netkit, labInfo), getLabScriptFilename(labInfo))"
 							onclick="toggle_submenu(-1)">Download .sh file</a>
 					</li>
 					<li>
-						<a data-ng-click="generateZip(netkit, labInfo)" onclick="toggle_submenu(-1)">Download .zip
+						<a data-ng-click="saveGeneratedFile(generateZip(netkit, labInfo), getLabZipFilename(labInfo))" onclick="toggle_submenu(-1)">Download .zip
 							file</a>
 					</li>
 				</ul>
+				<div class="container-fluid" style="padding: 8px 15px 12px; max-width: 960px;">
+					<label for="curl-download-example">Download with curl (HTTP hosting required)</label>
+					<textarea id="curl-download-example" class="form-control" rows="2" readonly
+						aria-label="Example curl download command">{{ getLabCurlExample(labInfo) }}</textarea>
+					<small>Example only: not available without an HTTP server. Replace YOUR_SERVER with the host
+						where you have published this ZIP file.</small>
+				</div>
 			</nav>
 
 			<!-- Sub-menu Save and Load -->
@@ -80,7 +87,7 @@
 						<a data-ng-click="import()" onclick="toggle_submenu(-1)">Import configuration</a>
 					</li>
 					<li>
-						<a data-ng-click="makeDownload(generateConfig(netkit, labInfo), getLabConfigFilename(labInfo))"
+						<a data-ng-click="saveGeneratedFile(generateConfig(netkit, labInfo), getLabConfigFilename(labInfo))"
 							onclick="toggle_submenu(-1)">Export configuration</a>
 					</li>
 				</ul>

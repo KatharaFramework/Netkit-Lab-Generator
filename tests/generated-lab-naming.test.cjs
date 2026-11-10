@@ -44,5 +44,41 @@ test('export controls use the description-based filenames', () => {
   const html = fs.readFileSync('index.html', 'utf8');
   const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
   assert.match(html, /getLabConfigFilename\(labInfo\)/);
-  assert.match(controller, /getLabZipFilename\(labInfoData\)/);
+  assert.match(controller, /\$scope\.getLabZipFilename = getLabZipFilename/);
+});
+
+test('downloads use a native picker where supported and a fallback otherwise', () => {
+  const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
+  assert.match(controller, /showSaveFilePicker/);
+  assert.match(controller, /createWritable/);
+  assert.match(controller, /saveAs\(/);
+  assert.match(controller, /AbortError/);
+});
+
+test('zip generation returns a Blob for the same saving flow as other exports', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
+  assert.match(html, /saveGeneratedFile\(generateZip\(netkit, labInfo\), getLabZipFilename\(labInfo\)\)/);
+  assert.match(controller, /\$scope\.getLabZipFilename = getLabZipFilename/);
+});
+
+test('curl block shows a clearly non-functional HTTP template with lab ZIP name', () => {
+  const info = { description: 'Labo IPv6 : Réseaux' };
+  const cmd = context.getLabCurlExample(info);
+
+  assert.match(cmd, /^curl -fL /);
+  assert.match(cmd, /YOUR_SERVER/);
+  assert.match(cmd, /labo_ipv6_reseaux[.]zip/);
+
+  const html = fs.readFileSync('index.html', 'utf8');
+  const controller = fs.readFileSync(
+    'src/lab-generator/controller.js',
+    'utf8'
+  );
+
+  assert.ok(html.includes('getLabCurlExample(labInfo)'));
+  assert.match(html, /not available without an HTTP server/i);
+  assert.ok(
+    controller.includes('$scope.getLabCurlExample = getLabCurlExample')
+  );
 });
