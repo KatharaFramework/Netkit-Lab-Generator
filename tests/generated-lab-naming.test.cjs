@@ -82,3 +82,23 @@ test('curl block shows a clearly non-functional HTTP template with lab ZIP name'
     controller.includes('$scope.getLabCurlExample = getLabCurlExample')
   );
 });
+
+test('generated shell does not delete an existing laboratory or itself', () => {
+  const script = context.makeScript(
+    {
+      folders: ['router1'],
+      file: { 'lab.conf': 'LAB_AUTHOR="Jérôme A"\n' }
+    },
+    { description: 'Formation IPv6' }
+  );
+
+  assert.doesNotMatch(script, /rm -rf/);
+  assert.doesNotMatch(script, /rm.*\$0/);
+
+  assert.match(
+    script,
+    /if \[ -e "\$target_dir" \] \|\| \[ -L "\$target_dir" \]/
+  );
+
+  assert.match(script, /exit 1/);
+});

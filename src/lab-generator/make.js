@@ -693,12 +693,16 @@ function getLabCurlExample(labInfo) {
 
 function makeScript(lab, labInfo) {
 	const directory = getLabSlug(labInfo && labInfo.description);
-	let text = "#! /bin/sh\n"
-		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
-		+ "\n"
-		+ "rm -rf \"$(dirname \"$0\")/" + directory + "\"\n"
-		+ "mkdir \"$(dirname \"$0\")/" + directory + "\"\n"
-		+ "cd \"$(dirname \"$0\")/" + directory + "\"\n";
+	let text = "#!/bin/sh\n"
+		+ "set -eu\n"
+		+ "script_dir=$(CDPATH= cd -- \"$(dirname -- \"$0\")\" && pwd)\n"
+		+ "target_dir=\"$script_dir/" + directory + "\"\n"
+		+ "if [ -e \"$target_dir\" ] || [ -L \"$target_dir\" ]; then\n"
+		+ "  printf '%s\\n' \"Error: laboratory directory already exists: $target_dir\" >&2\n"
+		+ "  exit 1\n"
+		+ "fi\n"
+		+ "mkdir \"$target_dir\"\n"
+		+ "cd \"$target_dir\"\n";
 
 	for (let folderName of lab.folders) {
 		if (folderName != "") text += "mkdir -p " + folderName + "\n";
@@ -715,7 +719,6 @@ function makeScript(lab, labInfo) {
 		}
 	}
 
-	text += "\nrm \"../$0\"\n";
 	return text;
 }
 
