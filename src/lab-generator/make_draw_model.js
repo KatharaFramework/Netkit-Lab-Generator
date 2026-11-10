@@ -40,8 +40,52 @@ function binary_netmask_from_decimal(dec) {
 	return netmask;
 }
 
+// Parse an IPv6 literal into eight 16-bit groups, including compressed forms.
+function parse_ipv6(ip) {
+	if (!/^[0-9a-fA-F:]+$/.test(ip) || (ip.match(/::/g) || []).length > 1) return null;
+	const compressed = ip.includes("::");
+	const halves = compressed ? ip.split("::") : [ip];
+	const left = halves[0] ? halves[0].split(":") : [];
+	const right = compressed && halves[1] ? halves[1].split(":") : [];
+	const fields = left.concat(right);
+	if (fields.some(part => !/^[0-9a-fA-F]{1,4}$/.test(part))) return null;
+	if (compressed ? fields.length >= 8 : fields.length !== 8) return null;
+	const missing = 8 - fields.length;
+	return left.concat(Array(missing).fill("0"), right).map(part => parseInt(part, 16));
+}
+
+function format_ipv6(groups) {
+	// RFC 5952: compress the longest run of at least two zero groups.
+	let bestStart = -1, bestLength = 0;
+	for (let i = 0; i < groups.length;) {
+		if (groups[i] !== 0) { i++; continue; }
+		let end = i;
+		while (end < groups.length && groups[end] === 0) end++;
+		if (end - i > bestLength && end - i >= 2) {
+			bestStart = i;
+			bestLength = end - i;
+		}
+		i = end;
+	}
+	const hex = groups.map(n => n.toString(16));
+	if (bestStart < 0) return hex.join(":");
+	const before = hex.slice(0, bestStart).join(":");
+	const after = hex.slice(bestStart + bestLength).join(":");
+	return before + "::" + after;
+}
+
 function get_network_from_ip_net(ip_net) {
 	let [ip, net] = ip_net.split("/");
+	if (ip.includes(":")) {
+		const groups = parse_ipv6(ip);
+		const prefix = Number(net);
+		if (!groups || !Number.isInteger(prefix) || prefix < 0 || prefix > 128) return null;
+		const network = groups.map((group, i) => {
+			const bits = Math.max(0, Math.min(16, prefix - i * 16));
+			return bits === 0 ? 0 : (group & (0xffff << (16 - bits)));
+		});
+		return format_ipv6(network) + "/" + prefix;
+	}
 	if (net > 32) net = 32;
 	if (net < 0) net = 0;
 	let binary = ip_to_bin(ip);
@@ -64,6 +108,18 @@ function find_destination_eth(lab, name, machine_name, eth_number) {
 }
 
 function get_eth_ip_difference(network, ip) {
+	if (!network) return 0;
+	if (ip.includes(":")) {
+		const networkGroups = parse_ipv6(network.split("/")[0]);
+		const addressGroups = parse_ipv6(ip.split("/")[0]);
+		if (!networkGroups || !addressGroups) return 0;
+		// Display the host portion as a compact IPv6 suffix when possible.
+		let first = 0;
+		while (first < 8 && networkGroups[first] === addressGroups[first]) first++;
+		if (first === 8) return 0;
+		const remaining = addressGroups.slice(first);
+		return "::" + remaining.map(n => n.toString(16)).join(":");
+	}
 	let net_split = network.split("/")[0];
 	let ip_split = ip.split("/")[0];
 	let net_split_i = net_split.split(".");
