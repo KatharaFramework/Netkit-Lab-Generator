@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+node_modules
+tests
+*.log
+Dockerfile
+compose.yaml
+docker/
+README.md
+Makefile
+package.json
+package-lock.json
+electronClient.js
+forge.config.js
