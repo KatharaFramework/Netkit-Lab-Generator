@@ -249,7 +249,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 					}
 				};
 				fileElement.value = "";
-				fileReader.readAsBinaryString(filePath);
+				fileReader.readAsText(filePath, "UTF-8");
 			} else {
 				fileElement.click();
 			}
