@@ -42,9 +42,10 @@ var LabLibrary = (function () {
 			return await new Promise(function (resolve, reject) {
 				const tx = db.transaction(STORE, mode);
 				const request = action(tx.objectStore(STORE));
-				request.onsuccess = function () { resolve(request.result); };
 				request.onerror = function () { reject(request.error || new Error("Library operation failed")); };
+				tx.oncomplete = function () { resolve(request.result); };
 				tx.onabort = function () { reject(tx.error || new Error("Library transaction aborted")); };
+				tx.onerror = function () { reject(tx.error || new Error("Library transaction failed")); };
 			});
 		} finally {
 			db.close();
