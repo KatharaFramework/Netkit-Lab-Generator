@@ -12,6 +12,7 @@
 	<script src="src/lab-generator/helper.js"></script>
 	<script src="src/lab-generator/ip_validation.js"></script>
 	<script src="src/lab-generator/lab_library.js"></script>
+	<script src="src/lab-generator/kathara_catalog.js"></script>
 </head>
 
 <body>
@@ -107,6 +108,26 @@
 						<button type="button" class="btn btn-danger btn-xs" data-ng-click="deleteLabFromLibrary(lab.id)">Delete</button>
 					</div>
 					<small>Local browser storage can be cleared. Export .config to keep a portable backup.</small>
+				</div>
+				<div class="container-fluid" style="padding: 10px 15px 15px; background: #fff; color: #333;">
+					<h4>Kathará example laboratories</h4>
+					<p>Three examples from KatharaFramework/Kathara-Labs. Import is partial: see limitations and original source.</p>
+					<div class="table-responsive">
+						<table id="kathara-labs-catalog" class="table table-striped table-condensed" style="background: #fff; color: #333;">
+							<thead><tr><th>Laboratory</th><th>Description</th><th>Limitations</th><th>Actions</th></tr></thead>
+							<tbody>
+								<tr data-ng-repeat="example in katharaExamples track by example.id">
+									<td>{{ example.title }}</td>
+									<td>{{ example.description }}</td>
+									<td><span data-ng-repeat="note in example.limitations track by $index">{{ note }} </span></td>
+									<td>
+										<button class="btn btn-primary btn-xs" type="button" data-ng-click="loadKatharaExample(example.id)">Load</button>
+										<a class="btn btn-default btn-xs" data-ng-href="{{ example.source }}" target="_blank" rel="noopener noreferrer">Source</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</nav>
 
