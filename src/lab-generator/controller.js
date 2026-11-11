@@ -289,6 +289,25 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 
 	$scope.refreshLabLibrary();
 
+	$scope.katharaExamples = KatharaCatalog.list();
+
+	$scope.loadKatharaExample = function (id) {
+		if (!confirm("Replace the current editor with this Kathará example? Unsupported native configuration will not be imported.")) return;
+		try {
+			const example = KatharaCatalog.load(id);
+			$scope.labInfo = example.labInfo;
+			$scope.netkit = example.netkit;
+			$scope.counter = example.netkit.length;
+			$scope.libraryMessage = "Loaded Kathará example: " + example.labInfo.description;
+			$scope.libraryError = "";
+			changed = true;
+		} catch (err) {
+			$scope.libraryError = err.message;
+		}
+	};
+
+
+
 	$scope.import = function () {
 		let fileElement = document.getElementById("file");
 		try {
