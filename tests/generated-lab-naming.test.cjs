@@ -103,8 +103,18 @@ test('generated shell does not delete an existing laboratory or itself', () => {
   assert.match(script, /exit 1/);
 });
 
-test('configuration importer decodes UTF-8 text instead of binary strings', () => {
+test('configuration importer reads UTF-8 and removes only an optional BOM', () => {
   const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
-  assert.match(controller, /fileReader[.]readAsText\\(filePath, ["']UTF-8["']\\)/);
+  assert.ok(controller.includes('fileReader.readAsText(filePath, "UTF-8")'));
   assert.doesNotMatch(controller, /readAsBinaryString/);
+  assert.ok(controller.includes('replace(/^\\uFEFF/, "")'));
+  assert.ok(!controller.includes('substring(e.target.result.indexOf('));
+});
+
+test('UTF-8 lab export with BOM is valid after removing the BOM', () => {
+  const original = [{ labInfo: { author: 'Jérôme A', description: 'Réseau IPv6' }, netkit: [] }];
+  const exported = '\uFEFF' + JSON.stringify(original);
+  const parsed = JSON.parse(exported.replace(/^\uFEFF/, ''));
+  assert.equal(parsed[0].labInfo.author, 'Jérôme A');
+  assert.equal(parsed[0].labInfo.description, 'Réseau IPv6');
 });

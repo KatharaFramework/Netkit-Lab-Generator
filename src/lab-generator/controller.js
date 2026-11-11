@@ -236,7 +236,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 				let fileReader = new FileReader();
 				fileReader.onloadend = function (e) {
 					try {
-						let app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica prima di '['
+						let app = JSON.parse(e.target.result.replace(/^\uFEFF/, "")); // Strip an optional UTF-8 BOM before parsing.
 						$scope.netkit = app[0].netkit;
 						$scope.counter = $scope.netkit.length;
 						$scope.labInfo = app[0].labInfo;
@@ -249,7 +249,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 					}
 				};
 				fileElement.value = "";
-				fileReader.readAsBinaryString(filePath);
+				fileReader.readAsText(filePath, "UTF-8");
 			} else {
 				fileElement.click();
 			}
