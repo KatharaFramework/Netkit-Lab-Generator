@@ -667,13 +667,42 @@ function makeFilesStructure(netkit, labInfo) {
 	return lab;
 }
 
-function makeScript(lab) {
-	let text = "#! /bin/sh\n"
-		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
-		+ "\n"
-		+ "rm -rf \"$(dirname \"$0\")/lab\"\n"
-		+ "mkdir \"$(dirname \"$0\")/lab\"\n"
-		+ "cd \"$(dirname \"$0\")/lab\"\n";
+function getLabSlug(description) {
+	const normalized = String(description || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	const slug = normalized.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+	return slug || "lab";
+}
+
+function getLabScriptFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".sh";
+}
+
+function getLabConfigFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".config";
+}
+
+function getLabZipFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".zip";
+}
+
+// Example only: generated labs are not served by this client-side application.
+function getLabCurlExample(labInfo) {
+	const filename = getLabZipFilename(labInfo);
+	return "curl -fL 'https://YOUR_SERVER/labs/" + filename + "' -o '" + filename + "'";
+}
+
+function makeScript(lab, labInfo) {
+	const directory = getLabSlug(labInfo && labInfo.description);
+	let text = "#!/bin/sh\n"
+		+ "set -eu\n"
+		+ "script_dir=$(CDPATH= cd -- \"$(dirname -- \"$0\")\" && pwd)\n"
+		+ "target_dir=\"$script_dir/" + directory + "\"\n"
+		+ "if [ -e \"$target_dir\" ] || [ -L \"$target_dir\" ]; then\n"
+		+ "  printf '%s\\n' \"Error: laboratory directory already exists: $target_dir\" >&2\n"
+		+ "  exit 1\n"
+		+ "fi\n"
+		+ "mkdir \"$target_dir\"\n"
+		+ "cd \"$target_dir\"\n";
 
 	for (let folderName of lab.folders) {
 		if (folderName != "") text += "mkdir -p " + folderName + "\n";
@@ -683,15 +712,17 @@ function makeScript(lab) {
 		text += "\ntouch " + fileName + "\n";
 		let lines = lab.file[fileName].split("\n");
 		for (let line of lines) {
-			if (line != "") text += "echo '" + line + "' >> " + fileName + "\n";
+			if (line != "") {
+				const quoted = "'" + line.replace(/'/g, "'\"'\"'") + "'";
+				text += "printf '%s\\n' " + quoted + " >> " + fileName + "\n";
+			}
 		}
 	}
 
-	text += "\nrm \"../$0\"\n";
 	return text;
 }
 
-function makeZip(lab) {
+function makeZip(lab, labInfo) {
 	let zip = new JSZip();
 
 	for (let folderName of lab.folders) {
@@ -700,6 +731,5 @@ function makeZip(lab) {
 	for (let fileName in lab.file) {
 		zip.file(fileName, lab.file[fileName]);
 	}
-	let content = zip.generate({ type: "blob" });
-	saveAs(content, "lab.zip");
+	return zip.generate({ type: "blob" });
 }

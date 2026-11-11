@@ -157,13 +157,40 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		}
 	};
 
-	$scope.makeDownload = function (text, filename) {
-		var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-		saveAs(blob, filename, true);
+	$scope.saveGeneratedFile = async function (content, filename) {
+		const blob = content instanceof Blob
+			? content
+			: new Blob([content], { type: "text/plain;charset=utf-8" });
+
+		// Chrome/Chromium: invoke the picker directly from the user's click.
+		// Firefox: the browser's download preferences control the destination.
+		if (typeof window.showSaveFilePicker === "function" && window.isSecureContext) {
+			try {
+				const handle = await window.showSaveFilePicker({ suggestedName: filename });
+				const writable = await handle.createWritable();
+				await writable.write(blob);
+				await writable.close();
+			} catch (error) {
+				// Cancel means no download; other failures must remain visible.
+				if (error.name !== "AbortError") {
+					console.error("Could not save generated file:", error);
+					alert("Could not save file: " + error.message);
+				}
+			}
+		} else {
+			saveAs(blob, filename);
+		}
 	};
 
+	$scope.makeDownload = $scope.saveGeneratedFile;
+
+	$scope.getLabScriptFilename = getLabScriptFilename;
+	$scope.getLabConfigFilename = getLabConfigFilename;
+	$scope.getLabZipFilename = getLabZipFilename;
+	$scope.getLabCurlExample = getLabCurlExample;
+
 	$scope.generateScript = function (netkitData, labInfoData) {
-		return makeScript(makeFilesStructure(netkitData, labInfoData));
+		return makeScript(makeFilesStructure(netkitData, labInfoData), labInfoData);
 	};
 
 	$scope.generateConfig = function (netkitData, labInfoData) {
@@ -172,7 +199,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 	};
 
 	$scope.generateZip = function (netkitData, labInfoData) {
-		return makeZip(makeFilesStructure(netkitData, labInfoData));
+		return makeZip(makeFilesStructure(netkitData, labInfoData), labInfoData);
 	};
 
 	$scope.makeGraph = function (netkitData) {
