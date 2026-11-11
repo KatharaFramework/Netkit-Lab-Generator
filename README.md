@@ -111,6 +111,7 @@ or invalid.
 
 **These are native Kathará ZIPs from the upstream repository**, not ZIPs
 generated from editable configurations in the browser. Editing a lab in
-the generator does not modify the downloaded native archive. Custom
-labs still need an HTTP upload/publication service before they can be
-retrieved with `curl`.
+the generator does not modify the downloaded native archive. The **Download Lab → curl** preview automatically uses the current page's
+HTTP(S) origin (including its port) instead of a static `YOUR_SERVER` placeholder.
+However, custom labs still need an HTTP upload/publication service before they
+can be retrieved with `curl`.

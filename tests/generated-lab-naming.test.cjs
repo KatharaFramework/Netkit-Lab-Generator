@@ -77,7 +77,7 @@ test('curl block shows a clearly non-functional HTTP template with lab ZIP name'
   );
 
   assert.ok(html.includes('getLabCurlExample(labInfo)'));
-  assert.match(html, /not available without an HTTP server/i);
+  assert.match(html, /Custom labs generated in the browser are not uploaded to the server/i);
   assert.ok(
     controller.includes('$scope.getLabCurlExample = getLabCurlExample')
   );
