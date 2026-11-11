@@ -228,6 +228,67 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		else $scope.labInfo.toggle = "disable";
 	};
 
+	$scope.savedLabs = [];
+	$scope.libraryMessage = "";
+	$scope.libraryError = "";
+
+	$scope.refreshLabLibrary = async function () {
+		try {
+			const labs = await LabLibrary.list();
+			$scope.$evalAsync(function () {
+				$scope.savedLabs = labs;
+				$scope.libraryError = "";
+			});
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.saveLabToLibrary = async function () {
+		try {
+			const snapshot = await LabLibrary.save($scope.labInfo, $scope.netkit);
+			$scope.$evalAsync(function () {
+				$scope.libraryMessage = "Saved: " + snapshot.name;
+				$scope.libraryError = "";
+			});
+			await $scope.refreshLabLibrary();
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.loadLabFromLibrary = async function (id) {
+		if (!confirm("Replace the current editor with this saved laboratory?")) return;
+		try {
+			const lab = await LabLibrary.get(id);
+			if (!lab) throw new Error("Saved laboratory not found");
+			const copy = JSON.parse(JSON.stringify(lab));
+			$scope.$evalAsync(function () {
+				$scope.labInfo = copy.labInfo;
+				$scope.netkit = copy.netkit;
+				$scope.counter = copy.netkit.length;
+				$scope.libraryMessage = "Loaded: " + copy.name;
+				$scope.libraryError = "";
+				changed = true;
+			});
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.deleteLabFromLibrary = async function (id) {
+		if (!confirm("Permanently delete this saved laboratory from this browser?")) return;
+		try {
+			await LabLibrary.remove(id);
+			$scope.$evalAsync(function () { $scope.libraryMessage = "Saved laboratory deleted"; });
+			await $scope.refreshLabLibrary();
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.refreshLabLibrary();
+
 	$scope.import = function () {
 		let fileElement = document.getElementById("file");
 		try {
