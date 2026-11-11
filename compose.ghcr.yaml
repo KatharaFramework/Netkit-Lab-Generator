@@ -1,0 +1,8 @@
+# Pull the published GitHub Container Registry image.
+# No Dockerfile or local build is needed.
+services:
+  netkit-lab-generator:
+    image: ghcr.io/jadjay/netkit-lab-generator:latest
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
