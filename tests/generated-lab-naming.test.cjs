@@ -102,3 +102,9 @@ test('generated shell does not delete an existing laboratory or itself', () => {
 
   assert.match(script, /exit 1/);
 });
+
+test('configuration importer decodes UTF-8 text instead of binary strings', () => {
+  const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
+  assert.match(controller, /fileReader[.]readAsText\\(filePath, ["']UTF-8["']\\)/);
+  assert.doesNotMatch(controller, /readAsBinaryString/);
+});
