@@ -6,7 +6,6 @@ tests
 *.log
 Dockerfile
 compose.yaml
-docker/
 README.md
 Makefile
 package.json
