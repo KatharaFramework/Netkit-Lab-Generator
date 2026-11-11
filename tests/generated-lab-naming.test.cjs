@@ -107,14 +107,14 @@ test('configuration importer reads UTF-8 and removes only an optional BOM', () =
   const controller = fs.readFileSync('src/lab-generator/controller.js', 'utf8');
   assert.ok(controller.includes('fileReader.readAsText(filePath, "UTF-8")'));
   assert.doesNotMatch(controller, /readAsBinaryString/);
-  assert.match(controller, /replace\\(\\/\\^\\\\uFEFF\\\\\\/\\, ""\\)/);
-  assert.doesNotMatch(controller, /substring\\(e[.]target[.]result[.]indexOf/);
+  assert.ok(controller.includes('replace(/^\\uFEFF/, "")'));
+  assert.ok(!controller.includes('substring(e.target.result.indexOf('));
 });
 
 test('UTF-8 lab export with BOM is valid after removing the BOM', () => {
   const original = [{ labInfo: { author: 'Jérôme A', description: 'Réseau IPv6' }, netkit: [] }];
-  const exported = '\\uFEFF' + JSON.stringify(original);
-  const parsed = JSON.parse(exported.replace(/^\\uFEFF/, ''));
+  const exported = '\uFEFF' + JSON.stringify(original);
+  const parsed = JSON.parse(exported.replace(/^\uFEFF/, ''));
   assert.equal(parsed[0].labInfo.author, 'Jérôme A');
   assert.equal(parsed[0].labInfo.description, 'Réseau IPv6');
 });
