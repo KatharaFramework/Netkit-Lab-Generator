@@ -115,3 +115,46 @@ the generator does not modify the downloaded native archive. The **Download Lab 
 HTTP(S) origin (including its port) instead of a static `YOUR_SERVER` placeholder.
 However, custom labs still need an HTTP upload/publication service before they
 can be retrieved with `curl`.
+
+### Prebuilt Docker image from GHCR (no local build)
+
+After the GitHub Actions workflow has successfully published the first image,
+deploy directly from GitHub Container Registry:
+
+```sh
+docker pull ghcr.io/jadjay/netkit-lab-generator:latest
+docker compose -f compose.ghcr.yaml up -d
+curl -fI http://localhost:8080/
+```
+
+The image is served at **http://localhost:8080**.
+
+To update an existing deployment to the latest published image:
+
+```sh
+docker compose -f compose.ghcr.yaml pull
+docker compose -f compose.ghcr.yaml up -d
+```
+
+Stop it with `docker compose -f compose.ghcr.yaml down`.
+
+**Publishing rules:**
+
+- Pull requests run the Node test suite and build the Docker image but **never push it**.
+- Pushes to `master` publish `latest` plus a short commit-SHA tag.
+- Git tags such as `v1.6.0` publish `1.6.0` and `1.6` plus the short SHA.
+- The workflow uses the repository-scoped `GITHUB_TOKEN` with
+  `packages: write` for publication. No personal access token is needed.
+
+**First publication / permissions:** GitHub Container Registry packages may
+initially be private. If you want anonymous `docker pull`, open your GitHub
+profile's **Packages** tab, select `netkit-lab-generator`, and change
+**Package settings → Change visibility** to **Public**. Until then, users need
+a suitably authorized `docker login ghcr.io`. If the package name already
+exists but is not associated with this repository, the workflow token may
+not have publishing access; connect the package to the repository under
+package settings.
+
+The prebuilt image includes the same three official Kathará ZIPs. The
+application's personal laboratory library remains client-side IndexedDB and
+is not stored in Docker volumes.
