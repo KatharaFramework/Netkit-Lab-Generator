@@ -31,3 +31,24 @@ test('Docker context excludes runtime and development metadata', () => {
   assert.match(ignore, /[.]git/);
   assert.match(ignore, /tests/);
 });
+
+test('Docker image publishes three pinned native Kathará example ZIPs', () => {
+  const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
+  assert.match(dockerfile, /COPY --from=lab-archives \/labs\/ \/usr\/share\/nginx\/html\/labs\//);
+  assert.match(dockerfile, /KatharaFramework\/Kathara-Labs/);
+  assert.match(dockerfile, /[0-9a-f]{40}/);
+  for (const name of [
+    'a_simple_example_two_computers_on_a_single_lan',
+    'basic_ipv4_configurations_ping_traceroute_and_arp',
+    'a_simple_example_showing_how_to_configure_static_routes'
+  ]) {
+    assert.ok(dockerfile.includes(name + '.zip'), name + ' missing');
+  }
+});
+
+test('Nginx serves native example ZIPs with correct content type and no fallback', () => {
+  const config = fs.readFileSync('docker/nginx.conf', 'utf8');
+  assert.match(config, /location \/labs\//);
+  assert.match(config, /application\/zip/);
+  assert.match(config, /try_files \$uri =404/);
+});
