@@ -72,8 +72,9 @@
 					<label for="curl-download-example">Download with curl (HTTP hosting required)</label>
 					<textarea id="curl-download-example" class="form-control" rows="2" readonly
 						aria-label="Example curl download command">{{ getLabCurlExample(labInfo) }}</textarea>
-					<small>Example only: not available without an HTTP server. Replace YOUR_SERVER with the host
-						where you have published this ZIP file.</small>
+					<small>Example only: the URL uses this page's server automatically. It works only if the ZIP
+						is already published at /labs/ (such as one of the bundled Kathará examples).
+						Custom labs generated in the browser are not uploaded to the server.</small>
 				</div>
 			</nav>
 

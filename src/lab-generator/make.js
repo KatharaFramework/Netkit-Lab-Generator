@@ -685,10 +685,15 @@ function getLabZipFilename(labInfo) {
 	return getLabSlug(labInfo && labInfo.description) + ".zip";
 }
 
-// Example only: generated labs are not served by this client-side application.
+// Example only: custom labs are not published by this client-side application.
+// The current origin gives a usable address for pre-published server-side ZIPs.
 function getLabCurlExample(labInfo) {
 	const filename = getLabZipFilename(labInfo);
-	return "curl -fL 'https://YOUR_SERVER/labs/" + filename + "' -o '" + filename + "'";
+	const location = typeof window !== "undefined" && window.location;
+	const origin = location && /^https?:$/.test(location.protocol) && location.origin
+		? location.origin
+		: "https://YOUR_SERVER";
+	return "curl -fL '" + origin + "/labs/" + filename + "' -o '" + filename + "'";
 }
 
 function makeScript(lab, labInfo) {

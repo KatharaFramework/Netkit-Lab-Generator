@@ -77,10 +77,26 @@ test('curl block shows a clearly non-functional HTTP template with lab ZIP name'
   );
 
   assert.ok(html.includes('getLabCurlExample(labInfo)'));
-  assert.match(html, /not available without an HTTP server/i);
+  assert.match(html, /Custom labs generated in the browser are not uploaded to the server/i);
   assert.ok(
     controller.includes('$scope.getLabCurlExample = getLabCurlExample')
   );
+});
+
+test('curl example uses the current HTTP origin, including nonstandard ports', () => {
+  const info = { description: 'Basic IPv4 Configurations, Ping, Traceroute, and ARP' };
+  const expected = 'basic_ipv4_configurations_ping_traceroute_and_arp.zip';
+  context.window = { location: { protocol: 'http:', origin: 'http://localhost:8080' } };
+  try {
+    const local = context.getLabCurlExample(info);
+    assert.match(local, /http:\/\/localhost:8080\/labs\//);
+    assert.ok(local.includes(expected));
+    assert.doesNotMatch(local, /YOUR_SERVER/);
+    context.window.location = { protocol: 'https:', origin: 'https://lab.example.org' };
+    assert.match(context.getLabCurlExample(info), /https:\/\/lab[.]example[.]org\/labs\//);
+  } finally {
+    delete context.window;
+  }
 });
 
 test('generated shell does not delete an existing laboratory or itself', () => {
