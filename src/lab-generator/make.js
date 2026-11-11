@@ -55,6 +55,12 @@ function makeLabConfFile(netkit, lab) {
 			lab.file["lab.conf"] += machine.name + "[image]=kathara/base";
 		}
 		lab.file["lab.conf"] += "\n";
+		// Kathará applies net.* sysctls during container creation.
+		// Inside an already-running container this write may be denied.
+		if (machine.type == "router" && machine.interfaces.if.some(
+			iface => iface.eth.domain && iface.ip && iface.ip.includes(":"))) {
+			lab.file["lab.conf"] += machine.name + '[sysctl]="net.ipv6.conf.all.forwarding=1"\n';
+		}
 	}
 }
 
@@ -100,9 +106,10 @@ function makeRouter(netkit, lab){
 function makeRouterFrr(machine, lab) {
 	// routing dinamico RIP e OSPF
 		if (machine.name && machine.name != "" && machine.type == "router") {
+			// frr.conf and vtysh.conf are generated even without dynamic routing.
+			lab.folders.push(machine.name + "/etc/frr");
 			if (machine.routing.rip.en || machine.routing.ospf.en || machine.routing.bgp.en) {
 				lab.file[machine.name + ".startup"] += "systemctl start frr\n";
-				lab.folders.push(machine.name + "/etc/frr");
 				lab.file[machine.name + "/etc/frr/daemons"] = "zebra=yes\n";
 			}
 			//inizializziamo il file frr.conf
@@ -412,18 +419,20 @@ function makeStaticRouting(netkit, lab){
 					}
 				}
 				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ip address add "+interface.ip+" dev eth" + interface.eth.number+"\n";
+					const ipFamilyOption = interface.ip.includes(":") ? "-6 " : "";
+					lab.file[machine.name + ".startup"] += "ip " + ipFamilyOption + "address add " + interface.ip + " dev eth" + interface.eth.number + "\n";
 				}
 			}
 
 			for (let gateway of machine.gateways.gw) {
 				if (gateway.gw && gateway.gw != "") {
-					if (gateway.route == "") {
-						lab.file[machine.name + ".startup"] += "ip route add 0.0.0.0/0 via "+ gateway.gw +" dev eth"+gateway.if+ "\n";
+					const ipv6 = gateway.gw.includes(":");
+					const route = gateway.route || (ipv6 ? "::/0" : "0.0.0.0/0");
+					if (gateway.route && gateway.route.includes(":") !== ipv6) {
+						throw new Error("Route and gateway address families must match on " + machine.name);
 					}
-					else {
-						lab.file[machine.name + ".startup"] += "ip route add " + gateway.route +" via "+gateway.gw + " dev eth" +gateway.if + "\n";
-					}
+					lab.file[machine.name + ".startup"] += "ip " + (ipv6 ? "-6 " : "") +
+						"route add " + route + " via " + gateway.gw + " dev eth" + gateway.if + "\n";
 				}
 			}
 
@@ -658,13 +667,47 @@ function makeFilesStructure(netkit, labInfo) {
 	return lab;
 }
 
-function makeScript(lab) {
-	let text = "#! /bin/sh\n"
-		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
-		+ "\n"
-		+ "rm -rf \"$(dirname \"$0\")/lab\"\n"
-		+ "mkdir \"$(dirname \"$0\")/lab\"\n"
-		+ "cd \"$(dirname \"$0\")/lab\"\n";
+function getLabSlug(description) {
+	const normalized = String(description || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	const slug = normalized.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+	return slug || "lab";
+}
+
+function getLabScriptFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".sh";
+}
+
+function getLabConfigFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".config";
+}
+
+function getLabZipFilename(labInfo) {
+	return getLabSlug(labInfo && labInfo.description) + ".zip";
+}
+
+// Example only: custom labs are not published by this client-side application.
+// The current origin gives a usable address for pre-published server-side ZIPs.
+function getLabCurlExample(labInfo) {
+	const filename = getLabZipFilename(labInfo);
+	const location = typeof window !== "undefined" && window.location;
+	const origin = location && /^https?:$/.test(location.protocol) && location.origin
+		? location.origin
+		: "https://YOUR_SERVER";
+	return "curl -fL '" + origin + "/labs/" + filename + "' -o '" + filename + "'";
+}
+
+function makeScript(lab, labInfo) {
+	const directory = getLabSlug(labInfo && labInfo.description);
+	let text = "#!/bin/sh\n"
+		+ "set -eu\n"
+		+ "script_dir=$(CDPATH= cd -- \"$(dirname -- \"$0\")\" && pwd)\n"
+		+ "target_dir=\"$script_dir/" + directory + "\"\n"
+		+ "if [ -e \"$target_dir\" ] || [ -L \"$target_dir\" ]; then\n"
+		+ "  printf '%s\\n' \"Error: laboratory directory already exists: $target_dir\" >&2\n"
+		+ "  exit 1\n"
+		+ "fi\n"
+		+ "mkdir \"$target_dir\"\n"
+		+ "cd \"$target_dir\"\n";
 
 	for (let folderName of lab.folders) {
 		if (folderName != "") text += "mkdir -p " + folderName + "\n";
@@ -674,15 +717,17 @@ function makeScript(lab) {
 		text += "\ntouch " + fileName + "\n";
 		let lines = lab.file[fileName].split("\n");
 		for (let line of lines) {
-			if (line != "") text += "echo '" + line + "' >> " + fileName + "\n";
+			if (line != "") {
+				const quoted = "'" + line.replace(/'/g, "'\"'\"'") + "'";
+				text += "printf '%s\\n' " + quoted + " >> " + fileName + "\n";
+			}
 		}
 	}
 
-	text += "\nrm \"../$0\"\n";
 	return text;
 }
 
-function makeZip(lab) {
+function makeZip(lab, labInfo) {
 	let zip = new JSZip();
 
 	for (let folderName of lab.folders) {
@@ -691,6 +736,5 @@ function makeZip(lab) {
 	for (let fileName in lab.file) {
 		zip.file(fileName, lab.file[fileName]);
 	}
-	let content = zip.generate({ type: "blob" });
-	saveAs(content, "lab.zip");
+	return zip.generate({ type: "blob" });
 }

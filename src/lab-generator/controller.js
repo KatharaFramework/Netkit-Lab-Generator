@@ -157,13 +157,40 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		}
 	};
 
-	$scope.makeDownload = function (text, filename) {
-		var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-		saveAs(blob, filename, true);
+	$scope.saveGeneratedFile = async function (content, filename) {
+		const blob = content instanceof Blob
+			? content
+			: new Blob([content], { type: "text/plain;charset=utf-8" });
+
+		// Chrome/Chromium: invoke the picker directly from the user's click.
+		// Firefox: the browser's download preferences control the destination.
+		if (typeof window.showSaveFilePicker === "function" && window.isSecureContext) {
+			try {
+				const handle = await window.showSaveFilePicker({ suggestedName: filename });
+				const writable = await handle.createWritable();
+				await writable.write(blob);
+				await writable.close();
+			} catch (error) {
+				// Cancel means no download; other failures must remain visible.
+				if (error.name !== "AbortError") {
+					console.error("Could not save generated file:", error);
+					alert("Could not save file: " + error.message);
+				}
+			}
+		} else {
+			saveAs(blob, filename);
+		}
 	};
 
+	$scope.makeDownload = $scope.saveGeneratedFile;
+
+	$scope.getLabScriptFilename = getLabScriptFilename;
+	$scope.getLabConfigFilename = getLabConfigFilename;
+	$scope.getLabZipFilename = getLabZipFilename;
+	$scope.getLabCurlExample = getLabCurlExample;
+
 	$scope.generateScript = function (netkitData, labInfoData) {
-		return makeScript(makeFilesStructure(netkitData, labInfoData));
+		return makeScript(makeFilesStructure(netkitData, labInfoData), labInfoData);
 	};
 
 	$scope.generateConfig = function (netkitData, labInfoData) {
@@ -172,7 +199,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 	};
 
 	$scope.generateZip = function (netkitData, labInfoData) {
-		return makeZip(makeFilesStructure(netkitData, labInfoData));
+		return makeZip(makeFilesStructure(netkitData, labInfoData), labInfoData);
 	};
 
 	$scope.makeGraph = function (netkitData) {
@@ -201,6 +228,86 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 		else $scope.labInfo.toggle = "disable";
 	};
 
+	$scope.savedLabs = [];
+	$scope.libraryMessage = "";
+	$scope.libraryError = "";
+
+	$scope.refreshLabLibrary = async function () {
+		try {
+			const labs = await LabLibrary.list();
+			$scope.$evalAsync(function () {
+				$scope.savedLabs = labs;
+				$scope.libraryError = "";
+			});
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.saveLabToLibrary = async function () {
+		try {
+			const snapshot = await LabLibrary.save($scope.labInfo, $scope.netkit);
+			$scope.$evalAsync(function () {
+				$scope.libraryMessage = "Saved: " + snapshot.name;
+				$scope.libraryError = "";
+			});
+			await $scope.refreshLabLibrary();
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.loadLabFromLibrary = async function (id) {
+		if (!confirm("Replace the current editor with this saved laboratory?")) return;
+		try {
+			const lab = await LabLibrary.get(id);
+			if (!lab) throw new Error("Saved laboratory not found");
+			const copy = JSON.parse(JSON.stringify(lab));
+			$scope.$evalAsync(function () {
+				$scope.labInfo = copy.labInfo;
+				$scope.netkit = copy.netkit;
+				$scope.counter = copy.netkit.length;
+				$scope.libraryMessage = "Loaded: " + copy.name;
+				$scope.libraryError = "";
+				changed = true;
+			});
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.deleteLabFromLibrary = async function (id) {
+		if (!confirm("Permanently delete this saved laboratory from this browser?")) return;
+		try {
+			await LabLibrary.remove(id);
+			$scope.$evalAsync(function () { $scope.libraryMessage = "Saved laboratory deleted"; });
+			await $scope.refreshLabLibrary();
+		} catch (err) {
+			$scope.$evalAsync(function () { $scope.libraryError = err.message; });
+		}
+	};
+
+	$scope.refreshLabLibrary();
+
+	$scope.katharaExamples = KatharaCatalog.list();
+
+	$scope.loadKatharaExample = function (id) {
+		if (!confirm("Replace the current editor with this Kathará example? Unsupported native configuration will not be imported.")) return;
+		try {
+			const example = KatharaCatalog.load(id);
+			$scope.labInfo = example.labInfo;
+			$scope.netkit = example.netkit;
+			$scope.counter = example.netkit.length;
+			$scope.libraryMessage = "Loaded Kathará example: " + example.labInfo.description;
+			$scope.libraryError = "";
+			changed = true;
+		} catch (err) {
+			$scope.libraryError = err.message;
+		}
+	};
+
+
+
 	$scope.import = function () {
 		let fileElement = document.getElementById("file");
 		try {
@@ -209,7 +316,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 				let fileReader = new FileReader();
 				fileReader.onloadend = function (e) {
 					try {
-						let app = JSON.parse(e.target.result.substring(e.target.result.indexOf("["))); // rimozione caratteri di codifica prima di '['
+						let app = JSON.parse(e.target.result.replace(/^\uFEFF/, "")); // Strip an optional UTF-8 BOM before parsing.
 						$scope.netkit = app[0].netkit;
 						$scope.counter = $scope.netkit.length;
 						$scope.labInfo = app[0].labInfo;
@@ -222,7 +329,7 @@ app.controller("nc", function ($location, $anchorScroll, $scope) {
 					}
 				};
 				fileElement.value = "";
-				fileReader.readAsBinaryString(filePath);
+				fileReader.readAsText(filePath, "UTF-8");
 			} else {
 				fileElement.click();
 			}
