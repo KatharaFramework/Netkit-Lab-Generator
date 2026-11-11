@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="src/style/main.css" />
 	<script src="src/lab-generator/helper.js"></script>
 	<script src="src/lab-generator/ip_validation.js"></script>
+	<script src="src/lab-generator/lab_library.js"></script>
 </head>
 
 <body>
@@ -91,6 +92,22 @@
 							onclick="toggle_submenu(-1)">Export configuration</a>
 					</li>
 				</ul>
+				<div class="container-fluid" style="padding: 8px 15px 12px; clear: both;">
+					<div class="form-inline" style="margin-bottom: 8px;">
+						<button type="button" class="btn btn-success btn-sm" data-ng-click="saveLabToLibrary()">Save in this browser</button>
+						<button type="button" class="btn btn-default btn-sm" data-ng-click="refreshLabLibrary()">Refresh list</button>
+					</div>
+					<p class="text-danger" role="alert" data-ng-if="libraryError">{{ libraryError }}</p>
+					<p class="text-success" role="status" data-ng-if="libraryMessage">{{ libraryMessage }}</p>
+					<strong>My saved laboratories (this browser only)</strong>
+					<p data-ng-if="!savedLabs.length">No saved laboratories yet.</p>
+					<div data-ng-repeat="lab in savedLabs track by lab.id" style="padding: 5px 0; border-bottom: 1px solid #ccc;">
+						<span>{{ lab.name }} — {{ lab.savedAt | date:'short' }}</span>
+						<button type="button" class="btn btn-primary btn-xs" data-ng-click="loadLabFromLibrary(lab.id)">Load</button>
+						<button type="button" class="btn btn-danger btn-xs" data-ng-click="deleteLabFromLibrary(lab.id)">Delete</button>
+					</div>
+					<small>Local browser storage can be cleared. Export .config to keep a portable backup.</small>
+				</div>
 			</nav>
 
 			<!-- Sub-menu Run Lab -->
